@@ -1,0 +1,683 @@
+fileFormatVersion: 2
+guid: a00256fd5195b3d4e945338f9aaabd43
+timeCreated: 1510060335
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: Dorosy_14:Layer3
+    100002: Dorosy_14:Layer4
+    100004: Dorosy_14:Layer5
+    100006: Dorosy_14:Layer8
+    100008: eye_base
+    100010: Head
+    100012: Head_02
+    100014: head_keep
+    100016: hip_centerA
+    100018: hip_centerB
+    100020: Hips
+    100022: jaw
+    100024: Left_back_keep
+    100026: Left_eye
+    100028: Left_Skirt_A_1
+    100030: Left_Skirt_A_2
+    100032: Left_Skirt_A_3
+    100034: Left_Skirt_B_1
+    100036: Left_Skirt_B_2
+    100038: Left_Skirt_B_3
+    100040: Left_Skirt_C_1
+    100042: Left_Skirt_C_2
+    100044: Left_Skirt_C_3
+    100046: Left_Skirt_D_1
+    100048: Left_Skirt_D_2
+    100050: Left_Skirt_D_3
+    100052: Left_thighA_osae
+    100054: LeftAnkle
+    100056: LeftArm
+    100058: LeftArmkeep
+    100060: LeftArmRoll
+    100062: LeftFoot
+    100064: LeftForeArm
+    100066: LeftForeArmRoll
+    100068: LeftHand
+    100070: LeftHandIndex0
+    100072: LeftHandIndex1
+    100074: LeftHandIndex2
+    100076: LeftHandIndex3
+    100078: LeftHandIndex4
+    100080: LeftHandMiddle0
+    100082: LeftHandMiddle1
+    100084: LeftHandMiddle2
+    100086: LeftHandMiddle3
+    100088: LeftHandMiddle4
+    100090: LeftHandPinky0
+    100092: LeftHandPinky1
+    100094: LeftHandPinky2
+    100096: LeftHandPinky3
+    100098: LeftHandPinky4
+    100100: LeftHandRing0
+    100102: LeftHandRing1
+    100104: LeftHandRing2
+    100106: LeftHandRing3
+    100108: LeftHandRing4
+    100110: LeftHandThumb0
+    100112: LeftHandThumb1
+    100114: LeftHandThumb2
+    100116: LeftHandThumb3
+    100118: LeftHandThumb4
+    100120: LeftHeel
+    100122: LeftHip
+    100124: LeftLeg
+    100126: LeftLegRoll
+    100128: LeftShoulder
+    100130: LeftShoulderB
+    100132: LeftToes
+    100134: LeftToesKeep
+    100136: LeftUpLeg
+    100138: LeftUpLegRoll
+    100140: Neck
+    100142: //RootNode
+    100144: Pai_moto_Left
+    100146: Pai_moto_Right
+    100148: PaiPai_Keep_Left
+    100150: PaiPai_Keep_Right
+    100152: PaiPai_Left
+    100154: PaiPai_Right
+    100156: Right_back_keep
+    100158: Right_eye
+    100160: Right_Skirt_A_1
+    100162: Right_Skirt_A_2
+    100164: Right_Skirt_A_3
+    100166: Right_Skirt_B_1
+    100168: Right_Skirt_B_2
+    100170: Right_Skirt_B_3
+    100172: Right_Skirt_C_1
+    100174: Right_Skirt_C_2
+    100176: Right_Skirt_C_3
+    100178: Right_Skirt_D_1
+    100180: Right_Skirt_D_2
+    100182: Right_Skirt_D_3
+    100184: Right_thighA_osae
+    100186: RightAnkle
+    100188: RightArm
+    100190: RightArmkeep
+    100192: RightArmRoll
+    100194: RightFoot
+    100196: RightForeArm
+    100198: RightForeArmRoll
+    100200: RightHand
+    100202: RightHandIndex0
+    100204: RightHandIndex1
+    100206: RightHandIndex2
+    100208: RightHandIndex3
+    100210: RightHandIndex4
+    100212: RightHandMiddle0
+    100214: RightHandMiddle1
+    100216: RightHandMiddle2
+    100218: RightHandMiddle3
+    100220: RightHandMiddle4
+    100222: RightHandPinky0
+    100224: RightHandPinky1
+    100226: RightHandPinky2
+    100228: RightHandPinky3
+    100230: RightHandPinky4
+    100232: RightHandRing0
+    100234: RightHandRing1
+    100236: RightHandRing2
+    100238: RightHandRing3
+    100240: RightHandRing4
+    100242: RightHandThumb0
+    100244: RightHandThumb1
+    100246: RightHandThumb2
+    100248: RightHandThumb3
+    100250: RightHandThumb4
+    100252: RightHeel
+    100254: RightHip
+    100256: RightLeg
+    100258: RightLegRoll
+    100260: RightShoulder
+    100262: RightShoulderB
+    100264: RightToes
+    100266: RightToesKeep
+    100268: RightUpLeg
+    100270: RightUpLegRoll
+    100272: Spine
+    100274: Spine1
+    100276: Spine2
+    100278: Spine2Keep
+    100280: Spine3
+    100282: Spine4
+    400000: Dorosy_14:Layer3
+    400002: Dorosy_14:Layer4
+    400004: Dorosy_14:Layer5
+    400006: Dorosy_14:Layer8
+    400008: eye_base
+    400010: Head
+    400012: Head_02
+    400014: head_keep
+    400016: hip_centerA
+    400018: hip_centerB
+    400020: Hips
+    400022: jaw
+    400024: Left_back_keep
+    400026: Left_eye
+    400028: Left_Skirt_A_1
+    400030: Left_Skirt_A_2
+    400032: Left_Skirt_A_3
+    400034: Left_Skirt_B_1
+    400036: Left_Skirt_B_2
+    400038: Left_Skirt_B_3
+    400040: Left_Skirt_C_1
+    400042: Left_Skirt_C_2
+    400044: Left_Skirt_C_3
+    400046: Left_Skirt_D_1
+    400048: Left_Skirt_D_2
+    400050: Left_Skirt_D_3
+    400052: Left_thighA_osae
+    400054: LeftAnkle
+    400056: LeftArm
+    400058: LeftArmkeep
+    400060: LeftArmRoll
+    400062: LeftFoot
+    400064: LeftForeArm
+    400066: LeftForeArmRoll
+    400068: LeftHand
+    400070: LeftHandIndex0
+    400072: LeftHandIndex1
+    400074: LeftHandIndex2
+    400076: LeftHandIndex3
+    400078: LeftHandIndex4
+    400080: LeftHandMiddle0
+    400082: LeftHandMiddle1
+    400084: LeftHandMiddle2
+    400086: LeftHandMiddle3
+    400088: LeftHandMiddle4
+    400090: LeftHandPinky0
+    400092: LeftHandPinky1
+    400094: LeftHandPinky2
+    400096: LeftHandPinky3
+    400098: LeftHandPinky4
+    400100: LeftHandRing0
+    400102: LeftHandRing1
+    400104: LeftHandRing2
+    400106: LeftHandRing3
+    400108: LeftHandRing4
+    400110: LeftHandThumb0
+    400112: LeftHandThumb1
+    400114: LeftHandThumb2
+    400116: LeftHandThumb3
+    400118: LeftHandThumb4
+    400120: LeftHeel
+    400122: LeftHip
+    400124: LeftLeg
+    400126: LeftLegRoll
+    400128: LeftShoulder
+    400130: LeftShoulderB
+    400132: LeftToes
+    400134: LeftToesKeep
+    400136: LeftUpLeg
+    400138: LeftUpLegRoll
+    400140: Neck
+    400142: //RootNode
+    400144: Pai_moto_Left
+    400146: Pai_moto_Right
+    400148: PaiPai_Keep_Left
+    400150: PaiPai_Keep_Right
+    400152: PaiPai_Left
+    400154: PaiPai_Right
+    400156: Right_back_keep
+    400158: Right_eye
+    400160: Right_Skirt_A_1
+    400162: Right_Skirt_A_2
+    400164: Right_Skirt_A_3
+    400166: Right_Skirt_B_1
+    400168: Right_Skirt_B_2
+    400170: Right_Skirt_B_3
+    400172: Right_Skirt_C_1
+    400174: Right_Skirt_C_2
+    400176: Right_Skirt_C_3
+    400178: Right_Skirt_D_1
+    400180: Right_Skirt_D_2
+    400182: Right_Skirt_D_3
+    400184: Right_thighA_osae
+    400186: RightAnkle
+    400188: RightArm
+    400190: RightArmkeep
+    400192: RightArmRoll
+    400194: RightFoot
+    400196: RightForeArm
+    400198: RightForeArmRoll
+    400200: RightHand
+    400202: RightHandIndex0
+    400204: RightHandIndex1
+    400206: RightHandIndex2
+    400208: RightHandIndex3
+    400210: RightHandIndex4
+    400212: RightHandMiddle0
+    400214: RightHandMiddle1
+    400216: RightHandMiddle2
+    400218: RightHandMiddle3
+    400220: RightHandMiddle4
+    400222: RightHandPinky0
+    400224: RightHandPinky1
+    400226: RightHandPinky2
+    400228: RightHandPinky3
+    400230: RightHandPinky4
+    400232: RightHandRing0
+    400234: RightHandRing1
+    400236: RightHandRing2
+    400238: RightHandRing3
+    400240: RightHandRing4
+    400242: RightHandThumb0
+    400244: RightHandThumb1
+    400246: RightHandThumb2
+    400248: RightHandThumb3
+    400250: RightHandThumb4
+    400252: RightHeel
+    400254: RightHip
+    400256: RightLeg
+    400258: RightLegRoll
+    400260: RightShoulder
+    400262: RightShoulderB
+    400264: RightToes
+    400266: RightToesKeep
+    400268: RightUpLeg
+    400270: RightUpLegRoll
+    400272: Spine
+    400274: Spine1
+    400276: Spine2
+    400278: Spine2Keep
+    400280: Spine3
+    400282: Spine4
+    4300000: Dorosy_14:Layer5
+    4300002: Dorosy_14:Layer4
+    4300004: Dorosy_14:Layer8
+    4300006: Dorosy_14:Layer3
+    7400000: openarm
+    9500000: //RootNode
+    13700000: Dorosy_14:Layer3
+    13700002: Dorosy_14:Layer4
+    13700004: Dorosy_14:Layer5
+    13700006: Dorosy_14:Layer8
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: openarm
+      takeName: Base Stack
+      firstFrame: 0
+      lastFrame: 21
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Dorosy_14:Layer5
+        weight: 1
+      - path: Dorosy_14:Layer5/Dorosy_14:Layer3
+        weight: 1
+      - path: Dorosy_14:Layer5/Dorosy_14:Layer4
+        weight: 1
+      - path: Dorosy_14:Layer5/Dorosy_14:Layer8
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/Left_Skirt_A_1
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/Left_Skirt_A_1/Left_Skirt_A_2
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/Left_Skirt_A_1/Left_Skirt_A_2/Left_Skirt_A_3
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/Left_Skirt_B_1
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/Left_Skirt_B_1/Left_Skirt_B_2
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/Left_Skirt_B_1/Left_Skirt_B_2/Left_Skirt_B_3
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/Left_Skirt_C_1
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/Left_Skirt_C_1/Left_Skirt_C_2
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/Left_Skirt_C_1/Left_Skirt_C_2/Left_Skirt_C_3
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/Left_Skirt_D_1
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/Left_Skirt_D_1/Left_Skirt_D_2
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/Left_Skirt_D_1/Left_Skirt_D_2/Left_Skirt_D_3
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/LeftHip
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/LeftHip/Left_thighA_osae
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/LeftHip/LeftUpLeg
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/LeftHip/LeftUpLeg/LeftUpLegRoll
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/LeftHip/LeftUpLeg/LeftUpLegRoll/LeftLeg
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/LeftHip/LeftUpLeg/LeftUpLegRoll/LeftLeg/LeftLegRoll
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/LeftHip/LeftUpLeg/LeftUpLegRoll/LeftLeg/LeftLegRoll/LeftAnkle
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/LeftHip/LeftUpLeg/LeftUpLegRoll/LeftLeg/LeftLegRoll/LeftAnkle/LeftFoot
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/LeftHip/LeftUpLeg/LeftUpLegRoll/LeftLeg/LeftLegRoll/LeftAnkle/LeftFoot/LeftHeel
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/LeftHip/LeftUpLeg/LeftUpLegRoll/LeftLeg/LeftLegRoll/LeftAnkle/LeftFoot/LeftToes
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/LeftHip/LeftUpLeg/LeftUpLegRoll/LeftLeg/LeftLegRoll/LeftAnkle/LeftFoot/LeftToes/LeftToesKeep
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/Right_Skirt_A_1
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/Right_Skirt_A_1/Right_Skirt_A_2
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/Right_Skirt_A_1/Right_Skirt_A_2/Right_Skirt_A_3
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/Right_Skirt_B_1
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/Right_Skirt_B_1/Right_Skirt_B_2
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/Right_Skirt_B_1/Right_Skirt_B_2/Right_Skirt_B_3
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/Right_Skirt_C_1
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/Right_Skirt_C_1/Right_Skirt_C_2
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/Right_Skirt_C_1/Right_Skirt_C_2/Right_Skirt_C_3
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/Right_Skirt_D_1
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/Right_Skirt_D_1/Right_Skirt_D_2
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/Right_Skirt_D_1/Right_Skirt_D_2/Right_Skirt_D_3
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/RightHip
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/RightHip/Right_thighA_osae
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/RightHip/RightUpLeg
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/RightHip/RightUpLeg/RightUpLegRoll
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/RightHip/RightUpLeg/RightUpLegRoll/RightLeg
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/RightHip/RightUpLeg/RightUpLegRoll/RightLeg/RightLegRoll
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/RightHip/RightUpLeg/RightUpLegRoll/RightLeg/RightLegRoll/RightAnkle
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/RightHip/RightUpLeg/RightUpLegRoll/RightLeg/RightLegRoll/RightAnkle/RightFoot
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/RightHip/RightUpLeg/RightUpLegRoll/RightLeg/RightLegRoll/RightAnkle/RightFoot/RightHeel
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/RightHip/RightUpLeg/RightUpLegRoll/RightLeg/RightLegRoll/RightAnkle/RightFoot/RightToes
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/hip_centerA/hip_centerB/RightHip/RightUpLeg/RightUpLegRoll/RightLeg/RightLegRoll/RightAnkle/RightFoot/RightToes/RightToesKeep
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine2Keep
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Pai_moto_Left
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Pai_moto_Left/PaiPai_Left
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Pai_moto_Left/PaiPai_Left/PaiPai_Keep_Left
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Pai_moto_Right
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Pai_moto_Right/PaiPai_Right
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Pai_moto_Right/PaiPai_Right/PaiPai_Keep_Right
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/Left_back_keep
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB/LeftArm
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB/LeftArm/LeftArmkeep
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB/LeftArm/LeftArmRoll
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB/LeftArm/LeftArmRoll/LeftForeArm
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB/LeftArm/LeftArmRoll/LeftForeArm/LeftForeArmRoll
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB/LeftArm/LeftArmRoll/LeftForeArm/LeftForeArmRoll/LeftHand
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB/LeftArm/LeftArmRoll/LeftForeArm/LeftForeArmRoll/LeftHand/LeftHandIndex0
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB/LeftArm/LeftArmRoll/LeftForeArm/LeftForeArmRoll/LeftHand/LeftHandIndex0/LeftHandIndex1
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB/LeftArm/LeftArmRoll/LeftForeArm/LeftForeArmRoll/LeftHand/LeftHandIndex0/LeftHandIndex1/LeftHandIndex2
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB/LeftArm/LeftArmRoll/LeftForeArm/LeftForeArmRoll/LeftHand/LeftHandIndex0/LeftHandIndex1/LeftHandIndex2/LeftHandIndex3
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB/LeftArm/LeftArmRoll/LeftForeArm/LeftForeArmRoll/LeftHand/LeftHandIndex0/LeftHandIndex1/LeftHandIndex2/LeftHandIndex3/LeftHandIndex4
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB/LeftArm/LeftArmRoll/LeftForeArm/LeftForeArmRoll/LeftHand/LeftHandMiddle0
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB/LeftArm/LeftArmRoll/LeftForeArm/LeftForeArmRoll/LeftHand/LeftHandMiddle0/LeftHandMiddle1
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB/LeftArm/LeftArmRoll/LeftForeArm/LeftForeArmRoll/LeftHand/LeftHandMiddle0/LeftHandMiddle1/LeftHandMiddle2
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB/LeftArm/LeftArmRoll/LeftForeArm/LeftForeArmRoll/LeftHand/LeftHandMiddle0/LeftHandMiddle1/LeftHandMiddle2/LeftHandMiddle3
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB/LeftArm/LeftArmRoll/LeftForeArm/LeftForeArmRoll/LeftHand/LeftHandMiddle0/LeftHandMiddle1/LeftHandMiddle2/LeftHandMiddle3/LeftHandMiddle4
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB/LeftArm/LeftArmRoll/LeftForeArm/LeftForeArmRoll/LeftHand/LeftHandPinky0
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB/LeftArm/LeftArmRoll/LeftForeArm/LeftForeArmRoll/LeftHand/LeftHandPinky0/LeftHandPinky1
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB/LeftArm/LeftArmRoll/LeftForeArm/LeftForeArmRoll/LeftHand/LeftHandPinky0/LeftHandPinky1/LeftHandPinky2
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB/LeftArm/LeftArmRoll/LeftForeArm/LeftForeArmRoll/LeftHand/LeftHandPinky0/LeftHandPinky1/LeftHandPinky2/LeftHandPinky3
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB/LeftArm/LeftArmRoll/LeftForeArm/LeftForeArmRoll/LeftHand/LeftHandPinky0/LeftHandPinky1/LeftHandPinky2/LeftHandPinky3/LeftHandPinky4
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB/LeftArm/LeftArmRoll/LeftForeArm/LeftForeArmRoll/LeftHand/LeftHandRing0
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB/LeftArm/LeftArmRoll/LeftForeArm/LeftForeArmRoll/LeftHand/LeftHandRing0/LeftHandRing1
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB/LeftArm/LeftArmRoll/LeftForeArm/LeftForeArmRoll/LeftHand/LeftHandRing0/LeftHandRing1/LeftHandRing2
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB/LeftArm/LeftArmRoll/LeftForeArm/LeftForeArmRoll/LeftHand/LeftHandRing0/LeftHandRing1/LeftHandRing2/LeftHandRing3
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB/LeftArm/LeftArmRoll/LeftForeArm/LeftForeArmRoll/LeftHand/LeftHandRing0/LeftHandRing1/LeftHandRing2/LeftHandRing3/LeftHandRing4
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB/LeftArm/LeftArmRoll/LeftForeArm/LeftForeArmRoll/LeftHand/LeftHandThumb0
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB/LeftArm/LeftArmRoll/LeftForeArm/LeftForeArmRoll/LeftHand/LeftHandThumb0/LeftHandThumb1
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB/LeftArm/LeftArmRoll/LeftForeArm/LeftForeArmRoll/LeftHand/LeftHandThumb0/LeftHandThumb1/LeftHandThumb2
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB/LeftArm/LeftArmRoll/LeftForeArm/LeftForeArmRoll/LeftHand/LeftHandThumb0/LeftHandThumb1/LeftHandThumb2/LeftHandThumb3
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/LeftShoulder/LeftShoulderB/LeftArm/LeftArmRoll/LeftForeArm/LeftForeArmRoll/LeftHand/LeftHandThumb0/LeftHandThumb1/LeftHandThumb2/LeftHandThumb3/LeftHandThumb4
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/Neck
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/Neck/Head
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/Neck/Head/eye_base
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/Neck/Head/eye_base/Left_eye
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/Neck/Head/eye_base/Right_eye
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/Neck/Head/Head_02
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/Neck/Head/head_keep
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/Neck/Head/jaw
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/Right_back_keep
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB/RightArm
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB/RightArm/RightArmkeep
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB/RightArm/RightArmRoll
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB/RightArm/RightArmRoll/RightForeArm
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB/RightArm/RightArmRoll/RightForeArm/RightForeArmRoll
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB/RightArm/RightArmRoll/RightForeArm/RightForeArmRoll/RightHand
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB/RightArm/RightArmRoll/RightForeArm/RightForeArmRoll/RightHand/RightHandIndex0
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB/RightArm/RightArmRoll/RightForeArm/RightForeArmRoll/RightHand/RightHandIndex0/RightHandIndex1
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB/RightArm/RightArmRoll/RightForeArm/RightForeArmRoll/RightHand/RightHandIndex0/RightHandIndex1/RightHandIndex2
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB/RightArm/RightArmRoll/RightForeArm/RightForeArmRoll/RightHand/RightHandIndex0/RightHandIndex1/RightHandIndex2/RightHandIndex3
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB/RightArm/RightArmRoll/RightForeArm/RightForeArmRoll/RightHand/RightHandIndex0/RightHandIndex1/RightHandIndex2/RightHandIndex3/RightHandIndex4
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB/RightArm/RightArmRoll/RightForeArm/RightForeArmRoll/RightHand/RightHandMiddle0
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB/RightArm/RightArmRoll/RightForeArm/RightForeArmRoll/RightHand/RightHandMiddle0/RightHandMiddle1
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB/RightArm/RightArmRoll/RightForeArm/RightForeArmRoll/RightHand/RightHandMiddle0/RightHandMiddle1/RightHandMiddle2
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB/RightArm/RightArmRoll/RightForeArm/RightForeArmRoll/RightHand/RightHandMiddle0/RightHandMiddle1/RightHandMiddle2/RightHandMiddle3
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB/RightArm/RightArmRoll/RightForeArm/RightForeArmRoll/RightHand/RightHandMiddle0/RightHandMiddle1/RightHandMiddle2/RightHandMiddle3/RightHandMiddle4
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB/RightArm/RightArmRoll/RightForeArm/RightForeArmRoll/RightHand/RightHandPinky0
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB/RightArm/RightArmRoll/RightForeArm/RightForeArmRoll/RightHand/RightHandPinky0/RightHandPinky1
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB/RightArm/RightArmRoll/RightForeArm/RightForeArmRoll/RightHand/RightHandPinky0/RightHandPinky1/RightHandPinky2
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB/RightArm/RightArmRoll/RightForeArm/RightForeArmRoll/RightHand/RightHandPinky0/RightHandPinky1/RightHandPinky2/RightHandPinky3
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB/RightArm/RightArmRoll/RightForeArm/RightForeArmRoll/RightHand/RightHandPinky0/RightHandPinky1/RightHandPinky2/RightHandPinky3/RightHandPinky4
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB/RightArm/RightArmRoll/RightForeArm/RightForeArmRoll/RightHand/RightHandRing0
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB/RightArm/RightArmRoll/RightForeArm/RightForeArmRoll/RightHand/RightHandRing0/RightHandRing1
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB/RightArm/RightArmRoll/RightForeArm/RightForeArmRoll/RightHand/RightHandRing0/RightHandRing1/RightHandRing2
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB/RightArm/RightArmRoll/RightForeArm/RightForeArmRoll/RightHand/RightHandRing0/RightHandRing1/RightHandRing2/RightHandRing3
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB/RightArm/RightArmRoll/RightForeArm/RightForeArmRoll/RightHand/RightHandRing0/RightHandRing1/RightHandRing2/RightHandRing3/RightHandRing4
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB/RightArm/RightArmRoll/RightForeArm/RightForeArmRoll/RightHand/RightHandThumb0
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB/RightArm/RightArmRoll/RightForeArm/RightForeArmRoll/RightHand/RightHandThumb0/RightHandThumb1
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB/RightArm/RightArmRoll/RightForeArm/RightForeArmRoll/RightHand/RightHandThumb0/RightHandThumb1/RightHandThumb2
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB/RightArm/RightArmRoll/RightForeArm/RightForeArmRoll/RightHand/RightHandThumb0/RightHandThumb1/RightHandThumb2/RightHandThumb3
+        weight: 1
+      - path: Dorosy_14:Layer5/Hips/Spine/Spine1/Spine2/Spine3/Spine4/RightShoulder/RightShoulderB/RightArm/RightArmRoll/RightForeArm/RightForeArmRoll/RightHand/RightHandThumb0/RightHandThumb1/RightHandThumb2/RightHandThumb3/RightHandThumb4
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
