@@ -7,6 +7,18 @@ public class NetworkManager : Photon.PunBehaviour
     public string ObjectName;
     public string masterServerAddress = "127.0.0.1";
 
+	[SerializeField]
+	private GameObject copyTransformHead;
+
+	[SerializeField]
+	private GameObject copyTransformRightHand;
+
+	[SerializeField]
+	private GameObject copyTransformLeftHand;
+
+	[SerializeField]
+	private GameObject offsetObject;
+
     void Start()
     {
         // Photonネットワークの設定を行う
@@ -51,7 +63,20 @@ public class NetworkManager : Photon.PunBehaviour
 
         // 「ルーム」に接続したらCubeを生成する（動作確認用）
         GameObject cube = PhotonNetwork.Instantiate(ObjectName, Vector3.zero, Quaternion.identity, 0);
+		InitializeTrackedObjects( cube );
     }
+
+	private void InitializeTrackedObjects( GameObject obj )
+	{
+		var trackedObjects = obj.GetComponent<TrackedObjects>();
+		if( trackedObjects == null )
+		{
+			Debug.LogError("trackedObject is null");
+			return;
+		}
+
+		trackedObjects.Initialize(copyTransformHead, copyTransformRightHand, copyTransformLeftHand, offsetObject);
+	}
 
     // 現在の接続状況を表示（デバッグ目的）
     void OnGUI()
