@@ -39,14 +39,14 @@ public class CopyTransform : MonoBehaviour
         //非头部
         if (useRotation)
         {
-			if( offsetObject )
-			{
-				transform.localRotation =  copySource.transform.rotation * offsetObject.transform.rotation;
-			}
-			else
-			{
+		//	if( offsetObject )
+		//	{
+		//		transform.localRotation =  copySource.transform.rotation * offsetObject.transform.rotation;
+		//	}
+		//	else
+		//	{
             	transform.localRotation = copySource.transform.rotation;
-			}
+		//	}
         }
 
         else
