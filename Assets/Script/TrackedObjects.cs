@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TrackedObjects : Photon.MonoBehaviour {
 
@@ -14,13 +15,16 @@ public class TrackedObjects : Photon.MonoBehaviour {
 	private CopyTransform leftHand;
 
 	[SerializeField]
-	private GameObject myCamera;
+	private Camera myCamera;
 
 	[SerializeField]
-	private GameObject headModel;
+	private MeshRenderer headModel;
 
 	[SerializeField]
 	private GameObject cameraImage;
+
+	[SerializeField]
+	private Text playerLabel;
 
 	/// <summary>
 	/// 観測者か？
@@ -39,9 +43,13 @@ public class TrackedObjects : Photon.MonoBehaviour {
 
 		rightHand.gameObject.SetActive( !_isObserver );
 		leftHand.gameObject.SetActive( !_isObserver );
-		headModel.SetActive( !_isObserver );
+		headModel.enabled = !_isObserver ;
+		playerLabel.enabled = !_isObserver;
+
 
 		cameraImage.SetActive( _isObserver );
+
+		observerController.enabled = _isObserver;
 
 		if( _isObserver )
 		{
@@ -67,15 +75,12 @@ public class TrackedObjects : Photon.MonoBehaviour {
 				{
 					c.enabled = false;
 				}
-
 			}
 
-			myCamera.SetActive( photonView.isMine );
-			headModel.SetActive( !photonView.isMine );
-
-			observerController.enabled = false;
+			myCamera.enabled = photonView.isMine;
+			headModel.enabled = !photonView.isMine && !_isObserver;
+			playerLabel.enabled = !photonView.isMine && !_isObserver;
 		}
-
 	}
 	
 	// Update is called once per frame
@@ -93,16 +98,24 @@ public class TrackedObjects : Photon.MonoBehaviour {
 		if( Input.GetKeyDown(KeyCode.O) )
 		{
 			photonView.RPC( "SetObserver", PhotonTargets.AllBuffered, !_isObserver );
-			observerController.enabled = _isObserver;
 		}
 	}
-
+		
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	public void Initialize( GameObject copyTransformHead, GameObject copyTransformRightHand, GameObject copyTransformLeftHand, GameObject offsetObject )
+	public void Initialize( GameObject copyTransformHead, GameObject copyTransformRightHand, GameObject copyTransformLeftHand, GameObject offsetObject, int playerId )
 	{
 		Debug.Log( gameObject.name + " " + System.Reflection.MethodBase.GetCurrentMethod() + "mine=" + (photonView != null && photonView.isMine).ToString() ) ;
+
+		if( playerId == 0 )
+		{
+			head.enabled = false;
+			rightHand.enabled = false;
+			leftHand.enabled = false;
+			photonView.RPC( "SetObserver", PhotonTargets.AllBuffered, !_isObserver );
+			return;
+		}
 
 		head.copySource = copyTransformHead;
 		head.offsetObject = offsetObject;
@@ -112,5 +125,11 @@ public class TrackedObjects : Photon.MonoBehaviour {
 
 		leftHand.copySource = copyTransformLeftHand;
 		leftHand.offsetObject = offsetObject;
+
+		playerLabel.text = "PLAYER[ " + playerId.ToString() + " ]"; 
+		playerLabel.color = color[ playerId % color.Length ];
+
 	}
+
+	Color[] color = new Color[]{ Color.gray, Color.red, Color.green, Color.blue, Color.yellow};
 }

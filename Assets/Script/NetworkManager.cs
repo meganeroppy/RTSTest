@@ -4,6 +4,15 @@ using UnityEngine;
 
 public class NetworkManager : Photon.PunBehaviour
 {
+	/// <summary>
+	/// 重複しないようにする
+	/// </summary>
+	[SerializeField]
+	private byte playerId = 0;
+
+	[SerializeField]
+	private TrackerSettings[] trackerSettings;
+
     public string ObjectName;
 
 	[SerializeField]
@@ -18,8 +27,15 @@ public class NetworkManager : Photon.PunBehaviour
 	[SerializeField]
 	private GameObject offsetObject;
 
+
+
 	void Start()
     {
+	//	foreach( TrackerSettings t in trackerSettings ) 
+	//	{
+	//		t.ObjectName
+	//	}
+
         // Photonネットワークの設定を行う
         PhotonNetwork.ConnectUsingSettings("1.0.0");
         PhotonNetwork.sendRate = 30;
@@ -73,7 +89,7 @@ public class NetworkManager : Photon.PunBehaviour
 			return;
 		}
 
-		trackedObjects.Initialize(copyTransformHead, copyTransformRightHand, copyTransformLeftHand, offsetObject);
+		trackedObjects.Initialize(copyTransformHead, copyTransformRightHand, copyTransformLeftHand, offsetObject, playerId);
 	}
 
     // 現在の接続状況を表示（デバッグ目的）
