@@ -5,7 +5,6 @@ using UnityEngine;
 public class NetworkManager : Photon.PunBehaviour
 {
     public string ObjectName;
-    public string masterServerAddress = "127.0.0.1";
 
 	[SerializeField]
 	private GameObject copyTransformHead;
@@ -19,11 +18,10 @@ public class NetworkManager : Photon.PunBehaviour
 	[SerializeField]
 	private GameObject offsetObject;
 
-    void Start()
+	void Start()
     {
         // Photonネットワークの設定を行う
-        PhotonNetwork.ConnectToMaster(masterServerAddress, 5055, "rtstest", "1.0.0");
-//        PhotonNetwork.ConnectUsingSettings("0.1");
+        PhotonNetwork.ConnectUsingSettings("1.0.0");
         PhotonNetwork.sendRate = 30;
     }
 
