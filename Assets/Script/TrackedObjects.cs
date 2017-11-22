@@ -19,8 +19,13 @@ public class TrackedObjects : Photon.MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
-		
+	void Update () 
+	{
+		// とりあえず仮でRを押して頭の回転リセット
+		if( Input.GetKeyDown(KeyCode.R) )
+		{
+			OVRManager.display.RecenterPose();
+		}
 	}
 
 	/// <summary>
