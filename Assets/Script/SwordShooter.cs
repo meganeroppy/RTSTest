@@ -54,6 +54,13 @@ public class SwordShooter : Photon.MonoBehaviour
 
 	private void Shot(Transform shotOrigin)
 	{
-		PhotonNetwork.Instantiate( shot.name, shotOrigin.position, shotOrigin.rotation, 0);
+		if( photonView != null && photonView.isMine )
+		{
+			PhotonNetwork.Instantiate( shot.name, shotOrigin.position, shotOrigin.rotation, 0);
+		}
+		else
+		{
+			Instantiate( shot, shotOrigin.position, shotOrigin.rotation);
+		}
 	}
 }
