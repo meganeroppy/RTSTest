@@ -1,0 +1,182 @@
+fileFormatVersion: 2
+guid: ae22714062f5f9d478b6fd54c7e74ddd
+timeCreated: 1460203209
+licenseType: Store
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: Rooms_01_bottle
+    100004: Rooms_01_bowl
+    100006: Rooms_01_cabinet
+    100008: Rooms_01_carpet
+    100010: Rooms_01_flower
+    100012: Rooms_01_fotel
+    100014: Rooms_01_lamp
+    100016: Rooms_01_luster
+    100018: Rooms_01_paint1
+    100020: Rooms_01_paint2
+    100022: Rooms_01_paint3
+    100024: Rooms_01_paint4
+    100026: Rooms_01_pillow
+    100028: Rooms_01_room
+    100030: Rooms_01_sofa
+    100032: Rooms_01_table
+    100034: Rooms_01_tv
+    100036: Rooms_01_window
+    400000: //RootNode
+    400002: Rooms_01_bottle
+    400004: Rooms_01_bowl
+    400006: Rooms_01_cabinet
+    400008: Rooms_01_carpet
+    400010: Rooms_01_flower
+    400012: Rooms_01_fotel
+    400014: Rooms_01_lamp
+    400016: Rooms_01_luster
+    400018: Rooms_01_paint1
+    400020: Rooms_01_paint2
+    400022: Rooms_01_paint3
+    400024: Rooms_01_paint4
+    400026: Rooms_01_pillow
+    400028: Rooms_01_room
+    400030: Rooms_01_sofa
+    400032: Rooms_01_table
+    400034: Rooms_01_tv
+    400036: Rooms_01_window
+    2300000: Rooms_01_bottle
+    2300002: Rooms_01_bowl
+    2300004: Rooms_01_cabinet
+    2300006: Rooms_01_carpet
+    2300008: Rooms_01_flower
+    2300010: Rooms_01_fotel
+    2300012: Rooms_01_lamp
+    2300014: Rooms_01_luster
+    2300016: Rooms_01_paint1
+    2300018: Rooms_01_paint2
+    2300020: Rooms_01_paint3
+    2300022: Rooms_01_paint4
+    2300024: Rooms_01_pillow
+    2300026: Rooms_01_room
+    2300028: Rooms_01_sofa
+    2300030: Rooms_01_table
+    2300032: Rooms_01_tv
+    2300034: Rooms_01_window
+    3300000: Rooms_01_bottle
+    3300002: Rooms_01_bowl
+    3300004: Rooms_01_cabinet
+    3300006: Rooms_01_carpet
+    3300008: Rooms_01_flower
+    3300010: Rooms_01_fotel
+    3300012: Rooms_01_lamp
+    3300014: Rooms_01_luster
+    3300016: Rooms_01_paint1
+    3300018: Rooms_01_paint2
+    3300020: Rooms_01_paint3
+    3300022: Rooms_01_paint4
+    3300024: Rooms_01_pillow
+    3300026: Rooms_01_room
+    3300028: Rooms_01_sofa
+    3300030: Rooms_01_table
+    3300032: Rooms_01_tv
+    3300034: Rooms_01_window
+    4300000: Rooms_01_window
+    4300002: Rooms_01_sofa
+    4300004: Rooms_01_table
+    4300006: Rooms_01_bottle
+    4300008: Rooms_01_carpet
+    4300010: Rooms_01_flower
+    4300012: Rooms_01_fotel
+    4300014: Rooms_01_lamp
+    4300016: Rooms_01_luster
+    4300018: Rooms_01_cabinet
+    4300020: Rooms_01_paint2
+    4300022: Rooms_01_paint3
+    4300024: Rooms_01_paint4
+    4300026: Rooms_01_paint1
+    4300028: Rooms_01_pillow
+    4300030: Rooms_01_tv
+    4300032: Rooms_01_bowl
+    4300034: Rooms_01_room
+    6400000: Rooms_01_bottle
+    6400002: Rooms_01_bowl
+    6400004: Rooms_01_cabinet
+    6400006: Rooms_01_carpet
+    6400008: Rooms_01_flower
+    6400010: Rooms_01_fotel
+    6400012: Rooms_01_lamp
+    6400014: Rooms_01_luster
+    6400016: Rooms_01_paint1
+    6400018: Rooms_01_paint2
+    6400020: Rooms_01_paint3
+    6400022: Rooms_01_paint4
+    6400024: Rooms_01_pillow
+    6400026: Rooms_01_room
+    6400028: Rooms_01_sofa
+    6400030: Rooms_01_table
+    6400032: Rooms_01_tv
+    6400034: Rooms_01_window
+    9500000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleRotations: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 250
+    meshCompression: 0
+    addColliders: 1
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 1
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 0
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
