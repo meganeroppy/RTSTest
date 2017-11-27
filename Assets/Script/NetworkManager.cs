@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class NetworkManager : Photon.PunBehaviour
-{
+{	
 	/// <summary>
 	/// 重複しないようにする
 	/// </summary>
@@ -13,7 +13,7 @@ public class NetworkManager : Photon.PunBehaviour
 	[SerializeField]
 	private TrackerSettings[] trackerSettings;
 
-    public string ObjectName;
+	public GameObject prefab;
 
 	[SerializeField]
 	private GameObject copyTransformHead;
@@ -27,8 +27,6 @@ public class NetworkManager : Photon.PunBehaviour
 	[SerializeField]
 	private GameObject offsetObject;
 
-
-
 	void Start()
     {
 	//	foreach( TrackerSettings t in trackerSettings ) 
@@ -36,7 +34,7 @@ public class NetworkManager : Photon.PunBehaviour
 	//		t.ObjectName
 	//	}
 
-        // Photonネットワークの設定を行う
+        // 指定の設定でPhotonネットワークに接続
         PhotonNetwork.ConnectUsingSettings("1.0.0");
         PhotonNetwork.sendRate = 30;
     }
@@ -75,9 +73,9 @@ public class NetworkManager : Photon.PunBehaviour
     {
         Debug.Log("OnJoinedRoom");
 
-        // 「ルーム」に接続したらCubeを生成する（動作確認用）
-        GameObject cube = PhotonNetwork.Instantiate(ObjectName, Vector3.zero, Quaternion.identity, 0);
-		InitializeTrackedObjects( cube );
+        // 「ルーム」に接続したらPrefabを生成する（動作確認用）
+		var obj = PhotonNetwork.Instantiate(prefab.name, Vector3.zero, Quaternion.identity, 0);
+		InitializeTrackedObjects( obj );
     }
 
 	private void InitializeTrackedObjects( GameObject obj )
@@ -90,6 +88,15 @@ public class NetworkManager : Photon.PunBehaviour
 		}
 
 		trackedObjects.Initialize(copyTransformHead, copyTransformRightHand, copyTransformLeftHand, offsetObject, playerId);
+	}
+
+	/// <summary>
+	/// Photonネットワークへの接続失敗時のコールバック
+	/// </summary>
+	public void OnFailedToConnectToPhoton()
+	{
+		var obj = Instantiate(prefab, Vector3.zero, Quaternion.identity);
+		InitializeTrackedObjects( obj ); 
 	}
 
     // 現在の接続状況を表示（デバッグ目的）

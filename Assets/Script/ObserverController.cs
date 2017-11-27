@@ -11,14 +11,15 @@ public class ObserverController : Photon.MonoBehaviour {
 	private float rot_speed = 2f;
 
 	// Use this for initialization
-	void Start () {
+	void Start () 
+	{
 		cameraRotate = transform.localRotation;
 	}
 	
 	// Update is called once per frame
 	void Update () 
 	{
-		if( photonView != null && !photonView.isMine ) return;
+		if( photonView.ownerId != 0 && !photonView.isMine ) return;
 
 		UpdatePosition();
 		UpdateRotaition();
@@ -86,6 +87,9 @@ public class ObserverController : Photon.MonoBehaviour {
 	[PunRPC]
 	private void ExecTest()
 	{
-		PhotonNetwork.Instantiate("TestHead", transform.position, transform.rotation, 0);
+		if( photonView.ownerId != 0 )
+		{
+			PhotonNetwork.Instantiate("TestHead", transform.position, transform.rotation, 0);
+		}
 	}
 }

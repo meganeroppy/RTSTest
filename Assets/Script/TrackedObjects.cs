@@ -26,44 +26,12 @@ public class TrackedObjects : Photon.MonoBehaviour {
 	[SerializeField]
 	private Text playerLabel;
 
-	/// <summary>
-	/// 観測者か？
-	/// </summary>
-	[PunRPC]
-	private void SetObserver( bool value )
-	{
-		Debug.Log( gameObject.name + " " + System.Reflection.MethodBase.GetCurrentMethod() + "mine=" + (photonView != null && photonView.isMine).ToString() ) ;
-
-		_isObserver = value;
-		var children = GetComponentsInChildren<CopyTransform>();
-		foreach( CopyTransform c in children )
-		{
-			c.enabled = !_isObserver;
-		}
-
-		rightHand.gameObject.SetActive( !_isObserver );
-		leftHand.gameObject.SetActive( !_isObserver );
-		headModel.enabled = !_isObserver ;
-		playerLabel.enabled = !_isObserver;
-
-
-		cameraImage.SetActive( _isObserver );
-
-		observerController.enabled = _isObserver;
-
-		if( _isObserver )
-		{
-			head.transform.localPosition = Vector3.zero;
-		}
-	}		
-	private bool _isObserver;
-
 	[SerializeField]
 	private ObserverController observerController;
 
 	// Use this for initialization
-	void Start () {
-
+	void Start () 
+	{
 		Debug.Log( gameObject.name + " " + System.Reflection.MethodBase.GetCurrentMethod() + "mine=" + (photonView != null && photonView.isMine).ToString() ) ;
 		// 自身でなければCopyTransformを削除
 		if( photonView != null)
@@ -77,7 +45,7 @@ public class TrackedObjects : Photon.MonoBehaviour {
 				}
 			}
 
-			myCamera.enabled = photonView.isMine;
+			myCamera.enabled = photonView.ownerId == 0 || photonView.isMine;
 			headModel.enabled = !photonView.isMine && !_isObserver;
 			playerLabel.enabled = !photonView.isMine && !_isObserver;
 		}
@@ -86,7 +54,7 @@ public class TrackedObjects : Photon.MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{		
-		if( photonView != null && !photonView.isMine  ) return;
+		if( photonView.ownerId != 0 && !photonView.isMine  ) return;
 
 		// とりあえず仮でRを押して頭の回転リセット
 		if( Input.GetKeyDown(KeyCode.R) )
@@ -108,12 +76,19 @@ public class TrackedObjects : Photon.MonoBehaviour {
 	{
 		Debug.Log( gameObject.name + " " + System.Reflection.MethodBase.GetCurrentMethod() + "mine=" + (photonView != null && photonView.isMine).ToString() ) ;
 
-		if( playerId == 0 )
+		if( playerId == 0 || photonView.ownerId == 0)
 		{
 			head.enabled = false;
 			rightHand.enabled = false;
 			leftHand.enabled = false;
-			photonView.RPC( "SetObserver", PhotonTargets.AllBuffered, !_isObserver );
+			if( photonView.ownerId != 0 && photonView.isMine )
+			{
+				photonView.RPC( "SetObserver", PhotonTargets.AllBuffered, !_isObserver );
+			}
+			else
+			{
+				SetObserver( true );
+			}
 			return;
 		}
 
@@ -132,4 +107,35 @@ public class TrackedObjects : Photon.MonoBehaviour {
 	}
 
 	Color[] color = new Color[]{ Color.gray, Color.red, Color.green, Color.blue, Color.yellow};
+
+	/// <summary>
+	/// 観測者に指定？
+	/// </summary>
+	[PunRPC]
+	public void SetObserver( bool value )
+	{
+		Debug.Log( gameObject.name + " " + System.Reflection.MethodBase.GetCurrentMethod() + "mine=" + (photonView != null && photonView.isMine).ToString() ) ;
+
+		_isObserver = value;
+		var children = GetComponentsInChildren<CopyTransform>();
+		foreach( CopyTransform c in children )
+		{
+			c.enabled = !_isObserver;
+		}
+
+		rightHand.gameObject.SetActive( !_isObserver );
+		leftHand.gameObject.SetActive( !_isObserver );
+		headModel.enabled = !_isObserver ;
+		playerLabel.enabled = !_isObserver;
+
+		cameraImage.SetActive( _isObserver );
+
+		observerController.enabled = _isObserver;
+
+		if( _isObserver )
+		{
+			head.transform.localPosition = Vector3.zero;
+		}
+	}		
+	private bool _isObserver;
 }
