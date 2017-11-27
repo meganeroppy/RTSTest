@@ -1,1 +1,4 @@
 ServerId=RTSGeekRoom
+HeadPrefix=Head
+RightHandPrefix=RH
+LeftHandPrefix=LH

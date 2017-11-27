@@ -2,13 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LoadedConfig  {
-	public static LoadedConfig instance;
+//namespace Config
+//{
+	public class LoadedConfig  {
+		public static LoadedConfig instance;
 
-	public LoadedConfig()
-	{
-		data = new List<KeyValuePair<string, string>>();
+		public LoadedConfig()
+		{
+			data = new List<KeyValuePair<string, string>>();
+		}
+		public string serverId;
+
+		public List<KeyValuePair<string, string>> data;
 	}
-	public string serverId;
-	public List<KeyValuePair<string, string>> data;
-}
+
+	public struct PresetConfig
+	{
+	//	public readonly string headPrefix = "Head";
+	//	public readonly string rightHandPrefix = "RH";
+	//	public readonly string leftHandPrefix = "LH";
+	}
+//}
