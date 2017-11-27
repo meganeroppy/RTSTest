@@ -32,6 +32,8 @@ public class TrackedObjects : Photon.MonoBehaviour {
 	[SerializeField]
 	private ObserverController observerController;
 
+	Color[] playerColor = new Color[]{ Color.gray, Color.red, Color.green, Color.blue, Color.yellow};
+
 	// Use this for initialization
 	void Start () 
 	{
@@ -104,11 +106,8 @@ public class TrackedObjects : Photon.MonoBehaviour {
 		leftHand.offsetObject = offsetObject;
 
 		playerLabel.text = "PLAYER[ " + playerId.ToString() + " ]"; 
-		playerLabel.color = color[ playerId % color.Length ];
-
+		playerLabel.color = playerColor[ playerId % playerColor.Length ];
 	}
-
-	Color[] color = new Color[]{ Color.gray, Color.red, Color.green, Color.blue, Color.yellow};
 
 	/// <summary>
 	/// 観測者に指定
@@ -119,6 +118,7 @@ public class TrackedObjects : Photon.MonoBehaviour {
 		Debug.Log( gameObject.name + " " + System.Reflection.MethodBase.GetCurrentMethod() + "mine=" + (photonView != null && photonView.isMine).ToString() ) ;
 
 		_isObserver = value;
+
 		var children = GetComponentsInChildren<CopyTransform>();
 		foreach( CopyTransform c in children )
 		{
