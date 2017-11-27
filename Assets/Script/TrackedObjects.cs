@@ -18,6 +18,9 @@ public class TrackedObjects : Photon.MonoBehaviour {
 	private Camera myCamera;
 
 	[SerializeField]
+	private AudioListener audioListener;
+
+	[SerializeField]
 	private MeshRenderer headModel;
 
 	[SerializeField]
@@ -33,22 +36,21 @@ public class TrackedObjects : Photon.MonoBehaviour {
 	void Start () 
 	{
 		Debug.Log( gameObject.name + " " + System.Reflection.MethodBase.GetCurrentMethod() + "mine=" + (photonView != null && photonView.isMine).ToString() ) ;
-		// 自身でなければCopyTransformを削除
-		if( photonView != null)
-		{
-			if( !photonView.isMine  )
-			{
-				var children = GetComponentsInChildren<CopyTransform>();
-				foreach( CopyTransform c in children )
-				{
-					c.enabled = false;
-				}
-			}
 
-			myCamera.enabled = photonView.ownerId == 0 || photonView.isMine;
-			headModel.enabled = !photonView.isMine && !_isObserver;
-			playerLabel.enabled = !photonView.isMine && !_isObserver;
+		// 自身でなければCopyTransformを削除
+		if( !photonView.isMine  )
+		{
+			var children = GetComponentsInChildren<CopyTransform>();
+			foreach( CopyTransform c in children )
+			{
+				c.enabled = false;
+			}
 		}
+
+		myCamera.enabled = photonView.ownerId == 0 || photonView.isMine;
+		audioListener.enabled = photonView.ownerId == 0 || photonView.isMine; 
+		headModel.enabled = !photonView.isMine && !_isObserver;
+		playerLabel.enabled = !photonView.isMine && !_isObserver;
 	}
 	
 	// Update is called once per frame
@@ -109,7 +111,7 @@ public class TrackedObjects : Photon.MonoBehaviour {
 	Color[] color = new Color[]{ Color.gray, Color.red, Color.green, Color.blue, Color.yellow};
 
 	/// <summary>
-	/// 観測者に指定？
+	/// 観測者に指定
 	/// </summary>
 	[PunRPC]
 	public void SetObserver( bool value )
