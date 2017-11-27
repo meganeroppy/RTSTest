@@ -152,4 +152,15 @@ public class TrackedObjects : Photon.MonoBehaviour {
 		}
 	}		
 	private bool _isObserver;
+
+	/// <summary>
+	/// 破棄時お処理
+	/// </summary>
+	private void OnDestroy()
+	{
+		if( list != null && list.Contains( this ) )
+		{
+			list.Remove( this );
+		}
+	}
 }
