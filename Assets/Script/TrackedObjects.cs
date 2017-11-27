@@ -34,6 +34,18 @@ public class TrackedObjects : Photon.MonoBehaviour {
 
 	Color[] playerColor = new Color[]{ Color.gray, Color.red, Color.green, Color.blue, Color.yellow};
 
+	public static List<TrackedObjects> list;
+
+	void Awake()
+	{
+		if( list == null )
+		{
+			list = new List<TrackedObjects>();
+		}
+
+		list.Add( this );
+	}
+
 	// Use this for initialization
 	void Start () 
 	{

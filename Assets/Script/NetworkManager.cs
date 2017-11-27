@@ -31,18 +31,24 @@ public class NetworkManager : Photon.PunBehaviour
 	[SerializeField]
 	private GameObject offsetObject;
 
-	void Awake()
-	{
-		// 指定されたシーンをロード
-		SceneManager.LoadSceneAsync( StartSceneName, LoadSceneMode.Additive );
-	}
-
-	void Start()
+	IEnumerator Start()
     {
 	//	foreach( TrackerSettings t in trackerSettings ) 
 	//	{
 	//		t.ObjectName
 	//	}
+
+
+		// 指定されたシーンをロード
+		SceneManager.LoadSceneAsync( StartSceneName, LoadSceneMode.Additive );
+
+		var scene = SceneManager.GetSceneByName( StartSceneName );
+		while ( !scene.isLoaded )
+		{
+			yield return null;
+		}
+		// アクティブなシーンに設定
+		SceneManager.SetActiveScene( scene );
 
         // 指定の設定でPhotonネットワークに接続
         PhotonNetwork.ConnectUsingSettings("1.0.0");

@@ -108,8 +108,49 @@ public class ObserverController : Photon.MonoBehaviour {
 	{
 		Debug.Log( System.Reflection.MethodBase.GetCurrentMethod() );
 
-		SceneManager.UnloadSceneAsync("WaitRoom" );
+		StartCoroutine( TransitionScene( "TeaRoom" ) ); 
+	}
 
-		SceneManager.LoadSceneAsync("TeaRoom", LoadSceneMode.Additive );
+	[SerializeField]
+	private string baseSceneName = "StartScene";
+
+	private IEnumerator TransitionScene( string newSceneName )
+	{
+		// TODO: 暗転
+
+		// 必要なオブジェクトの所属シーンを引っ越し
+		{
+			var baseScene = SceneManager.GetSceneByName( baseSceneName );
+
+			for( int i=0 ; i < TrackedObjects.list.Count ; ++i )
+			{
+				SceneManager.MoveGameObjectToScene( TrackedObjects.list[i].gameObject, baseScene );
+			}
+		}
+
+		// もともといた部屋シーンをアンロード
+		{
+			var scene = SceneManager.GetActiveScene(); 
+
+			// アンロード実行
+			var operation = SceneManager.UnloadSceneAsync( scene.name );
+
+			// アンロードが終わるまで待機
+			while( !operation.isDone ) yield return null;
+		}
+			
+		// 指定されたシーンをロードし、アクティブシーンにする
+		{
+			var operation = SceneManager.LoadSceneAsync(newSceneName, LoadSceneMode.Additive );
+
+			// ロードが終わるまで待機
+			while( !operation.isDone ) yield return null;
+
+			var scene = SceneManager.GetSceneByName( newSceneName );
+			SceneManager.SetActiveScene( scene );
+		}
+
+		// TODO: 暗転解除
+
 	}
 }
