@@ -22,12 +22,7 @@ public class ObserverController : Photon.MonoBehaviour {
 
 		UpdatePosition();
 		UpdateRotaition();
-
-		if( Input.GetKeyDown(KeyCode.T) )
-		{
-		//	photonView.RPC("ExecTest", PhotonTargets.AllBuffered);
-			ExecTest();
-		}
+		UpdateKeyInput();
 	}
 
 	void UpdatePosition()
@@ -69,6 +64,23 @@ public class ObserverController : Photon.MonoBehaviour {
 
 		//　カメラの視点変更を実行
 		transform.localRotation = Quaternion.Slerp(transform.localRotation, cameraRotate, rot_speed * Time.deltaTime);
+	}
+
+	void UpdateKeyInput()
+	{
+		// 視点の傾きをリセット
+		if( Input.GetKeyDown(KeyCode.R) )
+		{
+			var newRot = Quaternion.Euler( 0, transform.localRotation.eulerAngles.y, 0 );
+			cameraRotate = newRot;
+		}
+
+		// Tはテスト用のキー
+		if( Input.GetKeyDown(KeyCode.T) )
+		{
+			//	photonView.RPC("ExecTest", PhotonTargets.AllBuffered);
+			ExecTest();
+		}
 	}
 
 	[PunRPC]
