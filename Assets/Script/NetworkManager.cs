@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class NetworkManager : Photon.PunBehaviour
 {	
@@ -16,6 +17,9 @@ public class NetworkManager : Photon.PunBehaviour
 	public GameObject prefab;
 
 	[SerializeField]
+	private string StartSceneName;
+
+	[SerializeField]
 	private GameObject copyTransformHead;
 
 	[SerializeField]
@@ -26,6 +30,12 @@ public class NetworkManager : Photon.PunBehaviour
 
 	[SerializeField]
 	private GameObject offsetObject;
+
+	void Awake()
+	{
+		// 指定されたシーンをロード
+		SceneManager.LoadSceneAsync( StartSceneName, LoadSceneMode.Additive );
+	}
 
 	void Start()
     {

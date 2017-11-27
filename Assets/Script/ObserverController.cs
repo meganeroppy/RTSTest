@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ObserverController : Photon.MonoBehaviour {
 
@@ -76,6 +77,15 @@ public class ObserverController : Photon.MonoBehaviour {
 			cameraRotate = newRot;
 		}
 
+		// シーケンス開始
+		if( Input.GetKeyDown(KeyCode.P) )
+		{
+			if( photonView.ownerId != 0 )
+			{
+				photonView.RPC("StartSequence", PhotonTargets.All);
+			}
+		}
+
 		// Tはテスト用のキー
 		if( Input.GetKeyDown(KeyCode.T) )
 		{
@@ -91,5 +101,15 @@ public class ObserverController : Photon.MonoBehaviour {
 		{
 			PhotonNetwork.Instantiate("TestHead", transform.position, transform.rotation, 0);
 		}
+	}
+
+	[PunRPC]
+	private void StartSequence()
+	{
+		Debug.Log( System.Reflection.MethodBase.GetCurrentMethod() );
+
+		SceneManager.UnloadSceneAsync("WaitRoom" );
+
+		SceneManager.LoadSceneAsync("TeaRoom", LoadSceneMode.Additive );
 	}
 }
