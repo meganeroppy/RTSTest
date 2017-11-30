@@ -11,33 +11,25 @@ public class NetworkManager : Photon.PunBehaviour
 	[SerializeField]
 	private byte playerId = 0;
 
-	[SerializeField]
-	private TrackerSettings[] trackerSettings;
-
 	public GameObject prefab;
 
 	[SerializeField]
 	private string StartSceneName;
 
 	[SerializeField]
-	private GameObject copyTransformHead;
+	private TrackerSettings copyTransformHead;
 
 	[SerializeField]
-	private GameObject copyTransformRightHand;
+	private TrackerSettings copyTransformRightHand;
 
 	[SerializeField]
-	private GameObject copyTransformLeftHand;
+	private TrackerSettings copyTransformLeftHand;
 
 	[SerializeField]
 	private GameObject offsetObject;
 
 	IEnumerator Start()
     {
-	//	foreach( TrackerSettings t in trackerSettings ) 
-	//	{
-	//		t.ObjectName
-	//	}
-
 		// 文字列指定があれば指定されたシーンをロード
 		if( !string.IsNullOrEmpty( StartSceneName ) )
 		{
@@ -50,6 +42,19 @@ public class NetworkManager : Photon.PunBehaviour
 			}
 			// アクティブなシーンに設定
 			SceneManager.SetActiveScene( scene );
+		}
+
+		// プレイヤーIDが0でない時はトラッカーセッティングにオブジェクト名をセット
+		if( playerId != 0 )
+		{
+			if( copyTransformHead.ObjectName.EndsWith("Head") )
+				copyTransformHead.ObjectName = copyTransformHead.ObjectName + playerId.ToString();
+		
+			if( copyTransformRightHand.ObjectName.EndsWith("RH") )				
+				copyTransformRightHand.ObjectName = copyTransformRightHand.ObjectName + playerId.ToString();
+	
+			if( copyTransformLeftHand.ObjectName.EndsWith("LH") )				
+				copyTransformLeftHand.ObjectName = copyTransformLeftHand.ObjectName + playerId.ToString();
 		}
 
         // 指定の設定でPhotonネットワークに接続
@@ -96,6 +101,9 @@ public class NetworkManager : Photon.PunBehaviour
 		InitializeTrackedObjects( obj );
     }
 
+	/// <summary>
+	/// トラックされるオブジェクトを初期化
+	/// </summary>
 	private void InitializeTrackedObjects( GameObject obj )
 	{
 		var trackedObjects = obj.GetComponent<TrackedObjects>();
@@ -105,7 +113,7 @@ public class NetworkManager : Photon.PunBehaviour
 			return;
 		}
 
-		trackedObjects.Initialize(copyTransformHead, copyTransformRightHand, copyTransformLeftHand, offsetObject, playerId);
+		trackedObjects.Initialize(copyTransformHead.gameObject, copyTransformRightHand.gameObject, copyTransformLeftHand.gameObject, offsetObject, playerId);
 	}
 
 	/// <summary>
