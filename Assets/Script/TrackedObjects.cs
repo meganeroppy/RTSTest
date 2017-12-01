@@ -27,6 +27,12 @@ public class TrackedObjects : Photon.MonoBehaviour {
 	private GameObject cameraImage;
 
 	[SerializeField]
+	private Transform rotateCopyFrom;
+
+	[SerializeField]
+	private Transform rotateCopyTo;
+
+	[SerializeField]
 	private Text playerLabel;
 
 	[SerializeField]
@@ -161,6 +167,17 @@ public class TrackedObjects : Photon.MonoBehaviour {
 		if( list != null && list.Contains( this ) )
 		{
 			list.Remove( this );
+		}
+	}
+
+	/// <summary>
+	/// モデルの回転 自分自身の時はあまり意味がないが、人から見られるときに重要になる
+	/// </summary>
+	public void UpdateVisualRotation()
+	{
+		if( rotateCopyFrom != null && rotateCopyTo != null )
+		{
+			rotateCopyTo.forward = rotateCopyFrom.forward;
 		}
 	}
 }
