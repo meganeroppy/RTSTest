@@ -19,8 +19,15 @@ public class DrothyTest : MonoBehaviour
 		Furi2,
 		Count,
 	}
-
 	int animIdx = 0;
+
+	int colorIdx = 0;
+
+	[SerializeField]
+	private Texture[] colorTexs;
+
+	[SerializeField]
+	private SkinnedMeshRenderer dressMesh;
 
 	// Update is called once per frame
 	void Update () 
@@ -42,6 +49,11 @@ public class DrothyTest : MonoBehaviour
 		{
 			ExecAnim();
 		}
+
+		if( Input.GetKeyDown( KeyCode.C ) )
+		{
+			ChangeColor();
+		}
 	}
 	void ExecAnim()
 	{
@@ -57,5 +69,16 @@ public class DrothyTest : MonoBehaviour
 		Debug.Log( newAnim.ToString() + " is triggered " );
 	}
 
-	void ChangeColor(){}
+	void ChangeColor()
+	{
+		colorIdx++;
+
+		if( colorIdx >= colorTexs.Length )
+		{
+			colorIdx = 0;
+		}	
+
+		// ドレスのマテリアル差し替え
+		dressMesh.materials[1].mainTexture = colorTexs[colorIdx];
+	}
 }
