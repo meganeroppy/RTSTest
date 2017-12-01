@@ -69,7 +69,7 @@ public class TrackedObjects : Photon.MonoBehaviour {
 
 		myCamera.enabled = photonView.ownerId == 0 || photonView.isMine;
 		audioListener.enabled = photonView.ownerId == 0 || photonView.isMine; 
-		headModel.enabled = !photonView.isMine && !_isObserver;
+		if( headModel != null ) headModel.enabled = !photonView.isMine && !_isObserver;
 		playerLabel.enabled = !photonView.isMine && !_isObserver;
 	}
 	
@@ -145,7 +145,7 @@ public class TrackedObjects : Photon.MonoBehaviour {
 
 		rightHand.gameObject.SetActive( !_isObserver );
 		leftHand.gameObject.SetActive( !_isObserver );
-		headModel.enabled = !_isObserver ;
+		if( headModel != null )headModel.enabled = !_isObserver ;
 		playerLabel.enabled = !_isObserver;
 
 		cameraImage.SetActive( _isObserver );
