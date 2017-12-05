@@ -5,7 +5,7 @@ using UnityEngine;
 public class DrothyTest : MonoBehaviour
 {
 	public  float speed = 5f;
-	public Animator anim;
+	public List<Animator> anim;
 	 	
 	public Transform drothyBase;
 
@@ -17,6 +17,7 @@ public class DrothyTest : MonoBehaviour
 		EyeClose,
 		Go2,
 		Furi2,
+		OpenArm,
 		Count,
 	}
 	int animIdx = 0;
@@ -65,7 +66,7 @@ public class DrothyTest : MonoBehaviour
 		}
 
 		var newAnim = (Anim)animIdx;
-		anim.SetTrigger( newAnim.ToString() );
+		anim.ForEach( a => a.SetTrigger( newAnim.ToString() ) );
 		Debug.Log( newAnim.ToString() + " is triggered " );
 	}
 
@@ -81,4 +82,5 @@ public class DrothyTest : MonoBehaviour
 		// ドレスのマテリアル差し替え
 		dressMesh.materials[1].mainTexture = colorTexs[colorIdx];
 	}
+
 }
