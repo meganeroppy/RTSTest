@@ -62,6 +62,8 @@ public class TrackedObjects : Photon.MonoBehaviour {
 
 	public bool forceDrothy;
 
+	public bool useSimulateFoot = false;
+
 	void Awake()
 	{
 		if( list == null )
@@ -217,5 +219,10 @@ public class TrackedObjects : Photon.MonoBehaviour {
 		drothyIK.leftHandObj = leftHandObject;
 		drothyIK.bodyObj = bodyObject;
 		drothyIK.lookObj = lookTarget;
+
+		if( useSimulateFoot )
+		{
+			drothyIK.SetSimulateFoot();
+		}
 	}
 }

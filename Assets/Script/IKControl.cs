@@ -18,6 +18,10 @@ public class IKControl : MonoBehaviour {
 
 	public Transform lookObj = null;
 
+	public SimulateWalk simulateWalk;
+	public Transform simulateRightObj = null;
+	public Transform simulateLeftObj = null;
+
 	void Start () 
 	{
 		animator = GetComponent<Animator>();
@@ -76,5 +80,12 @@ public class IKControl : MonoBehaviour {
 			animator.SetIKPositionWeight(avatarIKGoal, 0);
 			animator.SetIKRotationWeight(avatarIKGoal, 0);  
 		}
+	}
+
+	public void SetSimulateFoot()
+	{
+		simulateWalk.enabled = true;
+		rightFootObj = simulateRightObj;
+		leftFootObj = simulateLeftObj;
 	}
 }

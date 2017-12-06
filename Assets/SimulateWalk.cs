@@ -9,12 +9,31 @@ public class SimulateWalk : MonoBehaviour
 	public float groundHeight = 0;
 	public float height = 1f;
 	public float speed = 0.1f;
+	public float openWidth = 0.5f;
+	public Transform root;
 
 	private int idx = 0;
+
 	// Use this for initialization
 	void Start ()
-	{
+	{		
 		StartCoroutine( Exec() );
+	}
+
+	void Update()
+	{
+		foreach( Transform foot in feet )
+		{
+			foot.forward = root.forward;
+	//		foot.rotation = Quaternion.Euler( 0, foot.rotation.y, foot.rotation.z );
+
+			var origin = foot.localPosition;
+
+			var diff = openWidth * 0.5f;
+			foot.localPosition = root.localPosition + diff * (foot.name.Contains("Right") ? root.right : -root.right);
+
+			foot.localPosition = new Vector3( foot.localPosition.x, origin.y, origin.z );
+		}
 	}
 	
 	IEnumerator Exec()
