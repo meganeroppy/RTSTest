@@ -12,7 +12,6 @@ public class IKControl : MonoBehaviour {
 
 	public Transform rightHandObj = null;
 	public Transform leftHandObj = null;
-	public Transform headObj = null;
 	public Transform bodyObj = null;
 
 	public Transform lookObj = null;

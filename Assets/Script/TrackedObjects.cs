@@ -6,19 +6,28 @@ using UnityEngine.UI;
 public class TrackedObjects : Photon.MonoBehaviour {
 
 	[SerializeField]
-	private CopyTransform head;
+	private CopyTransform copyTransformHead;
 
 	[SerializeField]
 	private Transform lookTarget;
 
 	[SerializeField]
-	private CopyTransform rightHand;
+	private CopyTransform copyTransformRightHand;
 
 	[SerializeField]
-	private CopyTransform leftHand;
+	private Transform rightHandObject;
 
 	[SerializeField]
-	private CopyTransform body;
+	private CopyTransform copyTransformLeftHand;
+
+	[SerializeField]
+	private Transform leftHandObject;
+
+	[SerializeField]
+	private CopyTransform copyTransformBody;
+
+	[SerializeField]
+	private Transform bodyObject;
 
 	[SerializeField]
 	private Camera myCamera;
@@ -115,10 +124,10 @@ public class TrackedObjects : Photon.MonoBehaviour {
 
 		if( playerId == 0 || photonView.ownerId == 0)
 		{
-			head.enabled = false;
-			rightHand.enabled = false;
-			leftHand.enabled = false;
-			body.enabled = false;
+			this.copyTransformHead.enabled = false;
+			this.copyTransformRightHand.enabled = false;
+			this.copyTransformLeftHand.enabled = false;
+			this.copyTransformBody.enabled = false;
 			if( photonView.ownerId != 0 && photonView.isMine )
 			{
 				photonView.RPC( "SetObserver", PhotonTargets.AllBuffered, !_isObserver );
@@ -130,17 +139,17 @@ public class TrackedObjects : Photon.MonoBehaviour {
 			return;
 		}
 
-		head.copySource = copyTransformHead;
-		head.offsetObject = offsetObject;
+		this.copyTransformHead.copySource = copyTransformHead;
+		this.copyTransformHead.offsetObject = offsetObject;
 
-		rightHand.copySource = copyTransformRightHand;
-		rightHand.offsetObject = offsetObject;
+		this.copyTransformRightHand.copySource = copyTransformRightHand;
+		this.copyTransformRightHand.offsetObject = offsetObject;
 
-		leftHand.copySource = copyTransformLeftHand;
-		leftHand.offsetObject = offsetObject;
+		this.copyTransformLeftHand.copySource = copyTransformLeftHand;
+		this.copyTransformLeftHand.offsetObject = offsetObject;
 
-		body.copySource = copyTransformBody;
-		body.offsetObject = offsetObject;
+		this.copyTransformBody.copySource = copyTransformBody;
+		this.copyTransformBody.offsetObject = offsetObject;
 
 		playerLabel.text = "PLAYER[ " + playerId.ToString() + " ]"; 
 		playerLabel.color = playerColor[ playerId % playerColor.Length ];
@@ -162,8 +171,8 @@ public class TrackedObjects : Photon.MonoBehaviour {
 			c.enabled = !_isObserver;
 		}
 
-		rightHand.gameObject.SetActive( !_isObserver );
-		leftHand.gameObject.SetActive( !_isObserver );
+		copyTransformRightHand.gameObject.SetActive( !_isObserver );
+		copyTransformLeftHand.gameObject.SetActive( !_isObserver );
 		if( headModel != null )headModel.enabled = !_isObserver ;
 		playerLabel.enabled = !_isObserver;
 
@@ -173,7 +182,7 @@ public class TrackedObjects : Photon.MonoBehaviour {
 
 		if( _isObserver )
 		{
-			head.transform.localPosition = Vector3.zero;
+			copyTransformHead.transform.localPosition = Vector3.zero;
 		}
 	}		
 	private bool _isObserver;
@@ -204,10 +213,9 @@ public class TrackedObjects : Photon.MonoBehaviour {
 	{
 		var drothyIK = Instantiate<IKControl>( drothyIKPrefab );
 
-		drothyIK.headObj = head.transform;
-		drothyIK.rightHandObj = rightHand.transform;
-		drothyIK.leftHandObj = leftHand.transform;
-		drothyIK.bodyObj = body.transform;
+		drothyIK.rightHandObj = rightHandObject;
+		drothyIK.leftHandObj = leftHandObject;
+		drothyIK.bodyObj = bodyObject;
 		drothyIK.lookObj = lookTarget;
 	}
 }
