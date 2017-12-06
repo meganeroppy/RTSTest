@@ -26,6 +26,9 @@ public class NetworkManager : Photon.PunBehaviour
 	private TrackerSettings copyTransformLeftHand;
 
 	[SerializeField]
+	private TrackerSettings copyTransformBody;
+
+	[SerializeField]
 	private GameObject offsetObject;
 
 	IEnumerator Start()
@@ -55,6 +58,9 @@ public class NetworkManager : Photon.PunBehaviour
 	
 			if( copyTransformLeftHand.ObjectName.EndsWith("LH") )				
 				copyTransformLeftHand.ObjectName = copyTransformLeftHand.ObjectName + playerId.ToString();
+
+			if( copyTransformBody.ObjectName.EndsWith("Body") )				
+				copyTransformBody.ObjectName = copyTransformBody.ObjectName + playerId.ToString();
 		}
 
         // 指定の設定でPhotonネットワークに接続
@@ -113,7 +119,7 @@ public class NetworkManager : Photon.PunBehaviour
 			return;
 		}
 
-		trackedObjects.Initialize(copyTransformHead.gameObject, copyTransformRightHand.gameObject, copyTransformLeftHand.gameObject, offsetObject, playerId);
+		trackedObjects.Initialize(copyTransformHead.gameObject, copyTransformRightHand.gameObject, copyTransformLeftHand.gameObject, copyTransformBody.gameObject, offsetObject, playerId);
 	}
 
 	/// <summary>

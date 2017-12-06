@@ -9,10 +9,16 @@ public class TrackedObjects : Photon.MonoBehaviour {
 	private CopyTransform head;
 
 	[SerializeField]
+	private Transform lookTarget;
+
+	[SerializeField]
 	private CopyTransform rightHand;
 
 	[SerializeField]
 	private CopyTransform leftHand;
+
+	[SerializeField]
+	private CopyTransform body;
 
 	[SerializeField]
 	private Camera myCamera;
@@ -38,9 +44,14 @@ public class TrackedObjects : Photon.MonoBehaviour {
 	[SerializeField]
 	private ObserverController observerController;
 
+	[SerializeField]
+	private IKControl drothyIKPrefab;
+
 	Color[] playerColor = new Color[]{ Color.gray, Color.red, Color.green, Color.blue, Color.yellow};
 
 	public static List<TrackedObjects> list;
+
+	public bool forceDrothy;
 
 	void Awake()
 	{
@@ -57,7 +68,7 @@ public class TrackedObjects : Photon.MonoBehaviour {
 	{
 		Debug.Log( gameObject.name + " " + System.Reflection.MethodBase.GetCurrentMethod() + "mine=" + (photonView != null && photonView.isMine).ToString() ) ;
 
-		// 自身でなければCopyTransformを削除
+		// 自身でなければCopyTransformを削除し、ドロシーを生成
 		if( !photonView.isMine  )
 		{
 			var children = GetComponentsInChildren<CopyTransform>();
@@ -65,7 +76,11 @@ public class TrackedObjects : Photon.MonoBehaviour {
 			{
 				c.enabled = false;
 			}
+
+			SetupDrothy();
 		}
+
+		if( forceDrothy ) SetupDrothy();
 
 		myCamera.enabled = photonView.ownerId == 0 || photonView.isMine;
 		audioListener.enabled = photonView.ownerId == 0 || photonView.isMine; 
@@ -94,7 +109,7 @@ public class TrackedObjects : Photon.MonoBehaviour {
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	public void Initialize( GameObject copyTransformHead, GameObject copyTransformRightHand, GameObject copyTransformLeftHand, GameObject offsetObject, int playerId )
+	public void Initialize( GameObject copyTransformHead, GameObject copyTransformRightHand, GameObject copyTransformLeftHand, GameObject copyTransformBody, GameObject offsetObject, int playerId )
 	{
 		Debug.Log( gameObject.name + " " + System.Reflection.MethodBase.GetCurrentMethod() + "mine=" + (photonView != null && photonView.isMine).ToString() ) ;
 
@@ -103,6 +118,7 @@ public class TrackedObjects : Photon.MonoBehaviour {
 			head.enabled = false;
 			rightHand.enabled = false;
 			leftHand.enabled = false;
+			body.enabled = false;
 			if( photonView.ownerId != 0 && photonView.isMine )
 			{
 				photonView.RPC( "SetObserver", PhotonTargets.AllBuffered, !_isObserver );
@@ -122,6 +138,9 @@ public class TrackedObjects : Photon.MonoBehaviour {
 
 		leftHand.copySource = copyTransformLeftHand;
 		leftHand.offsetObject = offsetObject;
+
+		body.copySource = copyTransformBody;
+		body.offsetObject = offsetObject;
 
 		playerLabel.text = "PLAYER[ " + playerId.ToString() + " ]"; 
 		playerLabel.color = playerColor[ playerId % playerColor.Length ];
@@ -179,5 +198,16 @@ public class TrackedObjects : Photon.MonoBehaviour {
 		{
 			rotateCopyTo.forward = rotateCopyFrom.forward;
 		}
+	}
+
+	private void SetupDrothy()
+	{
+		var drothyIK = Instantiate<IKControl>( drothyIKPrefab );
+
+		drothyIK.headObj = head.transform;
+		drothyIK.rightHandObj = rightHand.transform;
+		drothyIK.leftHandObj = leftHand.transform;
+		drothyIK.bodyObj = body.transform;
+		drothyIK.lookObj = lookTarget;
 	}
 }
