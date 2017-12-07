@@ -11,6 +11,20 @@ public class ObserverController : Photon.MonoBehaviour {
 	[SerializeField]
 	private float rot_speed = 2f;
 
+	private enum Sequence
+	{
+		WaitRoom,
+		CollapseGround_Event,
+		Falling,
+		TeaRoom,
+		Ending_Event,
+		Count_,
+	}
+
+	private int currentSequence = 0;
+
+
+
 	// Use this for initialization
 	void Start () 
 	{
@@ -82,7 +96,11 @@ public class ObserverController : Photon.MonoBehaviour {
 		{
 			if( photonView.ownerId != 0 )
 			{
-				photonView.RPC("StartSequence", PhotonTargets.All);
+				photonView.RPC("ProceedSequence", PhotonTargets.All);
+			}
+			else
+			{
+				ProceedSequence();
 			}
 		}
 
@@ -104,53 +122,79 @@ public class ObserverController : Photon.MonoBehaviour {
 	}
 
 	[PunRPC]
-	private void StartSequence()
+	private void ProceedSequence()
 	{
 		Debug.Log( System.Reflection.MethodBase.GetCurrentMethod() );
 
-		StartCoroutine( TransitionScene( "TeaRoom" ) ); 
+		currentSequence = (currentSequence+1) % (int)Sequence.Count_;
+
+		var nextSequence = (Sequence)currentSequence;
+		StartCoroutine( TransitionScene( nextSequence ) ); 
 	}
 
 	[SerializeField]
 	private string baseSceneName = "StartScene";
 
-	private IEnumerator TransitionScene( string newSceneName )
+	private IEnumerator TransitionScene( Sequence newSequence )
 	{
-		// TODO: 暗転
+		if( !newSequence.ToString().Contains("Event") )
+		{	
+			// シーンの切り替え
+			var newSceneName = newSequence.ToString();
 
-		// 必要なオブジェクトの所属シーンを引っ越し
-		{
-			var baseScene = SceneManager.GetSceneByName( baseSceneName );
-
-			for( int i=0 ; i < TrackedObjects.list.Count ; ++i )
+			if( string.IsNullOrEmpty(newSceneName) )
 			{
-				SceneManager.MoveGameObjectToScene( TrackedObjects.list[i].gameObject, baseScene );
+				Debug.LogWarning( newSequence.ToString() + " シーンは存在しない " );
+				yield break;
 			}
-		}
 
-		// もともといた部屋シーンをアンロード
+			// TODO: 暗転
+
+			// 必要なオブジェクトの所属シーンを引っ越し
+			{
+				var baseScene = SceneManager.GetSceneByName( baseSceneName );
+
+				for( int i=0 ; i < TrackedObjects.list.Count ; ++i )
+				{
+					SceneManager.MoveGameObjectToScene( TrackedObjects.list[i].gameObject, baseScene );
+				}
+			}
+
+			// もともといた部屋シーンをアンロード
+			{
+				var scene = SceneManager.GetActiveScene(); 
+
+				// アンロード実行
+				var operation = SceneManager.UnloadSceneAsync( scene.name );
+
+				// アンロードが終わるまで待機
+				while( !operation.isDone ) yield return null;
+			}
+				
+			// 指定されたシーンをロードし、アクティブシーンにする
+			{
+				var operation = SceneManager.LoadSceneAsync(newSceneName, LoadSceneMode.Additive );
+
+				// ロードが終わるまで待機
+				while( !operation.isDone ) yield return null;
+
+				var scene = SceneManager.GetSceneByName( newSceneName );
+				SceneManager.SetActiveScene( scene );
+			}
+
+			// TODO: 暗転解除
+		}
+		else
 		{
-			var scene = SceneManager.GetActiveScene(); 
-
-			// アンロード実行
-			var operation = SceneManager.UnloadSceneAsync( scene.name );
-
-			// アンロードが終わるまで待機
-			while( !operation.isDone ) yield return null;
+			// シーン切り替えなし
+			ExecEvent( newSequence );
 		}
-			
-		// 指定されたシーンをロードし、アクティブシーンにする
-		{
-			var operation = SceneManager.LoadSceneAsync(newSceneName, LoadSceneMode.Additive );
+	}
 
-			// ロードが終わるまで待機
-			while( !operation.isDone ) yield return null;
+	private void ExecEvent( Sequence newEvent )
+	{
+		Debug.Log( "イベント " + newEvent.ToString() + "の実行" );
 
-			var scene = SceneManager.GetSceneByName( newSceneName );
-			SceneManager.SetActiveScene( scene );
-		}
-
-		// TODO: 暗転解除
-
+		//
 	}
 }
