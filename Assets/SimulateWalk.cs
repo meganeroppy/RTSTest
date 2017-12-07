@@ -16,8 +16,9 @@ public class SimulateWalk : MonoBehaviour
 
 	// Use this for initialization
 	void Start ()
-	{		
-		StartCoroutine( Exec() );
+	{
+		if( height > 0 )
+			StartCoroutine( Exec() );
 	}
 
 	void Update()
