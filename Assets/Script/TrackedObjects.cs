@@ -84,7 +84,7 @@ public class TrackedObjects : Photon.MonoBehaviour
 	{
 		Debug.Log( gameObject.name + " " + System.Reflection.MethodBase.GetCurrentMethod() + "mine=" + (photonView != null && photonView.isMine).ToString() ) ;
 
-		// 自身でい時の処理
+		// 自身でない時の処理
 		if( !photonView.isMine  )
 		{
 			// CopyTransform削除
