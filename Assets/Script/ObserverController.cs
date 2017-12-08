@@ -158,6 +158,12 @@ public class ObserverController : Photon.MonoBehaviour {
 				{
 					SceneManager.MoveGameObjectToScene( TrackedObjects.list[i].gameObject, baseScene );
 				}
+
+				var drothyTeam = GameObject.FindGameObjectsWithTag("Drothy");
+				foreach( GameObject d in drothyTeam )
+				{
+					SceneManager.MoveGameObjectToScene( d, baseScene );
+				}
 			}
 
 			// もともといた部屋シーンをアンロード
