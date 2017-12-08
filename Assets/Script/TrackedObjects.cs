@@ -102,12 +102,19 @@ public class TrackedObjects : Photon.MonoBehaviour
 				CreateDrothy();
 			}
 
-			playerLabel.text = "PLAYER[ " + photonView.owner.UserId + " ]"; 
-			var iUserId = 0;
-			if( int.TryParse( photonView.owner.UserId, out iUserId ) )
+			int id = 0;
+			var obj = photonView.instantiationData;
+			if( obj.Length > 0 )
 			{
-				playerLabel.color = playerColor[ iUserId % playerColor.Length ];
+				if( obj[0].GetType().Equals( typeof(int) ) )
+				{
+					id = (int)obj[0];
+				}
 			}
+
+			playerLabel.text = "PLAYER[ " + id.ToString() + " ]"; 
+			playerLabel.color = playerColor[ id % playerColor.Length ];
+
 		}
 
 		if( forceDisableCopyTransform )

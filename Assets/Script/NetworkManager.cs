@@ -103,7 +103,8 @@ public class NetworkManager : Photon.PunBehaviour
         Debug.Log("OnJoinedRoom");
 
         // 「ルーム」に接続したらPrefabを生成する（動作確認用）
-		var obj = PhotonNetwork.Instantiate(prefab.name, Vector3.zero, Quaternion.identity, 0);
+		var data = new object[1]{playerId};
+		var obj = PhotonNetwork.Instantiate(prefab.name, Vector3.zero, Quaternion.identity, 0, data);
 
 		obj.GetPhotonView().owner.UserId = playerId.ToString();
 		InitializeTrackedObjects( obj );
