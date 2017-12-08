@@ -90,7 +90,7 @@ public class TrackedObjects : Photon.MonoBehaviour {
 				c.enabled = false;
 			}
 
-			SetupDrothy();
+			CreateDrothy();
 		}
 
 		if( forceDisableCopyTransform )
@@ -102,7 +102,7 @@ public class TrackedObjects : Photon.MonoBehaviour {
 			}
 		}
 
-		if( forceDrothy ) SetupDrothy();
+		if( forceDrothy ) CreateDrothy();
 
 		myCamera.enabled = photonView.ownerId == 0 || photonView.isMine;
 		audioListener.enabled = photonView.ownerId == 0 || photonView.isMine; 
@@ -223,7 +223,7 @@ public class TrackedObjects : Photon.MonoBehaviour {
 		}
 	}
 
-	private void SetupDrothy()
+	private void CreateDrothy()
 	{
 		var drothyIK = Instantiate<IKControl>( drothyIKPrefab );
 
