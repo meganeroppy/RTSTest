@@ -67,6 +67,8 @@ public class TrackedObjects : Photon.MonoBehaviour
 
 	public bool useSimulateFoot = false;
 
+	public bool useKeyboardControl = false;
+
 	void Awake()
 	{
 		if( list == null )
@@ -112,6 +114,8 @@ public class TrackedObjects : Photon.MonoBehaviour
 
 		if( forceDrothy ) CreateDrothy();
 
+		if( useKeyboardControl && photonView.isMine ) gameObject.AddComponent<PlayerTest>();
+
 		myCamera.enabled = photonView.ownerId == 0 || photonView.isMine;
 		audioListener.enabled = photonView.ownerId == 0 || photonView.isMine; 
 		if( headModel != null ) headModel.enabled = !photonView.isMine && !_isObserver;
@@ -124,6 +128,7 @@ public class TrackedObjects : Photon.MonoBehaviour
 		if( photonView.ownerId != 0 && !photonView.isMine  ) return;
 
 		// とりあえず仮でRを押して頭の回転リセット
+		// TODO この操作をしなくても自動で頭の回転が調整できるようにしたい
 		if( Input.GetKeyDown(KeyCode.R) )
 		{
 			OVRManager.display.RecenterPose();
@@ -236,6 +241,9 @@ public class TrackedObjects : Photon.MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// ドロシーを生成
+	/// </summary>
 	private void CreateDrothy()
 	{
 		var drothyIK = Instantiate<IKControl>( drothyIKPrefab );
@@ -249,6 +257,8 @@ public class TrackedObjects : Photon.MonoBehaviour
 		{
 			drothyIK.SetSimulateFoot();
 		}
+
+		// TODO プレイヤーIDによってカラバリを変更する
 
 		myDrothy = drothyIK;
 	}
