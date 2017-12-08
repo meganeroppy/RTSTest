@@ -189,7 +189,8 @@ public class TrackedObjects : Photon.MonoBehaviour {
 		if( headModel != null )headModel.enabled = !_isObserver ;
 		playerLabel.enabled = !_isObserver;
 
-		cameraImage.SetActive( _isObserver );
+		// 観測者かつ自身ではないときにビジュアルを有効にする
+		cameraImage.SetActive( _isObserver && !photonView.isMine );
 
 		observerController.enabled = _isObserver;
 
