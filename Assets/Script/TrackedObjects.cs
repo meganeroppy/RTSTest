@@ -101,6 +101,9 @@ public class TrackedObjects : Photon.MonoBehaviour
 			{
 				CreateDrothy();
 			}
+
+			playerLabel.text = "PLAYER[ " + photonView.ownerId.ToString() + " ]"; 
+			playerLabel.color = playerColor[ photonView.ownerId % playerColor.Length ];
 		}
 
 		if( forceDisableCopyTransform )
@@ -125,6 +128,12 @@ public class TrackedObjects : Photon.MonoBehaviour
 	// Update is called once per frame
 	void Update () 
 	{		
+		// 自分自身でなくともラベルは全て自分を向く
+		if( playerLabel.enabled && Camera.main != null)
+		{
+			playerLabel.transform.forward = Camera.main.transform.forward;
+		}
+
 		if( photonView.ownerId != 0 && !photonView.isMine  ) return;
 
 		// とりあえず仮でRを押して頭の回転リセット
@@ -176,9 +185,6 @@ public class TrackedObjects : Photon.MonoBehaviour
 
 		this.copyTransformBody.copySource = copyTransformBody;
 		this.copyTransformBody.offsetObject = offsetObject;
-
-		playerLabel.text = "PLAYER[ " + playerId.ToString() + " ]"; 
-		playerLabel.color = playerColor[ playerId % playerColor.Length ];
 	}
 
 	/// <summary>
