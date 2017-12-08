@@ -56,6 +56,8 @@ public class TrackedObjects : Photon.MonoBehaviour {
 	[SerializeField]
 	private IKControl drothyIKPrefab;
 
+	public bool forceDisableCopyTransform = false;
+
 	Color[] playerColor = new Color[]{ Color.gray, Color.red, Color.green, Color.blue, Color.yellow};
 
 	public static List<TrackedObjects> list;
@@ -89,6 +91,15 @@ public class TrackedObjects : Photon.MonoBehaviour {
 			}
 
 			SetupDrothy();
+		}
+
+		if( forceDisableCopyTransform )
+		{
+			var children = GetComponentsInChildren<CopyTransform>();
+			foreach( CopyTransform c in children )
+			{
+				c.enabled = false;
+			}
 		}
 
 		if( forceDrothy ) SetupDrothy();
