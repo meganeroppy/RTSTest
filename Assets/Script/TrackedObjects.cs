@@ -77,21 +77,28 @@ public class TrackedObjects : Photon.MonoBehaviour
 		list.Add( this );
 	}
 
-	// Use this for initialization
+	/// <summary>
+	/// Initialize & SetObserver より後に呼ばれる前提であるため注意する
+	/// </summary>
 	void Start () 
 	{
 		Debug.Log( gameObject.name + " " + System.Reflection.MethodBase.GetCurrentMethod() + "mine=" + (photonView != null && photonView.isMine).ToString() ) ;
 
-		// 自身でなければCopyTransformを削除し、ドロシーを生成
+		// 自身でい時の処理
 		if( !photonView.isMine  )
 		{
+			// CopyTransform削除
 			var children = GetComponentsInChildren<CopyTransform>();
 			foreach( CopyTransform c in children )
 			{
 				c.enabled = false;
 			}
 
-			CreateDrothy();
+			// 観測者でなければドロシー生成
+			if( !_isObserver )
+			{
+				CreateDrothy();
+			}
 		}
 
 		if( forceDisableCopyTransform )
