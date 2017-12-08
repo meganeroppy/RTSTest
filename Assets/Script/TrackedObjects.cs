@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TrackedObjects : Photon.MonoBehaviour {
-
+public class TrackedObjects : Photon.MonoBehaviour
+{
 	[SerializeField]
 	private CopyTransform copyTransformHead;
 
@@ -55,6 +55,7 @@ public class TrackedObjects : Photon.MonoBehaviour {
 
 	[SerializeField]
 	private IKControl drothyIKPrefab;
+	private IKControl myDrothy;
 
 	public bool forceDisableCopyTransform = false;
 
@@ -210,6 +211,11 @@ public class TrackedObjects : Photon.MonoBehaviour {
 		{
 			list.Remove( this );
 		}
+
+		if( myDrothy != null )
+		{
+			Destroy( myDrothy.gameObject );
+		}
 	}
 
 	/// <summary>
@@ -236,5 +242,7 @@ public class TrackedObjects : Photon.MonoBehaviour {
 		{
 			drothyIK.SetSimulateFoot();
 		}
+
+		myDrothy = drothyIK;
 	}
 }
