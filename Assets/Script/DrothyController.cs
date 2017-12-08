@@ -15,6 +15,14 @@ public class DrothyController : MonoBehaviour
 
 	private Vector3 prevPosition;
 
+	[SerializeField]
+	private SkinnedMeshRenderer skinMesh;
+
+	private int dressMatIdx = 1;
+
+	[SerializeField]
+	private Texture[] dressTexture;
+
 	// Use this for initialization
 	void Start ()
 	{
@@ -41,5 +49,10 @@ public class DrothyController : MonoBehaviour
 		}
 		
 		prevPosition = modelRoot.localPosition;
+	}
+
+	public void SetDressColor(int colorIdx)
+	{
+		skinMesh.materials[ dressMatIdx ].mainTexture = dressTexture[ colorIdx % dressTexture.Length ];
 	}
 }

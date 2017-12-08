@@ -96,12 +96,7 @@ public class TrackedObjects : Photon.MonoBehaviour
 				c.enabled = false;
 			}
 
-			// 観測者でなければドロシー生成
-			if( !_isObserver )
-			{
-				CreateDrothy();
-			}
-
+			// プレイヤーIDを取得
 			int id = 0;
 			var obj = photonView.instantiationData;
 			if( obj.Length > 0 )
@@ -111,6 +106,12 @@ public class TrackedObjects : Photon.MonoBehaviour
 
 			playerLabel.text = "PLAYER[ " + id.ToString() + " ]"; 
 			playerLabel.color = playerColor[ id % playerColor.Length ];
+
+			// 観測者でなければドロシー生成
+			if( !_isObserver )
+			{
+				CreateDrothy( id );
+			}
 		}
 
 		if( forceDisableCopyTransform )
@@ -257,7 +258,7 @@ public class TrackedObjects : Photon.MonoBehaviour
 	/// <summary>
 	/// ドロシーを生成
 	/// </summary>
-	private void CreateDrothy()
+	private void CreateDrothy( int colorIdx=1 )
 	{
 		var drothyIK = Instantiate<IKControl>( drothyIKPrefab );
 
@@ -272,6 +273,7 @@ public class TrackedObjects : Photon.MonoBehaviour
 		}
 
 		// TODO プレイヤーIDによってカラバリを変更する
+		drothyIK.GetComponent<DrothyController>().SetDressColor( colorIdx );
 
 		myDrothy = drothyIK;
 	}
