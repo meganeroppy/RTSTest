@@ -106,15 +106,11 @@ public class TrackedObjects : Photon.MonoBehaviour
 			var obj = photonView.instantiationData;
 			if( obj.Length > 0 )
 			{
-				if( obj[0].GetType().Equals( typeof(int) ) )
-				{
-					id = (int)obj[0];
-				}
+				id = System.Convert.ToInt32( obj[0] );
 			}
 
 			playerLabel.text = "PLAYER[ " + id.ToString() + " ]"; 
 			playerLabel.color = playerColor[ id % playerColor.Length ];
-
 		}
 
 		if( forceDisableCopyTransform )
