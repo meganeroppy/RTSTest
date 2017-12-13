@@ -201,6 +201,20 @@ public class ObserverController : Photon.MonoBehaviour {
 	{
 		Debug.Log( "イベント " + newEvent.ToString() + "の実行" );
 
-		//
+		switch( newEvent )
+		{
+		case Sequence.CollapseGround_Event:
+			var managerObj = GameObject.Find("GardenSceneManager");
+			if( !managerObj  ) break;
+			
+			var manager = managerObj.GetComponent<CollapseFloor>();
+			if( manager == null ) break;
+
+			manager.PlayEvent();
+
+			break;
+		default:
+			break;
+		}
 	}
 }
