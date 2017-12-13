@@ -18,6 +18,8 @@ public class CollapseFloor : MonoBehaviour
 	public FracturedObject fractuedObject;
 	public float upperForce = 15f;
 
+	public Transform propsParent;
+
 	// Use this for initialization
 	void Start () {
 		currentScale = startScale;
@@ -34,6 +36,14 @@ public class CollapseFloor : MonoBehaviour
 		expSource.Force = force;
 		StartCoroutine( ExecEvent() );
 	//	StartCoroutine( AscendChunks() );
+		if( propsParent != null )
+		{
+			var props = propsParent.gameObject.GetComponentsInChildren<Rigidbody>();
+			foreach( Rigidbody rb in props )
+			{
+				rb.isKinematic = false;
+			}
+		}
 	}
 
 	private IEnumerator ExecEvent()
