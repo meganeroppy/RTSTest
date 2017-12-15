@@ -49,10 +49,42 @@ public class DrothyController : MonoBehaviour
 		}
 		
 		prevPosition = modelRoot.localPosition;
+
+		if( falling )
+		{
+//			if( Mathf.Abs( transform.position.y ) > loopThresholdHeight )
+//			{
+//				transform.position = new Vector3( transform.position.x, originHeight, transform.position.z);
+//			}
+			var speed = fallingSpeedMin + Mathf.PingPong(Time.time * interval, (fallingSpeedMax - fallingSpeedMin));
+			transform.position += Vector3.down * speed * Time.deltaTime;
+
+		}
 	}
 
 	public void SetDressColor(int colorIdx)
 	{
 		skinMesh.materials[ dressMatIdx ].mainTexture = dressTexture[ colorIdx % dressTexture.Length ];
+	}
+
+	private bool falling = false;
+	public float fallingSpeedMax = 1f;
+	public float fallingSpeedMin = 1f;
+	public float interval = 1f;
+	public void SetIsFalling()
+	{
+		SetIsFalling(!falling);
+	}
+	public void SetIsFalling(bool value)
+	{
+		falling = value;
+	}
+
+	private float originHeight = 0;
+	public float loopThresholdHeight = 20f;
+	public void StartFalling()
+	{
+		originHeight = transform.position.y;
+		SetIsFalling( true );
 	}
 }
