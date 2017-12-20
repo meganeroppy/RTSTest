@@ -51,12 +51,16 @@ public class DrothyController : MonoBehaviour
 		prevPosition = modelRoot.localPosition;
 
 		if( falling )
-		{
-//			if( Mathf.Abs( transform.position.y ) > loopThresholdHeight )
-//			{
-//				transform.position = new Vector3( transform.position.x, originHeight, transform.position.z);
-//			}
-			var speed = fallingSpeedMin + Mathf.PingPong(Time.time * interval, (fallingSpeedMax - fallingSpeedMin));
+		{			
+			if( enableLoop && Mathf.Abs( transform.position.y ) > loopThresholdHeight )
+			{
+				transform.position = new Vector3( transform.position.x, originHeight, transform.position.z);
+			}
+
+			var speedDif = fallingSpeedMax - fallingSpeedMin;
+			if( speedDif == 0 ) speedDif = 1;
+
+			var speed = fallingSpeedMin + Mathf.PingPong(Time.time * interval, speedDif);
 			transform.position += Vector3.down * speed * Time.deltaTime;
 
 		}
@@ -71,6 +75,7 @@ public class DrothyController : MonoBehaviour
 	public float fallingSpeedMax = 1f;
 	public float fallingSpeedMin = 1f;
 	public float interval = 1f;
+	public bool enableLoop = false;
 	public void SetIsFalling()
 	{
 		SetIsFalling(!falling);
