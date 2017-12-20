@@ -245,8 +245,9 @@ public class ObserverController : Photon.MonoBehaviour {
                 // 出現候補を取得
                 var positions = teaRoomSceneManager.GetSmallenCakePositions();
 
-                // プレイヤー数を取得
-                int playerNum = TrackedObjects.list.Count;
+                // プレイヤー数を取得 自身は除く
+                int observerNum = 1; // TODO 観測者が複数いるとたぶにバグになる
+                int playerNum = TrackedObjects.list.Count - observerNum;
                 List<int> indexs = new List<int>();
 
                 // プレイヤー数まで位置を選定
