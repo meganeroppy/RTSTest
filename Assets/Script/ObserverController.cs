@@ -16,14 +16,17 @@ public class ObserverController : Photon.MonoBehaviour {
 		WaitRoom,
 		CollapseGround_Event,
 		Falling,
-		TeaRoom,
-		Ending_Event,
+        TeaRoom,
+        PopCakes1_Event,
+        SmallenDrothy_Event,
+        PopCakes2_Event,
+        LargenDrothy_Event,
+        PopMushrooms_Event,
+        Ending_Event,
 		Count_,
 	}
 
 	private int currentSequence = 0;
-
-
 
 	// Use this for initialization
 	void Start () 
@@ -197,24 +200,136 @@ public class ObserverController : Photon.MonoBehaviour {
 		}
 	}
 
+    /// <summary>
+    /// 複数回使用するためメンバで持つ
+    /// </summary>
+    private TeaRoomSceneManager teaRoomSceneManager;
+    private bool enableSmallenDrothy = false;
+
+    /// <summary>
+    /// イベントの実行
+    /// </summary>
 	private void ExecEvent( Sequence newEvent )
 	{
 		Debug.Log( "イベント " + newEvent.ToString() + "の実行" );
 
+        GameObject obj = null;
+
 		switch( newEvent )
 		{
 		case Sequence.CollapseGround_Event:
-			var managerObj = GameObject.Find("GardenSceneManager");
-			if( !managerObj  ) break;
+
+            // 地面か崩れるイベント
+			obj = GameObject.Find("GardenSceneManager");
+			if( !obj) break;
 			
-			var manager = managerObj.GetComponent<CollapseFloor>();
-			if( manager == null ) break;
+	    		obj.SendMessage("PlayEvent");
 
-			manager.PlayEvent();
+    			break;
+            case Sequence.PopCakes1_Event:
 
-			break;
-		default:
+            // 縮小ケーキが出現するイベント
+                obj = GameObject.Find("TeaRoomSceneManager");
+                if (!obj) break;
+
+                teaRoomSceneManager = obj.GetComponent<TeaRoomSceneManager>();
+
+                // 生成位置を統一するために自分自身の場合のみ位置を選定し、リモートに共有する
+
+                if( !photonView.isMine )
+                {
+                    Debug.Log("自分自身でないためケーキ生成位置の選定を行わない");
+                    return;
+                }
+
+                // 出現候補を取得
+                var positions = teaRoomSceneManager.GetSmallenCakePositions();
+
+                // プレイヤー数を取得
+                int playerNum = TrackedObjects.list.Count;
+                List<int> indexs = new List<int>();
+
+                // プレイヤー数まで位置を選定
+                while (indexs.Count < playerNum)
+                {
+                    int key = Random.Range(0, positions.Length);
+                    if (!indexs.Contains(key))
+                    {
+                        indexs.Add(key);
+                    }
+                }
+
+                //        photonView.RPC("SetLargenCakes", PhotonTargets.All, indexs.ToArray());
+                SetSmallenCakes(indexs.ToArray());
+
+                break;
+            case Sequence.SmallenDrothy_Event:
+                // ドロシーが小さくなるイベントのフラグを立てる
+                enableSmallenDrothy = true;
+
+                break;
+            case Sequence.PopCakes2_Event:
+          //      var managerObj = GameObject.Find("GardenSceneManager");
+          //      if (!managerObj) break;
+
+          //      var manager = managerObj.GetComponent<CollapseFloor>();
+          //      if (manager == null) break;
+
+          //      manager.PlayEvent();
+
+                break;
+            case Sequence.LargenDrothy_Event:
+           //     var managerObj = GameObject.Find("GardenSceneManager");
+          //      if (!managerObj) break;
+          //
+          //      var manager = managerObj.GetComponent<CollapseFloor>();
+          //      if (manager == null) break;
+
+          //      manager.PlayEvent();
+
+                break;
+            case Sequence.PopMushrooms_Event:
+            //    var managerObj = GameObject.Find("GardenSceneManager");
+            //    if (!managerObj) break;
+
+            //    var manager = managerObj.GetComponent<CollapseFloor>();
+            //    if (manager == null) break;
+
+            //    manager.PlayEvent();
+
+                break;
+            case Sequence.Ending_Event:
+            //    var managerObj = GameObject.Find("GardenSceneManager");
+            //    if (!managerObj) break;
+
+            //    var manager = managerObj.GetComponent<CollapseFloor>();
+            //    if (manager == null) break;
+
+            //   manager.PlayEvent();
+
+                break;
+
+            default:
 			break;
 		}
 	}
+
+    [PunRPC]
+    private void SetLargenCakes(int[] indexs)
+    {
+        foreach( int idx in indexs)
+        {
+            teaRoomSceneManager.SetLargenCakes(idx);
+        }
+    }
+
+    [PunRPC]
+    private void SetSmallenCakes(int[] indexs)
+    {
+        foreach (int idx in indexs)
+        {
+            teaRoomSceneManager.SetSmallenCakes(idx);
+        }
+    }
+
 }
