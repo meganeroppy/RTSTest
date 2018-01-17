@@ -1,16 +1,18 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class TestHead : Photon.MonoBehaviour {
+public class TestHead : NetworkBehaviour {
 
     public float speed = 50f;
 
     private void Start()
     {
-        if (!photonView.isMine)
-        {
-            var camera = GetComponent<Camera>();
+    //    if (!photonView.isMine)
+            if (!isLocalPlayer)
+            {
+                var camera = GetComponent<Camera>();
             if (camera != null) Destroy(camera);
         }
     }
@@ -21,9 +23,10 @@ public class TestHead : Photon.MonoBehaviour {
 
     void UpdatePositioin()
     {
-        if (photonView.isMine)
-        {
-            var move_x = Input.GetAxis("Horizontal");
+    //    if (photonView.isMine)
+            if (isLocalPlayer)
+            {
+                var move_x = Input.GetAxis("Horizontal");
             var move_z = Input.GetAxis("Vertical");
 
             var add = new Vector3(move_x, 0, move_z);

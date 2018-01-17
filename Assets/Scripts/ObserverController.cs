@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Networking;
 
-public class ObserverController : Photon.MonoBehaviour {
+public class ObserverController : NetworkBehaviour {
 
 	[SerializeField]
 	private float move_speed = 2f;
@@ -37,7 +38,9 @@ public class ObserverController : Photon.MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
-		if( photonView.ownerId != 0 && !photonView.isMine ) return;
+        // ローカルの自分自身でなかったらなにもしない
+        if (isLocalPlayer) return;
+	//	if( photonView.ownerId != 0 && !photonView.isMine ) return;
 
 		UpdatePosition();
 		UpdateRotaition();
@@ -97,6 +100,8 @@ public class ObserverController : Photon.MonoBehaviour {
 		// シーケンス開始
 		if( Input.GetKeyDown(KeyCode.P) )
 		{
+            // オンラインのときかどうかで場合わけ
+            /*
 			if( photonView.ownerId != 0 )
 			{
 				photonView.RPC("ProceedSequence", PhotonTargets.All);
@@ -105,6 +110,8 @@ public class ObserverController : Photon.MonoBehaviour {
 			{
 				ProceedSequence();
 			}
+            */
+            ProceedSequence();
 		}
 
 		// Tはテスト用のキー
@@ -115,16 +122,16 @@ public class ObserverController : Photon.MonoBehaviour {
 		}
 	}
 
-	[PunRPC]
+	//[PunRPC]
 	private void ExecTest()
 	{
-		if( photonView.ownerId != 0 )
-		{
-			PhotonNetwork.Instantiate("TestHead", transform.position, transform.rotation, 0);
-		}
+	//	if( photonView.ownerId != 0 )
+	//	{
+	//		PhotonNetwork.Instantiate("TestHead", transform.position, transform.rotation, 0);
+	//	}
 	}
 
-	[PunRPC]
+//	[PunRPC]
 	private void ProceedSequence()
 	{
 		Debug.Log( System.Reflection.MethodBase.GetCurrentMethod() );
@@ -236,7 +243,8 @@ public class ObserverController : Photon.MonoBehaviour {
 
                 // 生成位置を統一するために自分自身の場合のみ位置を選定し、リモートに共有する
 
-                if( !photonView.isMine )
+                if( isLocalPlayer )
+//                if( !photonView.isMine )
                 {
                     Debug.Log("自分自身でないためケーキ生成位置の選定を行わない");
                     return;
@@ -315,7 +323,7 @@ public class ObserverController : Photon.MonoBehaviour {
 		}
 	}
 
-    [PunRPC]
+ //   [PunRPC]
     private void SetLargenCakes(int[] indexs)
     {
         foreach( int idx in indexs)
@@ -324,7 +332,7 @@ public class ObserverController : Photon.MonoBehaviour {
         }
     }
 
-    [PunRPC]
+//    [PunRPC]
     private void SetSmallenCakes(int[] indexs)
     {
         foreach (int idx in indexs)

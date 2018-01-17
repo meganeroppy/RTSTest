@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class SwordShot : Photon.MonoBehaviour {
+public class SwordShot : NetworkBehaviour {
 
 	[SerializeField]
 	private GameObject effect;

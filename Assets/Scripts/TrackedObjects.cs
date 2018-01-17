@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Networking;
 
-public class TrackedObjects : Photon.MonoBehaviour
+public class TrackedObjects : NetworkBehaviour
 {
 	[SerializeField]
 	private CopyTransform copyTransformHead;
@@ -84,13 +85,14 @@ public class TrackedObjects : Photon.MonoBehaviour
 	/// </summary>
 	void Start () 
 	{
-		Debug.Log( gameObject.name + " " + System.Reflection.MethodBase.GetCurrentMethod() + "mine=" + (photonView != null && photonView.isMine).ToString() ) ;
+        //	Debug.Log( gameObject.name + " " + System.Reflection.MethodBase.GetCurrentMethod() + "mine=" + (photonView != null && photonView.isMine).ToString() ) ;
 
-		// 自身でない時の処理
-		if( !photonView.isMine  )
-		{
-			// CopyTransform削除
-			var children = GetComponentsInChildren<CopyTransform>();
+        // 自身でない時の処理
+        if (!isLocalPlayer)
+     //       if (!photonView.isMine)
+            {
+                // CopyTransform削除
+                var children = GetComponentsInChildren<CopyTransform>();
 			foreach( CopyTransform c in children )
 			{
 				c.enabled = false;
@@ -98,11 +100,17 @@ public class TrackedObjects : Photon.MonoBehaviour
 
 			// プレイヤーIDを取得
 			int id = 0;
-			var obj = photonView.instantiationData;
-			if( obj.Length > 0 )
-			{
-				id = System.Convert.ToInt32( obj[0] );
-			}
+            //	var obj = photonView.instantiationData;
+            //	if( obj.Length > 0 )
+            //	{
+            //		id = System.Convert.ToInt32( obj[0] );
+            //	}
+
+            var nIdentity = GetComponent<NetworkIdentity>();
+            if( nIdentity != null )
+            {
+            //    id = nIdentity.netId;
+            }
 
 			playerLabel.text = "PLAYER[ " + id.ToString() + " ]"; 
 			playerLabel.color = playerColor[ id % playerColor.Length ];
@@ -125,16 +133,21 @@ public class TrackedObjects : Photon.MonoBehaviour
 
 		if( forceDrothy ) CreateDrothy();
 
-		if( useKeyboardControl && photonView.isMine ) gameObject.AddComponent<PlayerTest>();
+        if (useKeyboardControl && isLocalPlayer) gameObject.AddComponent<PlayerTest>();
+        //        if (useKeyboardControl && photonView.isMine) gameObject.AddComponent<PlayerTest>();
 
-		myCamera.enabled = photonView.ownerId == 0 || photonView.isMine;
-		audioListener.enabled = photonView.ownerId == 0 || photonView.isMine; 
-		if( headModel != null ) headModel.enabled = !photonView.isMine && !_isObserver;
-		playerLabel.enabled = !photonView.isMine && !_isObserver;
-	}
-	
-	// Update is called once per frame
-	void Update () 
+        myCamera.enabled = isLocalPlayer;
+    //    myCamera.enabled = photonView.ownerId == 0 || photonView.isMine;
+        audioListener.enabled = isLocalPlayer;
+    //    audioListener.enabled = photonView.ownerId == 0 || photonView.isMine;
+        if (headModel != null) headModel.enabled = !isLocalPlayer && !_isObserver;
+    //    if (headModel != null) headModel.enabled = !photonView.isMine && !_isObserver;
+        playerLabel.enabled = !isLocalPlayer && !_isObserver;
+    //    playerLabel.enabled = !photonView.isMine && !_isObserver;
+    }
+
+    // Update is called once per frame
+    void Update () 
 	{		
 		// 自分自身でなくともラベルは全て自分を向く
 		if( playerLabel.enabled && Camera.main != null)
@@ -142,11 +155,12 @@ public class TrackedObjects : Photon.MonoBehaviour
 			playerLabel.transform.forward = Camera.main.transform.forward;
 		}
 
-		if( photonView.ownerId != 0 && !photonView.isMine  ) return;
+    //    if (photonView.ownerId != 0 && !photonView.isMine) return;
+        if ( !isLocalPlayer ) return;
 
-		// とりあえず仮でRを押して頭の回転リセット
-		// TODO この操作をしなくても自動で頭の回転が調整できるようにしたい
-		if( Input.GetKeyDown(KeyCode.R) )
+        // とりあえず仮でRを押して頭の回転リセット
+        // TODO この操作をしなくても自動で頭の回転が調整できるようにしたい
+        if ( Input.GetKeyDown(KeyCode.R) )
 		{
 			OVRManager.display.RecenterPose();
 		}
@@ -154,26 +168,30 @@ public class TrackedObjects : Photon.MonoBehaviour
 		// キーボードでOを押すと観測者になる
 		if( Input.GetKeyDown(KeyCode.O) )
 		{
-			photonView.RPC( "SetObserver", PhotonTargets.AllBuffered, !_isObserver );
-		}
-	}
+        //    photonView.RPC("SetObserver", PhotonTargets.AllBuffered, !_isObserver);
+        //    photonView.RPC("SetObserver", PhotonTargets.AllBuffered, !_isObserver);
+        }
+    }
 		
 	/// <summary>
 	/// 初期化
 	/// </summary>
 	public void Initialize( GameObject copyTransformHead, GameObject copyTransformRightHand, GameObject copyTransformLeftHand, GameObject copyTransformBody, GameObject offsetObject, int playerId )
 	{
-		Debug.Log( gameObject.name + " " + System.Reflection.MethodBase.GetCurrentMethod() + "mine=" + (photonView != null && photonView.isMine).ToString() ) ;
+        //	Debug.Log( gameObject.name + " " + System.Reflection.MethodBase.GetCurrentMethod() + "mine=" + (photonView != null && photonView.isMine).ToString() ) ;
 
-		if( playerId == 0 || photonView.ownerId == 0)
-		{
-			this.copyTransformHead.enabled = false;
+        if ( !isLocalPlayer )
+    //        if (playerId == 0 || photonView.ownerId == 0)
+            {
+                this.copyTransformHead.enabled = false;
 			this.copyTransformRightHand.enabled = false;
 			this.copyTransformLeftHand.enabled = false;
 			this.copyTransformBody.enabled = false;
-			if( photonView.ownerId != 0 && photonView.isMine )
-			{
-				photonView.RPC( "SetObserver", PhotonTargets.AllBuffered, !_isObserver );
+
+            if ( isLocalPlayer )
+         //       if (photonView.ownerId != 0 && photonView.isMine)
+            {
+            //        photonView.RPC( "SetObserver", PhotonTargets.AllBuffered, !_isObserver );
 			}
 			else
 			{
@@ -198,10 +216,10 @@ public class TrackedObjects : Photon.MonoBehaviour
 	/// <summary>
 	/// 観測者に指定
 	/// </summary>
-	[PunRPC]
+	//[PunRPC]   
 	public void SetObserver( bool value )
 	{
-		Debug.Log( gameObject.name + " " + System.Reflection.MethodBase.GetCurrentMethod() + "mine=" + (photonView != null && photonView.isMine).ToString() ) ;
+	//	Debug.Log( gameObject.name + " " + System.Reflection.MethodBase.GetCurrentMethod() + "mine=" + (photonView != null && photonView.isMine).ToString() ) ;
 
 		_isObserver = value;
 
@@ -216,10 +234,11 @@ public class TrackedObjects : Photon.MonoBehaviour
 		if( headModel != null )headModel.enabled = !_isObserver ;
 		playerLabel.enabled = !_isObserver;
 
-		// 観測者かつ自身ではないときにビジュアルを有効にする
-		cameraImage.SetActive( _isObserver && !photonView.isMine );
+        // 観測者かつ自身ではないときにビジュアルを有効にする
+        cameraImage.SetActive(_isObserver && !isLocalPlayer);
+    //    cameraImage.SetActive(_isObserver && !photonView.isMine);
 
-		observerController.enabled = _isObserver;
+        observerController.enabled = _isObserver;
 
 		if( _isObserver )
 		{

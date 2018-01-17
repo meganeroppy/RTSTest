@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class SwordShooter : Photon.MonoBehaviour
+public class SwordShooter : NetworkBehaviour
 {
 	[SerializeField]
 	private Transform shotOriginRight;
@@ -54,13 +55,14 @@ public class SwordShooter : Photon.MonoBehaviour
 
 	private void Shot(Transform shotOrigin)
 	{
-		if( photonView != null && photonView.isMine )
-		{
-			PhotonNetwork.Instantiate( shot.name, shotOrigin.position, shotOrigin.rotation, 0);
+        if ( isLocalPlayer )
+    //        if (photonView != null && photonView.isMine)
+        {
+        //        PhotonNetwork.Instantiate( shot.name, shotOrigin.position, shotOrigin.rotation, 0);
 		}
 		else
 		{
-			Instantiate( shot, shotOrigin.position, shotOrigin.rotation);
+		//	Instantiate( shot, shotOrigin.position, shotOrigin.rotation);
 		}
 	}
 }

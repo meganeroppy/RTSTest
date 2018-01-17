@@ -66,7 +66,7 @@ public class TeaRoomSceneManager : MonoBehaviour
     {
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
-        PhotonNetwork.Instantiate(smallenCakePrefab.name, smallenCakePositions[idx].position, Quaternion.identity, 0);
+    //    PhotonNetwork.Instantiate(smallenCakePrefab.name, smallenCakePositions[idx].position, Quaternion.identity, 0);
     }
 
     /// <summary>
@@ -76,7 +76,7 @@ public class TeaRoomSceneManager : MonoBehaviour
     {
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
-        PhotonNetwork.Instantiate(smallenCakePrefab.name, largenCakePositions[idx].position, Quaternion.identity, 0);
+    //    PhotonNetwork.Instantiate(smallenCakePrefab.name, largenCakePositions[idx].position, Quaternion.identity, 0);
     }
 
     /// <summary>

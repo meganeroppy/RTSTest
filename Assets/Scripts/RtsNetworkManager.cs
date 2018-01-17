@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Networking;
 
-public class RtsNetworkManager : Photon.PunBehaviour
+public class RtsNetworkManager : NetworkBehaviour
 {	
 	/// <summary>
 	/// 重複しないようにする
@@ -30,7 +31,7 @@ public class RtsNetworkManager : Photon.PunBehaviour
 
 	[SerializeField]
 	private GameObject offsetObject;
-
+    /*
 	IEnumerator Start()
     {
 		// 文字列指定があれば指定されたシーンをロード
@@ -64,15 +65,15 @@ public class RtsNetworkManager : Photon.PunBehaviour
 		}
 
         // 指定の設定でPhotonネットワークに接続
-        PhotonNetwork.ConnectUsingSettings("1.0.0");
-        PhotonNetwork.sendRate = 30;
+    //    PhotonNetwork.ConnectUsingSettings("1.0.0");
+    //    PhotonNetwork.sendRate = 30;
     }
 
     // 「ロビー」に接続した際に呼ばれるコールバック
     public override void OnJoinedLobby()
     {
         Debug.Log("OnJoinedLobby");
-        PhotonNetwork.JoinRandomRoom();
+    //    PhotonNetwork.JoinRandomRoom();
     }
 
     // いずれかの「ルーム」への接続に失敗した際のコールバック
@@ -81,7 +82,7 @@ public class RtsNetworkManager : Photon.PunBehaviour
         Debug.Log("OnPhotonRandomJoinFailed");
 
         // ルームを作成（今回の実装では、失敗＝マスタークライアントなし、として「ルーム」を作成）
-        PhotonNetwork.CreateRoom(null);
+    //    PhotonNetwork.CreateRoom(null);
     }
 
     // Photonサーバに接続した際のコールバック
@@ -94,7 +95,7 @@ public class RtsNetworkManager : Photon.PunBehaviour
     public override void OnConnectedToMaster()
     {
         Debug.Log("OnConnectedToMaster");
-        PhotonNetwork.JoinRandomRoom();
+    \\    PhotonNetwork.JoinRandomRoom();
     }
 
     // いずれかの「ルーム」に接続した際のコールバック
@@ -139,4 +140,5 @@ public class RtsNetworkManager : Photon.PunBehaviour
     {
         GUILayout.Label(PhotonNetwork.connectionStateDetailed.ToString());
     }
+    */
 }
