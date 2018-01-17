@@ -2,26 +2,41 @@
 using System.Collections;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
+/// <summary>
+/// プレイヤーの入力による制御とサーバーとの同期を管理
+/// </summary>
 public class PlayerTest : NetworkBehaviour
 {
 	private Rigidbody myRigidbody;
     public float moveSpeed = 10f;
     public float rotSpeed = 10f;
     private NetworkView netView = null;
-	public int iItemCount = 0;
 	private NetworkTransform nTransform = null;
 
+    /// <summary>
+    /// 管理者か？
+    /// </summary>
 	[SyncVar]
 	private bool isObserver = false;
     private bool isObserverPrev = false;
 
-	[SerializeField]
+    /// <summary>
+    /// 脚の動きのシミュレーションを有効にするか？
+    /// </summary>
+    public bool useSimulateFoot = false;
+
+    [SerializeField]
 	private MeshRenderer observerSign;
 
     [SerializeField]
-    private DrothySample drothyPrefab;
-    private DrothySample drothy;
+    private DrothySample drothyPrefabOld;
+    private DrothySample drothyOld;
+
+    [SerializeField]
+    private IKControl drothyIKPrefab;
+    private IKControl myDrothy;
 
     [SerializeField]
     private GameObject bulletPrefab;
@@ -57,6 +72,22 @@ public class PlayerTest : NetworkBehaviour
     private NetworkInstanceId drothyNetId;
 
     /// <summary>
+    /// （仮）プリセットのプレイヤーカラー
+    /// </summary>
+    Color[] playerColor = new Color[] { Color.gray, Color.red, Color.green, Color.blue, Color.yellow };
+
+    /// <summary>
+    /// キーボード操作を有効にするか？
+    /// </summary>
+    public bool useKeyboardControl = false;
+
+    /// <summary>
+    /// 情報表示ラベル
+    /// </summary>
+    [SerializeField]
+    private Text playerLabel;
+
+    /// <summary>
     /// つかめる距離にあるアイテム
     /// </summary>
     private Mushroom holdTarget = null;
@@ -65,6 +96,13 @@ public class PlayerTest : NetworkBehaviour
     /// つかんでいるアイテム
     /// </summary>
     private Mushroom holdItem = null;
+
+    /// <summary>
+    /// カメライメージ
+    /// </summary>
+    [SerializeField]
+    private GameObject cameraImage;
+
 
     [SerializeField]
     private string[] sceneNameList;
@@ -75,19 +113,41 @@ public class PlayerTest : NetworkBehaviour
     }
 
     // Use this for initialization
-    void Start () 
-	{
-		myRigidbody = GetComponent<Rigidbody>();
-		netView = GetComponent<NetworkView>();
-		nTransform = GetComponent<NetworkTransform>();
+    void Start()
+    {
+        myRigidbody = GetComponent<Rigidbody>();
+        netView = GetComponent<NetworkView>();
+        nTransform = GetComponent<NetworkTransform>();
 
-        if( !isLocalPlayer )        
-		{
-            // カメラ無効
+        if (!isLocalPlayer)
+        {
+            // カメラ無効（一緒にオーディオリスナーも無効になる）
             var camera = GetComponentInChildren<Camera>();
             if (camera.gameObject) camera.gameObject.SetActive(false);
-		}
-	}
+
+            // 観測者かつ自身ではないときにビジュアルを有効にする
+            cameraImage.SetActive(isObserver && !isLocalPlayer);
+        }
+
+        // ラベルの設定
+        { 
+            int id = 0;
+            //	var obj = photonView.instantiationData;
+            //	if( obj.Length > 0 )
+            //	{
+            //		id = System.Convert.ToInt32( obj[0] );
+            //	}
+
+            var nIdentity = GetComponent<NetworkIdentity>();
+            if (nIdentity != null)
+            {
+                //    id = nIdentity.netId;
+            }
+
+            playerLabel.text = "PLAYER[ " + id.ToString() + " ]";
+            playerLabel.color = playerColor[id % playerColor.Length];
+        }
+    }
 
     public override void OnStartLocalPlayer()
     {
@@ -127,7 +187,11 @@ public class PlayerTest : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        //	textItem.text = ""+iItemCount;
+        // 自分自身でなくともラベルは全て自分を向く
+        if (playerLabel.enabled && Camera.main != null)
+        {
+            playerLabel.transform.forward = Camera.main.transform.forward;
+        }
 
         textMesh.text = netIdStr;
 
@@ -149,20 +213,21 @@ public class PlayerTest : NetworkBehaviour
 
         if (isClient)
         {
-            if (drothy == null)
+            if (drothyOld == null)
             {
                 var obj = ClientScene.FindLocalObject(drothyNetId);
                 if( obj )
                 {
-                    drothy = obj.GetComponent<DrothySample>();
+                    drothyOld = obj.GetComponent<DrothySample>();
                 }
             }
 
-            if (drothy != null)
+            if (drothyOld != null)
             {
-                drothy.transform.localScale = Vector3.one * drothyScale;
+                drothyOld.transform.localScale = Vector3.one * drothyScale;
             }
         }
+
         // ■ここから↓はローカルプレイヤーのみ■
 
         if ( !nTransform.isLocalPlayer )
@@ -189,7 +254,6 @@ public class PlayerTest : NetworkBehaviour
             CmdFire();
         }
 
-
         if (Input.GetKeyDown(KeyCode.Space) && isObserver)
         {
             CmdCreateMushroom();
@@ -215,24 +279,65 @@ public class PlayerTest : NetworkBehaviour
             holdTarget = null;
             CmdReleaseHoldTarget();
         }
+
+        // キーボードでOを押すと観測者になる(仮）
+        if (Input.GetKeyDown(KeyCode.O))
+        {
+            //    photonView.RPC("SetObserver", PhotonTargets.AllBuffered, !_isObserver);
+            //    photonView.RPC("SetObserver", PhotonTargets.AllBuffered, !_isObserver);
+        }
+
     }
 
+    /// <summary>
+    /// ドロシーを生成する
+    /// </summary>
     [Command]
     private void CmdCreateDrothy()
+    //   private void CmdCreateDrothy( int colorIdx=1 ) // カラバリ対応用
     {
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
-        drothy = Instantiate(drothyPrefab);
-        drothy.SetOwner(this.transform);
+        // プレハブから生成
+        var drothyIK = Instantiate<IKControl>(drothyIKPrefab);
+
+        // IKのターゲットをトラッキングオブジェクトから取得
+        {
+            var trackedObj = GetComponent<TrackedObjects>();
+            if( trackedObj != null )
+            {
+                drothyIK.rightHandObj = trackedObj.RightHandObject;
+                drothyIK.leftHandObj = trackedObj.LeftHandObject;
+                drothyIK.bodyObj = trackedObj.BodyObject;
+                drothyIK.lookObj = trackedObj.LookTarget;
+            }
+        }
+
+
+        if (useSimulateFoot)
+        {
+            drothyIK.SetSimulateFoot();
+        }
+
+        // TODO プレイヤーIDによってカラバリを変更する
+    //    drothyIK.GetComponent<DrothyController>().SetDressColor(colorIdx);
+
+        myDrothy = drothyIK;
+
+    
+        drothyOld.SetOwner(this.transform);
 
 //        NetworkServer.Spawn(drothy.gameObject);
-        NetworkServer.SpawnWithClientAuthority(drothy.gameObject, gameObject);
+        NetworkServer.SpawnWithClientAuthority(drothyOld.gameObject, gameObject);
 
-        drothyNetId = drothy.netId;
+        drothyNetId = drothyOld.netId;
 
-        RpcPassDrothyReference(drothy.netId);
+        RpcPassDrothyReference(drothyOld.netId);
     }
 
+    /// <summary>
+    /// クライアント側でもドロシーの参照を持たせる
+    /// </summary>
     [ClientRpc]
     private void RpcPassDrothyReference( NetworkInstanceId netId )
     {
@@ -240,22 +345,31 @@ public class PlayerTest : NetworkBehaviour
 
         var obj = ClientScene.FindLocalObject(netId);
 
-        drothy = obj.GetComponent<DrothySample>();
+        drothyOld = obj.GetComponent<DrothySample>();
     }
 
+    /// <summary>
+    /// ドロシーへの参照を要求する
+    /// </summary>
     [Command]
     private void CmdRequestDrothyReference()
     {
-        if (drothy == null) return;
-        RpcPassDrothyReference(drothy.netId);
+        if (drothyOld == null) return;
+        RpcPassDrothyReference(drothyOld.netId);
     }
 
+    /// <summary>
+    /// 観測者フラグを設定する
+    /// </summary>
     [Command]
 	private void CmdSetIsObserver( bool value )
 	{
         isObserver = value;
     }
 
+    /// <summary>
+    /// （仮）銃弾を発射する
+    /// </summary>
     [Command]
     private void CmdFire()
     {
@@ -265,7 +379,6 @@ public class PlayerTest : NetworkBehaviour
         obj.transform.position = transform.position;
         obj.GetComponent<Rigidbody>().AddForce(transform.forward * 80f);
         obj.GetComponent<MeshRenderer>().material.color = isObserver ? Color.red : Color.white;
-
 
         NetworkServer.Spawn(obj);
     }
@@ -285,7 +398,7 @@ public class PlayerTest : NetworkBehaviour
     }
 
     /// <summary>
-    /// ローカルでのみ判定する
+    /// ローカルでのみ衝突を判定する
     /// </summary>
     private void OnTriggerEnter(Collider other)
     {
@@ -304,6 +417,9 @@ public class PlayerTest : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// つかみ候補のアイテムのセットをサーバーに反映する
+    /// </summary>
     [Command]
     private void CmdSetHoldTarget( NetworkInstanceId id )
     {
@@ -318,6 +434,9 @@ public class PlayerTest : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// つかみ候補の解放をサーバーに反映する
+    /// </summary>
     [Command]
     private void CmdReleaseHoldTarget()
     {
@@ -326,6 +445,9 @@ public class PlayerTest : NetworkBehaviour
         holdTarget = null;
     }
 
+    /// <summary>
+    /// つかんでいるアイテムをサーバーにも反映する
+    /// </summary>
     [Command]
     private void CmdSetHoldItem()
     {
@@ -346,6 +468,9 @@ public class PlayerTest : NetworkBehaviour
         RpcSetHoldItem();
     }
 
+    /// <summary>
+    /// つかんでいるアイテムのセットをクライアントに反映する
+    /// </summary>
     [ClientRpc]
     private void RpcSetHoldItem()
     {
@@ -354,9 +479,11 @@ public class PlayerTest : NetworkBehaviour
 
         holdItem = holdTarget.GetComponent<Mushroom>();
         holdTarget = null;
-
     }
 
+    /// <summary>
+    /// アイテムを消費する
+    /// </summary>
     [Command]
     private void CmdEatItem( )
     {
@@ -381,12 +508,18 @@ public class PlayerTest : NetworkBehaviour
         drothyScale = 10f;
     }
 
+    /// <summary>
+    /// アイテムの位置を更新する
+    /// </summary>
     [Command]
     private void CmdUpdateHoldItemPosition()
     {
         holdItem.CmdSetPosition(holdPos.position);
     }
 
+    /// <summary>
+    /// 次のシーンに移動する
+    /// </summary>
     [Command]
     private void CmdGotoNextScene()
     {
@@ -396,6 +529,11 @@ public class PlayerTest : NetworkBehaviour
         RpcGotoNextScene(currentSceneIndex, true);
     }
 
+    /// <summary>
+    /// 次のシーンに移動する
+    /// </summary>
+    /// <param name="newSceneIndex"></param>
+    /// <param name="allowLoadSameScene"></param>
     [ClientRpc]
     private void RpcGotoNextScene( int newSceneIndex, bool allowLoadSameScene )
     {

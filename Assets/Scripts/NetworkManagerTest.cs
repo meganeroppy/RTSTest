@@ -9,6 +9,13 @@ public class NetworkManagerTest : NetworkBehaviour
 
 	private NetworkManager nManager;
 
+    [SerializeField]
+    private int playerId = 1;
+    public int GetPlayerId()
+    {
+        return playerId;
+    }
+
     public enum Role
     {
         Server,

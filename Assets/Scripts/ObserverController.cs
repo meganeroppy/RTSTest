@@ -164,10 +164,10 @@ public class ObserverController : NetworkBehaviour {
 			{
 				var baseScene = SceneManager.GetSceneByName( baseSceneName );
 
-				for( int i=0 ; i < TrackedObjects.list.Count ; ++i )
-				{
-					SceneManager.MoveGameObjectToScene( TrackedObjects.list[i].gameObject, baseScene );
-				}
+		//		for( int i=0 ; i < TrackedObjects.list.Count ; ++i )
+		//		{
+		//			SceneManager.MoveGameObjectToScene( TrackedObjects.list[i].gameObject, baseScene );
+		//		}
 
 				var drothyTeam = GameObject.FindGameObjectsWithTag("Drothy");
 				foreach( GameObject d in drothyTeam )
@@ -255,7 +255,8 @@ public class ObserverController : NetworkBehaviour {
 
                 // プレイヤー数を取得 自身は除く
                 int observerNum = 1; // TODO 観測者が複数いるとたぶにバグになる
-                int playerNum = TrackedObjects.list.Count - observerNum;
+                int playerNum = observerNum;
+         //       int playerNum = TrackedObjects.list.Count - observerNum;
                 List<int> indexs = new List<int>();
 
                 // プレイヤー数まで位置を選定

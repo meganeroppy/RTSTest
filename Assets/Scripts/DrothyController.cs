@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class DrothyController : MonoBehaviour 
+public class DrothyController : NetworkBehaviour 
 {
 	private Animator anim;
 	private bool walking;
@@ -23,8 +24,20 @@ public class DrothyController : MonoBehaviour
 	[SerializeField]
 	private Texture[] dressTexture;
 
-	// Use this for initialization
-	void Start ()
+    [SyncVar]
+    private Transform owner;
+
+    [SyncVar]
+    private bool initialized = false;
+
+    public void SetOwner(Transform owner)
+    {
+        this.owner = owner;
+        initialized = true;
+    }
+
+    // Use this for initialization
+    void Start ()
 	{
 		anim = GetComponent<Animator>();
 		prevPosition = modelRoot.localPosition;
@@ -64,7 +77,22 @@ public class DrothyController : MonoBehaviour
 			transform.position += Vector3.down * speed * Time.deltaTime;
 
 		}
-	}
+
+        // DrothySampleから引っ越しされた部分
+        {
+            if (owner != null)
+            {
+                transform.SetPositionAndRotation(owner.position, owner.rotation);
+            }
+            else if (initialized)
+            {
+                // 初期化後にマスターがいなくなったら削除
+                Destroy(gameObject);
+            }
+
+        }
+
+    }
 
 	public void SetDressColor(int colorIdx)
 	{

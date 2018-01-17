@@ -5,34 +5,39 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Networking;
 
 public class RtsNetworkManager : NetworkBehaviour
-{	
-	/// <summary>
-	/// 重複しないようにする
-	/// </summary>
-	[SerializeField]
-	private byte playerId = 0;
+{
+    /// <summary>
+    /// 重複しないようにする
+    /// </summary>
+    [SerializeField]
+    private byte playerId = 0;
 
-	public GameObject prefab;
+    public GameObject prefab;
 
-	[SerializeField]
-	private string StartSceneName;
+    [SerializeField]
+    private string StartSceneName;
 
-	[SerializeField]
-	private TrackerSettings copyTransformHead;
+    [SerializeField]
+    private TrackerSettings copyTransformHead;
+    public GameObject CopyTransformHead { get { return copyTransformHead.gameObject; } }
 
 	[SerializeField]
 	private TrackerSettings copyTransformRightHand;
+    public GameObject CopyTransformRightHand { get { return copyTransformRightHand.gameObject; } }
 
-	[SerializeField]
+    [SerializeField]
 	private TrackerSettings copyTransformLeftHand;
+    public GameObject CopyTransformLeftHand { get { return copyTransformLeftHand.gameObject; } }
 
-	[SerializeField]
+    [SerializeField]
 	private TrackerSettings copyTransformBody;
+    public GameObject CopyTransformBody { get { return copyTransformBody.gameObject; } }
 
-	[SerializeField]
+    [SerializeField]
 	private GameObject offsetObject;
-    /*
-	IEnumerator Start()
+    public GameObject OffsetObject { get { return offsetObject.gameObject; } }
+
+    IEnumerator Start()
     {
 		// 文字列指定があれば指定されたシーンをロード
 		if( !string.IsNullOrEmpty( StartSceneName ) )
@@ -63,52 +68,6 @@ public class RtsNetworkManager : NetworkBehaviour
 			if( copyTransformBody.ObjectName.EndsWith("Body") )				
 				copyTransformBody.ObjectName = copyTransformBody.ObjectName + playerId.ToString();
 		}
-
-        // 指定の設定でPhotonネットワークに接続
-    //    PhotonNetwork.ConnectUsingSettings("1.0.0");
-    //    PhotonNetwork.sendRate = 30;
-    }
-
-    // 「ロビー」に接続した際に呼ばれるコールバック
-    public override void OnJoinedLobby()
-    {
-        Debug.Log("OnJoinedLobby");
-    //    PhotonNetwork.JoinRandomRoom();
-    }
-
-    // いずれかの「ルーム」への接続に失敗した際のコールバック
-    void OnPhotonRandomJoinFailed()
-    {
-        Debug.Log("OnPhotonRandomJoinFailed");
-
-        // ルームを作成（今回の実装では、失敗＝マスタークライアントなし、として「ルーム」を作成）
-    //    PhotonNetwork.CreateRoom(null);
-    }
-
-    // Photonサーバに接続した際のコールバック
-    public override void OnConnectedToPhoton()
-    {
-        Debug.Log("OnConnectedToPhoton");
-    }
-
-    // マスタークライアントに接続した際のコールバック
-    public override void OnConnectedToMaster()
-    {
-        Debug.Log("OnConnectedToMaster");
-    \\    PhotonNetwork.JoinRandomRoom();
-    }
-
-    // いずれかの「ルーム」に接続した際のコールバック
-    public override void OnJoinedRoom()
-    {
-        Debug.Log("OnJoinedRoom");
-
-        // 「ルーム」に接続したらPrefabを生成する（動作確認用）
-		var data = new object[1]{playerId};
-		var obj = PhotonNetwork.Instantiate(prefab.name, Vector3.zero, Quaternion.identity, 0, data);
-
-		obj.GetPhotonView().owner.UserId = playerId.ToString();
-		InitializeTrackedObjects( obj );
     }
 
 	/// <summary>
@@ -123,22 +82,6 @@ public class RtsNetworkManager : NetworkBehaviour
 			return;
 		}
 
-		trackedObjects.Initialize(copyTransformHead.gameObject, copyTransformRightHand.gameObject, copyTransformLeftHand.gameObject, copyTransformBody.gameObject, offsetObject, playerId);
-	}
-
-	/// <summary>
-	/// Photonネットワークへの接続失敗時のコールバック
-	/// </summary>
-	public void OnFailedToConnectToPhoton()
-	{
-		var obj = Instantiate(prefab, Vector3.zero, Quaternion.identity);
-		InitializeTrackedObjects( obj ); 
-	}
-
-    // 現在の接続状況を表示（デバッグ目的）
-    void OnGUI()
-    {
-        GUILayout.Label(PhotonNetwork.connectionStateDetailed.ToString());
-    }
-    */
+	//	trackedObjects.Initialize(copyTransformHead.gameObject, copyTransformRightHand.gameObject, copyTransformLeftHand.gameObject, copyTransformBody.gameObject, offsetObject, playerId);
+	} 
 }
