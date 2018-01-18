@@ -108,12 +108,6 @@ public class ObserverController : NetworkBehaviour {
             em.CmdProceedSequence();
 		}
 
-        // きのこ配置仮
-        if (!behaveAsOnePlayer && Input.GetKeyDown(KeyCode.Space) )
-        {
-            em.CmdCreateMushroom();
-        }
-
         // 次のシーンに移動仮
         if (!behaveAsOnePlayer && Input.GetKeyDown(KeyCode.N) )
         {

@@ -35,19 +35,31 @@ public class EventManager : NetworkBehaviour
 
     private int currentSequence = 0;
 
+    /// <summary>
+    /// 削除候補
+    /// </summary>
+    [System.Obsolete]
     [SerializeField]
     private string[] sceneNameList;
 
     /// <summary>
     /// 現在のシーンインデックス
     /// </summary>
+    [System.Obsolete]
     [SyncVar]
     private int currentSceneIndex = 0;
 
+    private enum ItemType
+    {
+        SmallenCake,
+        LargenCake,
+        Mushroom,
+    }
+
     /// <summary>
-    /// 複数回使用するためメンバで持つ
+    /// このフラグが有効な時に各プレイヤーが同時にケーキを食べるとドロシーが小さくなる
+    /// 論理値で管理しなくてもシーケンスをみて判断できそうなきもするので削除候補
     /// </summary>
-    private TeaRoomSceneManager teaRoomSceneManager;
     private bool enableSmallenDrothy = false;
 
     /// <summary>
@@ -159,14 +171,14 @@ public class EventManager : NetworkBehaviour
     {
         Debug.Log("イベント " + newEvent.ToString() + "の実行");
 
-        GameObject obj = null;
-
         switch (newEvent)
         {
             case Sequence.CollapseGround_Event:
 
                 // 地面か崩れるイベント
-                obj = GameObject.Find("GardenSceneManager");
+                // やりかたかえてもいいかも？
+
+                GameObject　obj = GameObject.Find("GardenSceneManager");
                 if (!obj) break;
 
                 obj.SendMessage("PlayEvent");
@@ -174,91 +186,37 @@ public class EventManager : NetworkBehaviour
                 break;
             case Sequence.PopCakes1_Event:
 
-                // 縮小ケーキが出現するイベント
-                obj = GameObject.Find("TeaRoomSceneManager");
-                if (!obj) break;
-
-                teaRoomSceneManager = obj.GetComponent<TeaRoomSceneManager>();
-
-                // 生成位置を統一するために自分自身の場合のみ位置を選定し、リモートに共有する
-
-                if (isLocalPlayer)
-                //                if( !photonView.isMine )
-                {
-                    Debug.Log("自分自身でないためケーキ生成位置の選定を行わない");
-                    return;
-                }
-
-                // 出現候補を取得
-                var positions = teaRoomSceneManager.GetSmallenCakePositions();
-
-                // プレイヤー数を取得 自身は除く
-                int observerNum = 1; // TODO 観測者が複数いるとたぶにバグになる
-                int playerNum = observerNum;
-                //       int playerNum = TrackedObjects.list.Count - observerNum;
-                List<int> indexs = new List<int>();
-
-                // プレイヤー数まで位置を選定
-                while (indexs.Count < playerNum)
-                {
-                    int key = Random.Range(0, positions.Length);
-                    if (!indexs.Contains(key))
-                    {
-                        indexs.Add(key);
-                    }
-                }
-
-                //        photonView.RPC("SetLargenCakes", PhotonTargets.All, indexs.ToArray());
-                SetSmallenCakes(indexs.ToArray());
+                // 縮小化ケーキが出現するイベント                
+                CmdCreateItems( ItemType.SmallenCake );
 
                 break;
             case Sequence.SmallenDrothy_Event:
-                // ドロシーが小さくなるイベントのフラグを立てる
+
+                // ドロシー縮小化フラグを有効
                 enableSmallenDrothy = true;
 
                 break;
             case Sequence.PopCakes2_Event:
-                //      var managerObj = GameObject.Find("GardenSceneManager");
-                //      if (!managerObj) break;
 
-                //      var manager = managerObj.GetComponent<CollapseFloor>();
-                //      if (manager == null) break;
-
-                //      manager.PlayEvent();
+                // 巨大化ケーキ出現
+                CmdCreateItems(ItemType.LargenCake);
 
                 break;
             case Sequence.LargenDrothy_Event:
-                //     var managerObj = GameObject.Find("GardenSceneManager");
-                //      if (!managerObj) break;
-                //
-                //      var manager = managerObj.GetComponent<CollapseFloor>();
-                //      if (manager == null) break;
 
-                //      manager.PlayEvent();
+                // ドロシー巨大化フラグを有効
 
                 break;
             case Sequence.PopMushrooms_Event:
-                //    var managerObj = GameObject.Find("GardenSceneManager");
-                //    if (!managerObj) break;
 
-                //    var manager = managerObj.GetComponent<CollapseFloor>();
-                //    if (manager == null) break;
-
-                //    manager.PlayEvent();
+                // きのこ出現
+                CmdCreateItems(ItemType.Mushroom);
 
                 break;
             case Sequence.Ending_Event:
-                //    var managerObj = GameObject.Find("GardenSceneManager");
-                //    if (!managerObj) break;
-
-                //    var manager = managerObj.GetComponent<CollapseFloor>();
-                //    if (manager == null) break;
-
-                //   manager.PlayEvent();
-
-                break;
-
             default:
+
+                // エンディングから待機画面にもどる                
                 break;
         }
     }
@@ -267,17 +225,27 @@ public class EventManager : NetworkBehaviour
     /// きのこ配置
     /// </summary>
     [Command]
-    public void CmdCreateMushroom()
+    private void CmdCreateItems( ItemType type )
     {
+        if (TeaRoomSceneManager.instance == null) return;
+
+        // 出現候補を取得
+        var positions =
+            type == ItemType.SmallenCake ? TeaRoomSceneManager.instance.SmallenCakePositions :
+            type == ItemType.LargenCake ? TeaRoomSceneManager.instance.LargenCakePosition :            
+            TeaRoomSceneManager.instance.MushroomPositions;
+
+        // TODO プレイヤー数を取得
+        int PlayerNum = 1; 
+
         var obj = Instantiate(mushroomPrefab);
-        obj.transform.position = transform.position;
-        var mush = obj.GetComponent<Mushroom>();
-        mush.CmdSetParent(this.gameObject);
+        obj.transform.position = positions[Random.Range(0, positions.Length)].position;
 
         NetworkServer.Spawn(obj);
     }
 
     /// <summary>
+    /// 削除候補
     /// 次のシーンに移動する
     /// </summary>
     [Command]
@@ -290,6 +258,7 @@ public class EventManager : NetworkBehaviour
     }
 
     /// <summary>
+    /// 削除候補
     /// 次のシーンに移動する
     /// </summary>
     /// <param name="newSceneIndex"></param>
@@ -309,24 +278,6 @@ public class EventManager : NetworkBehaviour
             {
                 SceneManager.UnloadSceneAsync(sceneNameList[(currentSceneIndex - 1) % sceneNameList.Length]);
             }
-        }
-    }
-
-    //   [PunRPC]
-    private void SetLargenCakes(int[] indexs)
-    {
-        foreach (int idx in indexs)
-        {
-            teaRoomSceneManager.SetLargenCakes(idx);
-        }
-    }
-
-    //    [PunRPC]
-    private void SetSmallenCakes(int[] indexs)
-    {
-        foreach (int idx in indexs)
-        {
-            teaRoomSceneManager.SetSmallenCakes(idx);
         }
     }
 }

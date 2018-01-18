@@ -26,10 +26,6 @@ public class Mushroom : NetworkBehaviour
         nTrans = GetComponent<NetworkTransform>();
     }
 
-    public GameObject parent
-    {
-        get; set;
-    }
 
     [ServerCallback]
     private void Update()
@@ -41,14 +37,9 @@ public class Mushroom : NetworkBehaviour
         }
     }
 
-
-//    [Command]
-    public void CmdSetParent(GameObject obj )
-    {
-        parent = obj;
-    }
-
- //   [Command]
+    /// <summary>
+    /// サーバー上で削除する
+    /// </summary>
     public void CmdRemove()
     {
         NetworkServer.Destroy(gameObject);
@@ -62,12 +53,4 @@ public class Mushroom : NetworkBehaviour
             list.Remove(this);
         }
     }
-
-//    [Command]
-    public void CmdSetPosition( Vector3 pos )
-    {
-        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
-        transform.position = pos;
-    }
-
 }

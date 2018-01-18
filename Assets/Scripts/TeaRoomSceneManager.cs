@@ -4,9 +4,15 @@ using UnityEngine;
 
 /// <summary>
 /// ティールームのシーン制御
+/// 色々準備してるけど全部イベントマネージャでやったほうが楽かも
+/// 場合によってはこちらのメソッドたちも使用する
+/// とりあえず現状はアイテムの生成トランスフォームを保持するのみ？
+/// アイテム生成でなくシーンそのものに変化（スケール変更など）を起こす際に使う予定
 /// </summary>
 public class TeaRoomSceneManager : MonoBehaviour
 {
+    public static TeaRoomSceneManager instance;
+
     /// <summary>
     /// 巨大化ケーキのプレハブ
     /// </summary>
@@ -30,18 +36,26 @@ public class TeaRoomSceneManager : MonoBehaviour
     /// </summary>
     [SerializeField]
     private Transform[] largenCakePositions;
+    public Transform[] LargenCakePosition { get { return largenCakePositions; } }
 
     /// <summary>
     /// 縮小化ケーキの出現位置候補
     /// </summary>
     [SerializeField]
     private Transform[] smallenCakePositions;
+    public Transform[] SmallenCakePositions { get { return smallenCakePositions; } }
 
     /// <summary>
     /// キノコの出現位置候補
     /// </summary>
     [SerializeField]
     private Transform[] mushroomPositions;
+    public Transform[] MushroomPositions { get { return mushroomPositions; } }
+
+    private void Awake()
+    {
+        instance = this;
+    }
 
     /// <summary>
     /// プレイヤーを大きくなる演出（※プレイヤー以外の環境オブジェクトを小さくして表現する
@@ -86,21 +100,4 @@ public class TeaRoomSceneManager : MonoBehaviour
     {
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
     }
-
-    public Transform[] GetLargenCakePositions()
-    {
-        return largenCakePositions;
-    }
-
-    public Transform[] GetSmallenCakePositions()
-    {
-        return smallenCakePositions;
-    }
-
-
-    public Transform[] GetMushroomPositions()
-    {
-        return mushroomPositions;
-    }
-
 }
