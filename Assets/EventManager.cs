@@ -50,6 +50,13 @@ public class EventManager : NetworkBehaviour
     private TeaRoomSceneManager teaRoomSceneManager;
     private bool enableSmallenDrothy = false;
 
+    /// <summary>
+    /// 削除候補
+    /// シーン遷移時に生成済みオブジェクトの配置シーン移動を行う際に必要になる可能性がある
+    /// </summary>
+    [SerializeField]
+    private string baseSceneName = "StartScene";
+
     private void Awake()
     {
         instance = this;
@@ -63,16 +70,27 @@ public class EventManager : NetworkBehaviour
         currentSequence = (currentSequence + 1) % (int)Sequence.Count_;
 
         var nextSequence = (Sequence)currentSequence;
-        StartCoroutine(TransitionScene(nextSequence));
+
+        // 各クライアントでイベントを進める
+        RpcProceedSequence(nextSequence);
     }
 
-    [SerializeField]
-    private string baseSceneName = "StartScene";
+    [ClientRpc]
+    private void RpcProceedSequence(Sequence newSequence)
+    {
+        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
-    private IEnumerator TransitionScene(Sequence newSequence)
+        currentSequence = (int)newSequence;
+
+        StartCoroutine(ExecSequence(newSequence));
+    }
+
+    private IEnumerator ExecSequence(Sequence newSequence)
     {
         if (!newSequence.ToString().Contains("Event"))
         {
+            Debug.Log("シーン遷移 ->" + newSequence.ToString());
+
             // シーンの切り替え
             var newSceneName = newSequence.ToString();
 
@@ -311,5 +329,4 @@ public class EventManager : NetworkBehaviour
             teaRoomSceneManager.SetSmallenCakes(idx);
         }
     }
-
 }

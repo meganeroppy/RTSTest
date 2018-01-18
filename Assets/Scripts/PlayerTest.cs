@@ -399,8 +399,6 @@ public class PlayerTest : NetworkBehaviour
     /// </summary>
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
-
         if ((isObserver) || !isLocalPlayer ) return;
 
         if (other.tag.Equals("Item"))
