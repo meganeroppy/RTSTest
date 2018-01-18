@@ -39,7 +39,8 @@ public class BaseSceneManager : MonoBehaviour
     void Start ()
     {
         instance = this;
-        SceneManager.LoadScene(firstSceneName, LoadSceneMode.Additive);
+
+        StartCoroutine(LoadFirstScene());
 
         int playerId = 0;
         if (RtsTestNetworkManager.instance != null) playerId = RtsTestNetworkManager.instance.GetPlayerId();
@@ -58,6 +59,18 @@ public class BaseSceneManager : MonoBehaviour
             if (copyTransformBody.ObjectName.EndsWith("Body"))
                 copyTransformBody.ObjectName = copyTransformBody.ObjectName + playerId.ToString();
         }
+    }
+
+    private IEnumerator LoadFirstScene()
+    {
+        var operation = SceneManager.LoadSceneAsync(firstSceneName, LoadSceneMode.Additive);
+
+        while (!operation.isDone) yield return null;
+
+        var scene = SceneManager.GetSceneByName(firstSceneName);
+
+        SceneManager.SetActiveScene( scene );
+
     }
 
     public void ActivatePresetCameras()

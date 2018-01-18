@@ -20,7 +20,7 @@ public class EventManager : NetworkBehaviour
 
     private enum Sequence
     {
-        WaitRoom,
+        Garden,
         CollapseGround_Event,
         Falling,
         TeaRoom,
@@ -86,6 +86,8 @@ public class EventManager : NetworkBehaviour
 
             // 必要なオブジェクトの所属シーンを引っ越し
             {
+                // とりあえず現状はBaseSceneに主なオブジェクトは置いておくつもりなので引っ越しはしなくてよさそう
+                /*
                 var baseScene = SceneManager.GetSceneByName(baseSceneName);
 
                 //		for( int i=0 ; i < TrackedObjects.list.Count ; ++i )
@@ -98,6 +100,7 @@ public class EventManager : NetworkBehaviour
                 {
                     SceneManager.MoveGameObjectToScene(d, baseScene);
                 }
+                */
             }
 
             // もともとのシーンをアンロード
@@ -131,9 +134,8 @@ public class EventManager : NetworkBehaviour
         }
     }
 
-
     /// <summary>
-    /// イベントの実行
+    /// シーンの変更を伴わないイベントの実行
     /// </summary>
 	private void ExecEvent(Sequence newEvent)
     {
