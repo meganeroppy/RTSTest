@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// サーバーから切断されてしまったときに遷移するシーンを制御
+/// </summary>
 public class WaitSceneManager : MonoBehaviour
 {
     [SerializeField]

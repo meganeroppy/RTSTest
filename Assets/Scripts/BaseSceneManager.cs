@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// ベースとなるシーンを制御
+/// </summary>
 public class BaseSceneManager : MonoBehaviour
 {
     public static BaseSceneManager instance;
@@ -39,7 +42,7 @@ public class BaseSceneManager : MonoBehaviour
         SceneManager.LoadScene(firstSceneName, LoadSceneMode.Additive);
 
         int playerId = 0;
-        if (NetworkManagerTest.instance != null) playerId = NetworkManagerTest.instance.GetPlayerId();
+        if (RtsTestNetworkManager.instance != null) playerId = RtsTestNetworkManager.instance.GetPlayerId();
 
         if (playerId != 0)
         {

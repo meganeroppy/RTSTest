@@ -9,11 +9,10 @@ using UnityEngine.UI;
 /// </summary>
 public class PlayerTest : NetworkBehaviour
 {
-	private Rigidbody myRigidbody;
-    public float moveSpeed = 10f;
-    public float rotSpeed = 10f;
-    private NetworkView netView = null;
-	private NetworkTransform nTransform = null;
+    [SerializeField]
+    private float moveSpeed = 10f;
+    [SerializeField]
+    private float rotSpeed = 10f;
 
     /// <summary>
     /// 管理者か？
@@ -27,22 +26,16 @@ public class PlayerTest : NetworkBehaviour
     /// </summary>
     public bool useSimulateFoot = false;
 
+    /// <summary>
+    /// 削除予定
+    /// 観測者だと赤くなるだけのキューブ
+    /// </summary>
     [SerializeField]
 	private MeshRenderer observerSign;
 
     [SerializeField]
-    private DrothySample drothyPrefabOld;
-    private DrothySample drothyOld;
-
-    [SerializeField]
     private IKControl drothyIKPrefab;
-    private IKControl myDrothy;
-
-    [SerializeField]
-    private GameObject bulletPrefab;
-
-    [SerializeField]
-    private GameObject mushroomPrefab;
+    private DrothyController myDrothy;
 
     [SerializeField]
     private TextMesh textMesh;
@@ -50,26 +43,32 @@ public class PlayerTest : NetworkBehaviour
     [SerializeField]
     private GameObject youIcon;
 
+    /// <summary>
+    /// 削除候補
+    /// NetId
+    /// Cmdでサーバー側にセットしなくても勝手に同期されるかも？
+    /// </summary>
     [SyncVar]
     private string netIdStr;
 
+    /// <summary>
+    /// アイテムをつかんでいる時のアイテムの位置
+    /// </summary>
     [SerializeField]
     private Transform holdPos;
 
+    /// <summary>
+    /// 削除候補
+    /// 現在食べた回数
+    /// </summary>
     [SyncVar]
     private int eatCount = 0;
 
+    /// <summary>
+    /// 現在のドロシーのスケール
+    /// </summary>
     [SyncVar]
     private float drothyScale = 1f;
-
-    [SyncVar]
-    private int currentSceneIndex = 0;
-
-    [SerializeField]
-    private bool forceBehaveLikePlayer = false;
-
-    [SyncVar]
-    private NetworkInstanceId drothyNetId;
 
     /// <summary>
     /// （仮）プリセットのプレイヤーカラー
@@ -103,22 +102,17 @@ public class PlayerTest : NetworkBehaviour
     [SerializeField]
     private GameObject cameraImage;
 
+    /// <summary>
+    /// 観測者クラス
+    /// </summary>
+    private ObserverController observerController;
 
-    [SerializeField]
-    private string[] sceneNameList;
-
-    private void Awake()
-    {
-        Debug.Log("Awake" + "isObserver = " + isObserver.ToString() + " local= " + isLocalPlayer.ToString());
-    }
+    [SyncVar]
+    private bool biggenFlag = false;
 
     // Use this for initialization
     void Start()
     {
-        myRigidbody = GetComponent<Rigidbody>();
-        netView = GetComponent<NetworkView>();
-        nTransform = GetComponent<NetworkTransform>();
-
         if (!isLocalPlayer)
         {
             // カメラ無効（一緒にオーディオリスナーも無効になる）
@@ -149,17 +143,23 @@ public class PlayerTest : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// ローカルプレイヤーとして開始したときに呼ばれる
+    /// </summary>
     public override void OnStartLocalPlayer()
     {
-        Debug.Log("OnStartLocalPlayer" + "isObserver = " + isObserver.ToString() + " local= " + isLocalPlayer.ToString());
+        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
+        // サーバー上でドロシーを生成
         CmdCreateDrothy();
 
+        // ＊不要説あり＊ NetIDをサーバーにセット 
         CmdSetNetIdStr();
 
-        CmdSetIsObserver(NetworkManagerTest.instance.IsObserver);
+        // サーバー上で観測者フラグをセットする syncVarなのでのちにクライアントにも反映される
+        CmdSetIsObserver(RtsTestNetworkManager.instance.IsObserver);
 
-        if(NetworkManagerTest.instance.IsObserver)
+        if(RtsTestNetworkManager.instance.IsObserver)
         {
             var obj = GameObject.Find("BaseSceneManager");
             if( obj )
@@ -173,6 +173,9 @@ public class PlayerTest : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// 不要説
+    /// </summary>
     [Command]
     private void CmdSetNetIdStr()
     {
@@ -181,7 +184,7 @@ public class PlayerTest : NetworkBehaviour
 
     public override void OnStartClient()
     {
-        Debug.Log("OnStartClient" + "isObserver = " + isObserver.ToString() + " local= " + isLocalPlayer.ToString());
+        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
     }
 
     // Update is called once per frame
@@ -193,17 +196,34 @@ public class PlayerTest : NetworkBehaviour
             playerLabel.transform.forward = Camera.main.transform.forward;
         }
 
+        // ラベルを更新
+    //    textMesh.text = netId.Value.ToString();
         textMesh.text = netIdStr;
 
-        if (isObserver != isObserverPrev)
+        // 観測者フラグに変更があった場合のみ処理する
         {
-            observerSign.material.color = isObserver ? Color.red : Color.white;
+            if (isObserver != isObserverPrev)
+            {
+                observerSign.material.color = isObserver ? Color.red : Color.white;
+
+                if (observerController == null)
+                {
+                    observerController = GetComponent<ObserverController>();
+                }
+
+                if (observerController != null)
+                {
+                    observerController.enabled = isObserver;
+                }
+
+            }
+            isObserverPrev = isObserver;
         }
 
-        isObserverPrev = isObserver;
-
+        // 自分の時だけ「YOU]アイコン表示
         youIcon.SetActive(isLocalPlayer);
 
+        // アイテムをつかんでいる時はつかんでいる位置にマイフレーム設定
         if (holdItem)
         {
             holdItem.transform.position = holdPos.position;
@@ -213,63 +233,59 @@ public class PlayerTest : NetworkBehaviour
 
         if (isClient)
         {
-            if (drothyOld == null)
-            {
-                var obj = ClientScene.FindLocalObject(drothyNetId);
-                if( obj )
-                {
-                    drothyOld = obj.GetComponent<DrothySample>();
-                }
-            }
+        //    if (myDrothy == null)
+        //    {
+        //        var obj = ClientScene.FindLocalObject(drothyNetId);
+        //        if( obj )
+        //        {
+        //            myDrothy = obj.GetComponent<DrothyController>();
+        //        }
+        //    }
 
-            if (drothyOld != null)
+            // サーバーの値が同期されるdrothyScaleの値でドロシーのスケールを更新
+            if (myDrothy != null)
             {
-                drothyOld.transform.localScale = Vector3.one * drothyScale;
+                myDrothy.transform.localScale = Vector3.one * drothyScale;
             }
         }
 
+        /////////////////////////////////////////
         // ■ここから↓はローカルプレイヤーのみ■
+        /////////////////////////////////////////
 
-        if ( !nTransform.isLocalPlayer )
+        if ( !isLocalPlayer )
 		{
 			return;
 		}
 
-		Vector3 move = new Vector3(
-			Input.GetAxisRaw("Horizontal"),
-            0,
-			Input.GetAxisRaw("Vertical"));
-
-        transform.Translate( move * moveSpeed * Time.deltaTime);
-        //	myRigidbody.velocity = (transform.forward + move.normalized) * fSpeed ;
-
-        var rot = Input.GetKey(KeyCode.I) ? -1 : Input.GetKey(KeyCode.O) ? 1 : 0;
-        if( rot != 0 )
+        if (useKeyboardControl)
         {
-            transform.Rotate(Vector3.up * rot * rotSpeed * Time.deltaTime);
+            Vector3 move = new Vector3(
+                Input.GetAxisRaw("Horizontal"),
+                0,
+                Input.GetAxisRaw("Vertical"));
+
+            transform.Translate(move * moveSpeed * Time.deltaTime);
+            //	myRigidbody.velocity = (transform.forward + move.normalized) * fSpeed ;
+
+            var rot = Input.GetKey(KeyCode.I) ? -1 : Input.GetKey(KeyCode.O) ? 1 : 0;
+            if (rot != 0)
+            {
+                transform.Rotate(Vector3.up * rot * rotSpeed * Time.deltaTime);
+            }
         }
 
-        if( Input.GetKeyDown( KeyCode.Space ) )
+        if( useKeyboardControl && Input.GetKeyDown( KeyCode.Space ) )
         {
-            CmdFire();
+
         }
 
-        if (Input.GetKeyDown(KeyCode.Space) && isObserver)
-        {
-            CmdCreateMushroom();
-        }
-
-        if (Input.GetKeyDown(KeyCode.N) && isObserver)
-        {
-            CmdGotoNextScene();
-        }
-
-        if ( holdTarget && !holdItem && Input.GetKeyDown(KeyCode.H))
+        if ( holdTarget && !holdItem && useKeyboardControl && Input.GetKeyDown(KeyCode.H))
         {
             CmdSetHoldItem();
         }
 
-        if (holdItem && Input.GetKeyDown(KeyCode.Y))
+        if (holdItem && useKeyboardControl && Input.GetKeyDown(KeyCode.Y))
         {
             CmdEatItem();
         }
@@ -286,7 +302,7 @@ public class PlayerTest : NetworkBehaviour
             //    photonView.RPC("SetObserver", PhotonTargets.AllBuffered, !_isObserver);
             //    photonView.RPC("SetObserver", PhotonTargets.AllBuffered, !_isObserver);
         }
-
+        
     }
 
     /// <summary>
@@ -313,7 +329,7 @@ public class PlayerTest : NetworkBehaviour
             }
         }
 
-
+        // 設定が有効になっている場合は脚の動きのシミュレートを行う
         if (useSimulateFoot)
         {
             drothyIK.SetSimulateFoot();
@@ -322,17 +338,21 @@ public class PlayerTest : NetworkBehaviour
         // TODO プレイヤーIDによってカラバリを変更する
     //    drothyIK.GetComponent<DrothyController>().SetDressColor(colorIdx);
 
-        myDrothy = drothyIK;
+        myDrothy = drothyIK.GetComponent<DrothyController>();
+        if( myDrothy == null )
+        {
+            return;
+        }
 
-    
-        drothyOld.SetOwner(this.transform);
+        myDrothy.SetOwner(this.transform);
 
-//        NetworkServer.Spawn(drothy.gameObject);
-        NetworkServer.SpawnWithClientAuthority(drothyOld.gameObject, gameObject);
+        // どちらが正しいかはまだ不明
+//      NetworkServer.Spawn(drothy.gameObject);
+        NetworkServer.SpawnWithClientAuthority(myDrothy.gameObject, gameObject);
 
-        drothyNetId = drothyOld.netId;
+    //    drothyNetId = myDrothy.netId;
 
-        RpcPassDrothyReference(drothyOld.netId);
+        RpcPassDrothyReference(myDrothy.netId);
     }
 
     /// <summary>
@@ -345,7 +365,13 @@ public class PlayerTest : NetworkBehaviour
 
         var obj = ClientScene.FindLocalObject(netId);
 
-        drothyOld = obj.GetComponent<DrothySample>();
+        myDrothy = obj.GetComponent<DrothyController>();
+
+        // 仮 自分のドロシーは無効にする
+        if (isLocalPlayer)
+        {
+            obj.SetActive(false);
+        }
     }
 
     /// <summary>
@@ -354,8 +380,8 @@ public class PlayerTest : NetworkBehaviour
     [Command]
     private void CmdRequestDrothyReference()
     {
-        if (drothyOld == null) return;
-        RpcPassDrothyReference(drothyOld.netId);
+        if (myDrothy == null) return;
+        RpcPassDrothyReference(myDrothy.netId);
     }
 
     /// <summary>
@@ -367,35 +393,6 @@ public class PlayerTest : NetworkBehaviour
         isObserver = value;
     }
 
-    /// <summary>
-    /// （仮）銃弾を発射する
-    /// </summary>
-    [Command]
-    private void CmdFire()
-    {
-        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
-
-        var obj = Instantiate(bulletPrefab);
-        obj.transform.position = transform.position;
-        obj.GetComponent<Rigidbody>().AddForce(transform.forward * 80f);
-        obj.GetComponent<MeshRenderer>().material.color = isObserver ? Color.red : Color.white;
-
-        NetworkServer.Spawn(obj);
-    }
-
-    /// <summary>
-    /// きのこ配置
-    /// </summary>
-    [Command]
-    private void CmdCreateMushroom()
-    {
-        var obj = Instantiate(mushroomPrefab);
-        obj.transform.position = transform.position;
-        var mush = obj.GetComponent<Mushroom>();
-        mush.CmdSetParent(this.gameObject);
-
-        NetworkServer.Spawn(obj);
-    }
 
     /// <summary>
     /// ローカルでのみ衝突を判定する
@@ -404,7 +401,7 @@ public class PlayerTest : NetworkBehaviour
     {
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
-        if ((isObserver && !forceBehaveLikePlayer) || !isLocalPlayer ) return;
+        if ((isObserver) || !isLocalPlayer ) return;
 
         if (other.tag.Equals("Item"))
         {
@@ -499,56 +496,9 @@ public class PlayerTest : NetworkBehaviour
         }
     }
 
-    [SyncVar]
-    private bool biggenFlag = false;
-
     [Server]
     private void ChangeScale()
     {
         drothyScale = 10f;
-    }
-
-    /// <summary>
-    /// アイテムの位置を更新する
-    /// </summary>
-    [Command]
-    private void CmdUpdateHoldItemPosition()
-    {
-        holdItem.CmdSetPosition(holdPos.position);
-    }
-
-    /// <summary>
-    /// 次のシーンに移動する
-    /// </summary>
-    [Command]
-    private void CmdGotoNextScene()
-    {
-        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
-
-        currentSceneIndex++;
-        RpcGotoNextScene(currentSceneIndex, true);
-    }
-
-    /// <summary>
-    /// 次のシーンに移動する
-    /// </summary>
-    /// <param name="newSceneIndex"></param>
-    /// <param name="allowLoadSameScene"></param>
-    [ClientRpc]
-    private void RpcGotoNextScene( int newSceneIndex, bool allowLoadSameScene )
-    {
-        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
-
-        if (currentSceneIndex != newSceneIndex || allowLoadSameScene)
-        {
-            currentSceneIndex = newSceneIndex;
-
-            SceneManager.LoadScene(sceneNameList[currentSceneIndex % sceneNameList.Length], LoadSceneMode.Additive);
-
-            if (currentSceneIndex >= 1)
-            {
-            SceneManager.UnloadSceneAsync(sceneNameList[(currentSceneIndex - 1) % sceneNameList.Length]);
-            }
-        }
     }
 }

@@ -42,6 +42,8 @@ public class DrothyController : NetworkBehaviour
 		anim = GetComponent<Animator>();
 		prevPosition = modelRoot.localPosition;
 		walking = false;
+
+        Debug.Log("DrothyController isLocal=" + isLocalPlayer.ToString());
 	}
 
 	// Update is called once per frame
