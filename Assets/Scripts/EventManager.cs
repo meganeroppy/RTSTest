@@ -83,6 +83,24 @@ public class EventManager : NetworkBehaviour
 
         var nextSequence = (Sequence)currentSequence;
 
+        {
+            var baseScene = SceneManager.GetSceneByName(baseSceneName);
+
+            var players = GameObject.FindGameObjectsWithTag("Player");
+
+            foreach (GameObject g in players)
+            {
+                SceneManager.MoveGameObjectToScene(g, baseScene);
+            }
+
+            var drothies = GameObject.FindGameObjectsWithTag("Drothy");
+            foreach (GameObject d in drothies)
+            {
+                SceneManager.MoveGameObjectToScene(d, baseScene);
+            }
+
+        }
+
         // 各クライアントでイベントを進める
         RpcProceedSequence(nextSequence);
     }
@@ -115,22 +133,22 @@ public class EventManager : NetworkBehaviour
             // TODO: 暗転演出
 
             // 必要なオブジェクトの所属シーンを引っ越し
-            {
-                // とりあえず現状はBaseSceneに主なオブジェクトは置いておくつもりなので引っ越しはしなくてよさそう
-                /*
+            {        
                 var baseScene = SceneManager.GetSceneByName(baseSceneName);
 
-                //		for( int i=0 ; i < TrackedObjects.list.Count ; ++i )
-                //		{
-                //			SceneManager.MoveGameObjectToScene( TrackedObjects.list[i].gameObject, baseScene );
-                //		}
+                var players = GameObject.FindGameObjectsWithTag("Player");
 
-                var drothyTeam = GameObject.FindGameObjectsWithTag("Drothy");
-                foreach (GameObject d in drothyTeam)
+                foreach(  GameObject g in players )
+                {
+                	SceneManager.MoveGameObjectToScene( g, baseScene );
+                }
+
+                var drothies = GameObject.FindGameObjectsWithTag("Drothy");
+                foreach (GameObject d in drothies)
                 {
                     SceneManager.MoveGameObjectToScene(d, baseScene);
                 }
-                */
+                
             }
 
             // もともとのシーンをアンロード
