@@ -9,9 +9,16 @@ using UnityEngine.Networking;
 /// </summary>
 public class TrackedObjects : NetworkBehaviour
 {
+    /// <summary>
+    /// シリアライズされたトラッキング位置と回転がそのまま適用されるオブジェクト、HMDをトラッキングしたもの
+    /// </summary>
 	[SerializeField]
 	private CopyTransform copyTransformHead;
 
+    /// <summary>
+    /// copyTransformHeadの子要素
+    /// ドロシーモデルの頭が見つめる目標になる
+    /// </summary>
 	[SerializeField]
 	private Transform lookTarget;
     public Transform LookTarget
@@ -19,9 +26,16 @@ public class TrackedObjects : NetworkBehaviour
         get { return lookTarget; }
     }
 
-	[SerializeField]
+    /// <summary>
+    /// シリアライズされたトラッキング位置と回転がそのまま適用されるオブジェクト、Touchの右手をトラッキングしたもの
+    /// </summary>
+    [SerializeField]
 	private CopyTransform copyTransformRightHand;
 
+    /// <summary>
+    /// ドロシーの右手のIK対象として位置角度を調整したもの。
+    /// copyTransformRightHandの子要素
+    /// </summary>
 	[SerializeField]
 	private Transform rightHandObject;
     public Transform RightHandObject
@@ -29,9 +43,16 @@ public class TrackedObjects : NetworkBehaviour
         get { return rightHandObject; }
     }
 
+    /// <summary>
+    /// シリアライズされたトラッキング位置と回転がそのまま適用されるオブジェクト、Touchの左手をトラッキングしたもの
+    /// </summary>
     [SerializeField]
 	private CopyTransform copyTransformLeftHand;
 
+    /// <summary>
+    /// ドロシーの右手のIK対象として位置角度を調整したもの。
+    /// copyTransformLeftHandの子要素
+    /// </summary>
 	[SerializeField]
 	private Transform leftHandObject;
     public Transform LeftHandObject
@@ -39,10 +60,17 @@ public class TrackedObjects : NetworkBehaviour
         get { return leftHandObject; }
     }
 
+    /// <summary>
+    /// シリアライズされたトラッキング位置と回転がそのまま適用されるオブジェクト、バックパックPCをトラッキングしたもの
+    /// </summary>
     [SerializeField]
 	private CopyTransform copyTransformBody;
 
-	[SerializeField]
+    /// <summary>
+    /// ドロシーの体のIK対象として位置角度を調整したもの。
+    /// copyTransformBodyの子要素
+    /// </summary>
+    [SerializeField]
 	private Transform bodyObject;
     public Transform BodyObject
     {
@@ -64,21 +92,9 @@ public class TrackedObjects : NetworkBehaviour
 	{
         //	Debug.Log( gameObject.name + " " + System.Reflection.MethodBase.GetCurrentMethod() + "mine=" + (photonView != null && photonView.isMine).ToString() ) ;
 
-        // 自身でない時の処理
-        if (!isLocalPlayer)
+        if (!isLocalPlayer || forceDisableCopyTransform)
         {
-            // CopyTransform削除
             var children = GetComponentsInChildren<CopyTransform>();
-			foreach( CopyTransform c in children )
-			{
-				c.enabled = false;
-			}
-
-		}
-
-		if( forceDisableCopyTransform )
-		{
-			var children = GetComponentsInChildren<CopyTransform>();
 			foreach( CopyTransform c in children )
 			{
 				c.enabled = false;
@@ -92,19 +108,10 @@ public class TrackedObjects : NetworkBehaviour
             this.copyTransformLeftHand.enabled = false;
             this.copyTransformBody.enabled = false;
 
-            if (isLocalPlayer)
-            {
-                //        photonView.RPC( "SetObserver", PhotonTargets.AllBuffered, !_isObserver );
-            }
-            else
-            {
-                SetObserver(true);
-            }
             return;
         }
 
-        BaseSceneManager b = null;
-        b = BaseSceneManager.instance;
+        var b = BaseSceneManager.instance;
 
         if (b != null)
         {
@@ -125,6 +132,7 @@ public class TrackedObjects : NetworkBehaviour
     // Update is called once per frame
     void Update () 
 	{		
+        // 自身でなければなにもしない
         if ( !isLocalPlayer ) return;
 
         // とりあえず仮でRを押して頭の回転リセット
@@ -134,31 +142,6 @@ public class TrackedObjects : NetworkBehaviour
 			OVRManager.display.RecenterPose();
 		}
     }
-
-	/// <summary>
-	/// 観測者に指定
-	/// </summary>
-	//[PunRPC]   
-	public void SetObserver( bool value )
-	{
-		_isObserver = value;
-
-		var children = GetComponentsInChildren<CopyTransform>();
-		foreach( CopyTransform c in children )
-		{
-			c.enabled = !_isObserver;
-		}
-
-		copyTransformRightHand.gameObject.SetActive( !_isObserver );
-		copyTransformLeftHand.gameObject.SetActive( !_isObserver );
-
-		if( _isObserver )
-		{
-			copyTransformHead.transform.localPosition = Vector3.zero;
-		}
-	}		
-	private bool _isObserver;
-
 
 	/// <summary>
 	/// モデルの回転 自分自身の時はあまり意味がないが、人から見られるときに重要になる
