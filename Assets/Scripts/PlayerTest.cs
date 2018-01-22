@@ -65,13 +65,6 @@ public class PlayerTest : NetworkBehaviour
     private Transform holdPos;
 
     /// <summary>
-    /// 削除候補
-    /// 現在食べた回数
-    /// </summary>
-    [SyncVar]
-    private int eatCount = 0;
-
-    /// <summary>
     /// 現在のドロシーのスケール
     /// </summary>
     [SyncVar]
@@ -441,10 +434,12 @@ public class PlayerTest : NetworkBehaviour
     /// </summary>
     private void OnTriggerEnter(Collider other)
     {
-        if ((isObserver) || !isLocalPlayer ) return;
+        if ((isObserver ) || !isLocalPlayer ) return;
 
         if (other.tag.Equals("Item"))
         {
+            Debug.Log(System.Reflection.MethodBase.GetCurrentMethod() + other.name);
+
             var mush = other.GetComponent<Mushroom>();
             if (mush != null)
             {
@@ -527,9 +522,8 @@ public class PlayerTest : NetworkBehaviour
         if (!holdItem) return;
 
         NetworkServer.Destroy(holdItem.gameObject);
-        eatCount++;
 
-        if( eatCount >= 3 && !biggenFlag )
+        if( !biggenFlag )
         {
             biggenFlag = true;
             ChangeScale();
