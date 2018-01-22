@@ -150,6 +150,9 @@ public class PlayerTest : NetworkBehaviour
     {
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
+		// プレイヤー名を変更する
+		gameObject.name = "[YOU] " + gameObject.name;
+
         // サーバー上でドロシーを生成
         CmdCreateDrothy();
 
@@ -171,6 +174,11 @@ public class PlayerTest : NetworkBehaviour
                 }
             }
         }
+		else
+		{
+			var to = GetComponent<TrackedObjects>();
+			to.SetEnable(!useKeyboardControl);
+		}
     }
 
     /// <summary>
@@ -216,6 +224,13 @@ public class PlayerTest : NetworkBehaviour
                     observerController.enabled = isObserver;
                 }
 
+				// 観測者かつ自身ではないときにビジュアルを有効にする
+				cameraImage.SetActive(isObserver && !isLocalPlayer);
+
+				// 観測者の時はトラッキングによる移動を無効
+				// TODO: ただし他のプレイヤーと同様にトラッキングで動ける観測者にもおいおい対応する
+				var to = GetComponent<TrackedObjects>();
+				to.SetEnable(!isObserver && !useKeyboardControl);
             }
             isObserverPrev = isObserver;
         }
@@ -392,7 +407,6 @@ public class PlayerTest : NetworkBehaviour
 	{
         isObserver = value;
     }
-
 
     /// <summary>
     /// ローカルでのみ衝突を判定する

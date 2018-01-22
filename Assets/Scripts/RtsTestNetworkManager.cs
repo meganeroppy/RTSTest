@@ -29,6 +29,10 @@ public class RtsTestNetworkManager : NetworkBehaviour
         Host,
         Client,
     }
+	public Role GetRole()
+	{
+		return role;
+	}
 
 	[SerializeField]
 	private Role role;
