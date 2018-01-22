@@ -34,9 +34,9 @@ public class RtsMovementSample : MonoBehaviour
     [SerializeField]
     private Vector3 lhOriginPos = Vector3.right * -1f;
     [SerializeField]
-    private Vector3 headOriginPos = Vector3.up * 1f;
+    private Vector3 headOriginPos = Vector3.up * 1.5f;
     [SerializeField]
-    private Vector3 bodyOriginPos = Vector3.zero;
+    private Vector3 bodyOriginPos = Vector3.up * 1f;
 
     private bool initialized = false;
 

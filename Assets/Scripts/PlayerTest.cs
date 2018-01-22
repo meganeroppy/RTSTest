@@ -24,7 +24,14 @@ public class PlayerTest : NetworkBehaviour
     /// <summary>
     /// 脚の動きのシミュレーションを有効にするか？
     /// </summary>
-    public bool useSimulateFoot = false;
+    [SerializeField]
+    private bool useSimulateFoot = false;
+
+    /// <summary>
+    /// 自身であってもドロシーを表示する
+    /// </summary>
+    [SerializeField]
+    private bool forceDisplayDrothy = false;
 
     /// <summary>
     /// 削除予定
@@ -391,7 +398,7 @@ public class PlayerTest : NetworkBehaviour
         myDrothy = obj.GetComponent<DrothyController>();
 
         // 仮 自分のドロシーは無効にする
-        if (isLocalPlayer)
+        if (isLocalPlayer && !forceDisplayDrothy)
         {
             obj.SetActive(false);
         }
