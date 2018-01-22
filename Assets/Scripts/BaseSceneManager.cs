@@ -35,6 +35,8 @@ public class BaseSceneManager : MonoBehaviour
     private GameObject offsetObject;
     public GameObject OffsetObject { get { return offsetObject.gameObject; } }
 
+	private bool serverOnly = false;
+
     // Use this for initialization
     void Start ()
     {
@@ -59,7 +61,15 @@ public class BaseSceneManager : MonoBehaviour
             if (copyTransformBody.ObjectName.EndsWith("Body"))
                 copyTransformBody.ObjectName = copyTransformBody.ObjectName + playerId.ToString();
         }
+
+		if( RtsTestNetworkManager.instance.GetRole() == RtsTestNetworkManager.Role.Server )
+		{
+			serverOnly = true;
+			ActivatePresetCameras();
+		}
+
     }
+
 
     private IEnumerator LoadFirstScene()
     {
@@ -75,10 +85,13 @@ public class BaseSceneManager : MonoBehaviour
 
     public void ActivatePresetCameras()
     {
+		// サーバーのみの場合はDisplay1から、ホストの時は自身の視界がDisplay1なのでDisplay2から
+		int diff = serverOnly ? 0 : 1; 
+
         for( int i = 0 ; i < presetCameras.Length; ++i )
         {
             presetCameras[i].enabled = true;
-            presetCameras[i].targetDisplay = i+1;
+			presetCameras[i].targetDisplay = i+diff;
         }
     }
 }
