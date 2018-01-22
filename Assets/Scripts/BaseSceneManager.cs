@@ -16,19 +16,19 @@ public class BaseSceneManager : MonoBehaviour
     private Camera[] presetCameras;
 
     [SerializeField]
-    private TrackerSettings copyTransformHead;
+    private Transform copyTransformHead;
     public GameObject CopyTransformHead { get { return copyTransformHead.gameObject; } }
 
     [SerializeField]
-    private TrackerSettings copyTransformRightHand;
+    private Transform copyTransformRightHand;
     public GameObject CopyTransformRightHand { get { return copyTransformRightHand.gameObject; } }
 
     [SerializeField]
-    private TrackerSettings copyTransformLeftHand;
+    private Transform copyTransformLeftHand;
     public GameObject CopyTransformLeftHand { get { return copyTransformLeftHand.gameObject; } }
 
     [SerializeField]
-    private TrackerSettings copyTransformBody;
+    private Transform copyTransformBody;
     public GameObject CopyTransformBody { get { return copyTransformBody.gameObject; } }
 
     [SerializeField]
@@ -47,17 +47,17 @@ public class BaseSceneManager : MonoBehaviour
 
         if (playerId != 0)
         {
-            if (copyTransformHead.ObjectName.EndsWith("Head"))
-                copyTransformHead.ObjectName = copyTransformHead.ObjectName + playerId.ToString();
+            if (copyTransformHead.gameObject.name.EndsWith("Head"))
+                copyTransformHead.gameObject.name = copyTransformHead.gameObject.name + playerId.ToString();
 
-            if (copyTransformRightHand.ObjectName.EndsWith("RH"))
-                copyTransformRightHand.ObjectName = copyTransformRightHand.ObjectName + playerId.ToString();
+            if (copyTransformRightHand.gameObject.name.EndsWith("RH"))
+                copyTransformRightHand.gameObject.name = copyTransformRightHand.gameObject.name + playerId.ToString();
 
-            if (copyTransformLeftHand.ObjectName.EndsWith("LH"))
-                copyTransformLeftHand.ObjectName = copyTransformLeftHand.ObjectName + playerId.ToString();
+            if (copyTransformLeftHand.gameObject.name.EndsWith("LH"))
+                copyTransformLeftHand.gameObject.name = copyTransformLeftHand.gameObject.name + playerId.ToString();
 
-            if (copyTransformBody.ObjectName.EndsWith("Body"))
-                copyTransformBody.ObjectName = copyTransformBody.ObjectName + playerId.ToString();
+            if (copyTransformBody.gameObject.name.EndsWith("Body"))
+                copyTransformBody.gameObject.name = copyTransformBody.gameObject.name + playerId.ToString();
         }
     }
 

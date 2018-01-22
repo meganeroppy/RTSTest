@@ -23,12 +23,14 @@ public class ObserverController : NetworkBehaviour {
     /// 無効の時はキーボード操作で遠隔からシーン内を飛び回る観測者となる
     /// false時は実質キーボード操作
     /// </summary>
+    [SerializeField]
     private bool behaveAsOnePlayer = false;
 
     // Use this for initialization
     void Start () 
 	{
 		cameraRotate = transform.localRotation;
+
 	}
 	
 	// Update is called once per frame
