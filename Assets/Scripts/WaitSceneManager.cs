@@ -22,7 +22,7 @@ public class WaitSceneManager : MonoBehaviour
 	void Update () {
 		if( Input.GetKeyDown( KeyCode.T ) )
         {
-            SceneManager.LoadScene("LobbyPractice");
+            SceneManager.LoadScene("Lobby");
         }
 
         if( autoRetryToJoinHost )
@@ -30,7 +30,7 @@ public class WaitSceneManager : MonoBehaviour
             timer += Time.deltaTime;
             if( timer >= wait )
             {
-                SceneManager.LoadScene("LobbyPractice");
+                SceneManager.LoadScene("Lobby");
                 autoRetryToJoinHost = false;
             }
         }
