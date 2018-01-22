@@ -397,6 +397,19 @@ public class PlayerTest : NetworkBehaviour
 
         myDrothy = obj.GetComponent<DrothyController>();
 
+        // まだクライアント側はIKターゲットが未指定なのでセットする
+        {
+            var trackedObj = GetComponent<TrackedObjects>();
+            var drothyIK = myDrothy.GetComponent<IKControl>();
+            if (trackedObj != null && drothyIK != null)
+            {
+                drothyIK.rightHandObj = trackedObj.RightHandObject;
+                drothyIK.leftHandObj = trackedObj.LeftHandObject;
+                drothyIK.bodyObj = trackedObj.BodyObject;
+                drothyIK.lookObj = trackedObj.LookTarget;
+            }
+        }
+
         // 仮 自分のドロシーは無効にする
         if (isLocalPlayer && !forceDisplayDrothy)
         {
