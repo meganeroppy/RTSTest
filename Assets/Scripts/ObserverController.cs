@@ -30,18 +30,20 @@ public class ObserverController : NetworkBehaviour {
     void Start () 
 	{
 		cameraRotate = transform.localRotation;
-
 	}
-	
-	// Update is called once per frame
-	void Update () 
-	{
+
+    // Update is called once per frame
+    void Update()
+    {
         // ローカルの自分自身でなかったらなにもしない
         if (!isLocalPlayer) return;
-    
-		UpdatePosition();
-		UpdateRotaition();
-		UpdateEvent();
+
+    //    if (!RtsTestNetworkManager.instance.ForceRelatedToTracking)
+    //    {
+            UpdatePosition();
+            UpdateRotaition();
+    //    }
+        UpdateEvent();
 	}
 
 	void UpdatePosition()

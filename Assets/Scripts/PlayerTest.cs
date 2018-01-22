@@ -78,7 +78,7 @@ public class PlayerTest : NetworkBehaviour
     /// <summary>
     /// キーボード操作を有効にするか？
     /// </summary>
-    public bool useKeyboardControl = false;
+    public bool forceUseKeyboardControl = false;
 
     /// <summary>
     /// 情報表示ラベル
@@ -164,6 +164,7 @@ public class PlayerTest : NetworkBehaviour
 
         if(RtsTestNetworkManager.instance.IsObserver)
         {
+            // 観測者の場合
             var obj = GameObject.Find("BaseSceneManager");
             if( obj )
             {
@@ -173,11 +174,19 @@ public class PlayerTest : NetworkBehaviour
                     manager.ActivatePresetCameras();
                 }
             }
+
+            if( RtsTestNetworkManager.instance.ForceRelatedToTracking)
+            {
+                var to = GetComponent<TrackedObjects>();
+                to.SetEnable(true);
+            }
         }
 		else
 		{
+            // 通常プレイヤーの場合
+
 			var to = GetComponent<TrackedObjects>();
-			to.SetEnable(!useKeyboardControl);
+			to.SetEnable(!forceUseKeyboardControl);
 		}
     }
 
@@ -227,10 +236,9 @@ public class PlayerTest : NetworkBehaviour
 				// 観測者かつ自身ではないときにビジュアルを有効にする
 				cameraImage.SetActive(isObserver && !isLocalPlayer);
 
-				// 観測者の時はトラッキングによる移動を無効
-				// TODO: ただし他のプレイヤーと同様にトラッキングで動ける観測者にもおいおい対応する
+				// トラッキングによる移動の有効を設定
 				var to = GetComponent<TrackedObjects>();
-				to.SetEnable(!isObserver && !useKeyboardControl);
+				to.SetEnable((!isObserver && !forceUseKeyboardControl) || RtsTestNetworkManager.instance.ForceRelatedToTracking);
             }
             isObserverPrev = isObserver;
         }
@@ -273,7 +281,7 @@ public class PlayerTest : NetworkBehaviour
 			return;
 		}
 
-        if (useKeyboardControl)
+        if (forceUseKeyboardControl)
         {
             Vector3 move = new Vector3(
                 Input.GetAxisRaw("Horizontal"),
@@ -290,17 +298,17 @@ public class PlayerTest : NetworkBehaviour
             }
         }
 
-        if( useKeyboardControl && Input.GetKeyDown( KeyCode.Space ) )
+        if( forceUseKeyboardControl && Input.GetKeyDown( KeyCode.Space ) )
         {
 
         }
 
-        if ( holdTarget && !holdItem && useKeyboardControl && Input.GetKeyDown(KeyCode.H))
+        if ( holdTarget && !holdItem && forceUseKeyboardControl && Input.GetKeyDown(KeyCode.H))
         {
             CmdSetHoldItem();
         }
 
-        if (holdItem && useKeyboardControl && Input.GetKeyDown(KeyCode.Y))
+        if (holdItem && forceUseKeyboardControl && Input.GetKeyDown(KeyCode.Y))
         {
             CmdEatItem();
         }

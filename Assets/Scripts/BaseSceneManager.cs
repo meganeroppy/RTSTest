@@ -44,29 +44,27 @@ public class BaseSceneManager : MonoBehaviour
 
         StartCoroutine(LoadFirstScene());
 
+        if (RtsTestNetworkManager.instance.GetRole() == RtsTestNetworkManager.Role.Server)
+        {
+            serverOnly = true;
+            ActivatePresetCameras();
+        }
+
         int playerId = 0;
         if (RtsTestNetworkManager.instance != null) playerId = RtsTestNetworkManager.instance.GetPlayerId();
 
-        if (playerId != 0)
-        {
-            if (copyTransformHead.gameObject.name.EndsWith("Head"))
-                copyTransformHead.gameObject.name = copyTransformHead.gameObject.name + playerId.ToString();
+        if (copyTransformHead.gameObject.name.EndsWith("Head"))
+            copyTransformHead.gameObject.name = copyTransformHead.gameObject.name + playerId.ToString();
 
-            if (copyTransformRightHand.gameObject.name.EndsWith("RH"))
-                copyTransformRightHand.gameObject.name = copyTransformRightHand.gameObject.name + playerId.ToString();
+        if (copyTransformRightHand.gameObject.name.EndsWith("RH"))
+            copyTransformRightHand.gameObject.name = copyTransformRightHand.gameObject.name + playerId.ToString();
 
-            if (copyTransformLeftHand.gameObject.name.EndsWith("LH"))
-                copyTransformLeftHand.gameObject.name = copyTransformLeftHand.gameObject.name + playerId.ToString();
+        if (copyTransformLeftHand.gameObject.name.EndsWith("LH"))
+            copyTransformLeftHand.gameObject.name = copyTransformLeftHand.gameObject.name + playerId.ToString();
 
-            if (copyTransformBody.gameObject.name.EndsWith("Body"))
-                copyTransformBody.gameObject.name = copyTransformBody.gameObject.name + playerId.ToString();
-        }
+        if (copyTransformBody.gameObject.name.EndsWith("Body"))
+            copyTransformBody.gameObject.name = copyTransformBody.gameObject.name + playerId.ToString();
 
-		if( RtsTestNetworkManager.instance.GetRole() == RtsTestNetworkManager.Role.Server )
-		{
-			serverOnly = true;
-			ActivatePresetCameras();
-		}
 
     }
 

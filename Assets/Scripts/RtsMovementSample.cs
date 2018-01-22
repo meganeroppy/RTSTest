@@ -38,7 +38,6 @@ public class RtsMovementSample : MonoBehaviour
     [SerializeField]
     private Vector3 bodyOriginPos = Vector3.zero;
 
-
     private void Start()
     {
         // 各オブジェクトのTrackerSettingを削除

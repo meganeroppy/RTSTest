@@ -46,11 +46,28 @@ public class RtsTestNetworkManager : NetworkBehaviour
     [SerializeField]
     private bool autoExecRole = false;
 
+
+    /// <summary>
+    /// 観測者フラグ
+    /// 後々動的に設定できるようにする
+    /// </summary>
     [SerializeField]
     private bool isObserver;
     public bool IsObserver
     {
         get { return isObserver; }
+    }
+
+    /// <summary>
+    /// 強制トラッカー依存
+    /// 有効にすると観測者フラグが立っていてもトラッカー依存の操作系になる
+    /// 後々動的に設定できるようにする
+    /// </summary>
+    [SerializeField]
+    private bool forceRelatedToTracking;
+    public bool ForceRelatedToTracking
+    {
+        get { return forceRelatedToTracking; }
     }
 
     private void Awake()
