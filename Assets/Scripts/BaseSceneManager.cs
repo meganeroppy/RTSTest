@@ -50,6 +50,13 @@ public class BaseSceneManager : MonoBehaviour
             ActivatePresetCameras();
         }
 
+        // RTSモーションシミュレーションフラグがあったら設定する
+        if( RtsTestNetworkManager.instance.SimulateRtsMovement )
+        {
+            var obj = GetComponent<RtsMovementSample>();
+            if (obj != null) obj.Init();
+        }
+
         int playerId = 0;
         if (RtsTestNetworkManager.instance != null) playerId = RtsTestNetworkManager.instance.GetPlayerId();
 

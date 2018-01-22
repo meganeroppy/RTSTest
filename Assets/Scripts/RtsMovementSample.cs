@@ -38,7 +38,9 @@ public class RtsMovementSample : MonoBehaviour
     [SerializeField]
     private Vector3 bodyOriginPos = Vector3.zero;
 
-    private void Start()
+    private bool initialized = false;
+
+    public void Init()
     {
         // 各オブジェクトのTrackerSettingを削除
         TrackerSettings component = null;
@@ -69,10 +71,14 @@ public class RtsMovementSample : MonoBehaviour
             component.transform.localRotation = Quaternion.identity;
             Destroy(component);
         }
+
+        initialized = true;
     }
 
     private void Update()
     {
+        if (!initialized) return;
+
         UpdatePosition();
         UpdateRotation();
     }

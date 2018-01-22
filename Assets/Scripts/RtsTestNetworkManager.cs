@@ -70,6 +70,16 @@ public class RtsTestNetworkManager : NetworkBehaviour
         get { return forceRelatedToTracking; }
     }
 
+    /// <summary>
+    /// RTS空間内のプレイヤーの動きをシミュレートするか？
+    /// </summary>
+    [SerializeField]
+    private bool simulateRtsMovement = false;
+    public bool SimulateRtsMovement
+    {
+        get { return simulateRtsMovement; }
+    }
+
     private void Awake()
     {
         instance = this;
