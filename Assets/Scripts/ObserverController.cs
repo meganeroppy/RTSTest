@@ -112,12 +112,6 @@ public class ObserverController : NetworkBehaviour {
             em.CmdProceedSequence();
 		}
 
-        // 次のシーンに移動仮
-        if (!behaveAsOnePlayer && Input.GetKeyDown(KeyCode.N) )
-        {
-            em.CmdGotoNextScene();
-        }
-
         // Tはテスト用のキー
         if (!behaveAsOnePlayer && Input.GetKeyDown(KeyCode.T) )
 		{

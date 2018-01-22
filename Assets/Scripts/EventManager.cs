@@ -261,41 +261,4 @@ public class EventManager : NetworkBehaviour
 
         NetworkServer.Spawn(obj);
     }
-
-    /// <summary>
-    /// 削除候補
-    /// 次のシーンに移動する
-    /// </summary>
-    [Command]
-    public void CmdGotoNextScene()
-    {
-        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
-
-        currentSceneIndex++;
-        RpcGotoNextScene(currentSceneIndex, true);
-    }
-
-    /// <summary>
-    /// 削除候補
-    /// 次のシーンに移動する
-    /// </summary>
-    /// <param name="newSceneIndex"></param>
-    /// <param name="allowLoadSameScene"></param>
-    [ClientRpc]
-    private void RpcGotoNextScene(int newSceneIndex, bool allowLoadSameScene)
-    {
-        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
-
-        if (currentSceneIndex != newSceneIndex || allowLoadSameScene)
-        {
-            currentSceneIndex = newSceneIndex;
-
-            SceneManager.LoadScene(sceneNameList[currentSceneIndex % sceneNameList.Length], LoadSceneMode.Additive);
-
-            if (currentSceneIndex >= 1)
-            {
-                SceneManager.UnloadSceneAsync(sceneNameList[(currentSceneIndex - 1) % sceneNameList.Length]);
-            }
-        }
-    }
 }
