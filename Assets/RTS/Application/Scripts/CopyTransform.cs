@@ -53,6 +53,5 @@ public class CopyTransform : MonoBehaviour
         {
             transform.localPosition -= InputTracking.GetLocalPosition(VRNode.Head);
         }
-
     }
 }

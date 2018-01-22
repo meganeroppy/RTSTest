@@ -83,33 +83,29 @@ public class TrackedObjects : NetworkBehaviour
 	[SerializeField]
 	private Transform rotateCopyTo;
 
-	public bool forceDisableCopyTransform = false;
-
 	/// <summary>
-	/// Initialize & SetObserver より後に呼ばれる前提であるため注意する
+	/// CopyTransformのついた子要素の位置を0にした上で無効にする
 	/// </summary>
-	void Start () 
+	public void SetEnable(bool key)
 	{
-        //	Debug.Log( gameObject.name + " " + System.Reflection.MethodBase.GetCurrentMethod() + "mine=" + (photonView != null && photonView.isMine).ToString() ) ;
-
-        if (!isLocalPlayer || forceDisableCopyTransform)
-        {
-            var children = GetComponentsInChildren<CopyTransform>();
-			foreach( CopyTransform c in children )
-			{
-				c.enabled = false;
-			}
+		var children = GetComponentsInChildren<CopyTransform>();
+		foreach( CopyTransform c in children )
+		{
+			c.enabled = key;
+			c.transform.localPosition = Vector3.zero;
 		}
+	}
+
+	private void Start () 
+	{
+		Debug.Log( System.Reflection.MethodBase.GetCurrentMethod());
 
         if (!isLocalPlayer)
         {
-            this.copyTransformHead.enabled = false;
-            this.copyTransformRightHand.enabled = false;
-            this.copyTransformLeftHand.enabled = false;
-            this.copyTransformBody.enabled = false;
+			SetEnable(false);
 
-            return;
-        }
+			return;
+		}
 
         var b = BaseSceneManager.instance;
 
