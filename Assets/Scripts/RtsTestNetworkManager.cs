@@ -46,7 +46,6 @@ public class RtsTestNetworkManager : NetworkBehaviour
     [SerializeField]
     private bool autoExecRole = false;
 
-
     /// <summary>
     /// 観測者フラグ
     /// 後々動的に設定できるようにする
@@ -79,6 +78,8 @@ public class RtsTestNetworkManager : NetworkBehaviour
     {
         get { return simulateRtsMovement; }
     }
+
+    private bool executed = false;
 
     private void Awake()
     {
@@ -115,6 +116,10 @@ public class RtsTestNetworkManager : NetworkBehaviour
 
     public void ExecRole()
     {
+        if (executed) return;
+
+        executed = true;
+
         switch( role )
         {
             case Role.Server:
