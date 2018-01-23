@@ -198,44 +198,48 @@ public class EventManager : NetworkBehaviour
         {
             case Sequence.CollapseGround_Event:
 
-                // 地面か崩れるイベント
-                // やりかたかえてもいいかも？
-
+                // 地面が崩れるイベント
                 var manager = GardenSceneManager.instance;
                 if (manager == null) break;
 
                 manager.PlayEvent();
 
                 break;
+
             case Sequence.PopCakes1_Event:
 
                 // 縮小化ケーキが出現するイベント                
                 CmdCreateItems( ItemType.SmallenCake );
 
                 break;
+
             case Sequence.SmallenDrothy_Event:
 
                 // ドロシー縮小化フラグを有効
                 enableSmallenDrothy = true;
 
                 break;
+
             case Sequence.PopCakes2_Event:
 
                 // 巨大化ケーキ出現
                 CmdCreateItems(ItemType.LargenCake);
 
                 break;
+
             case Sequence.LargenDrothy_Event:
 
                 // ドロシー巨大化フラグを有効
 
                 break;
+
             case Sequence.PopMushrooms_Event:
 
                 // きのこ出現
                 CmdCreateItems(ItemType.Mushroom);
 
                 break;
+
             case Sequence.Ending_Event:
             default:
 

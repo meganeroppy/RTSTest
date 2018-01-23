@@ -127,6 +127,9 @@ public class ObserverController : NetworkBehaviour {
         }
     }
 
+    /// <summary>
+    /// 道筋やヒントをプレイヤーに与えるためのショットを発射
+    /// </summary>
     [Command]
     private void CmdFireNavigateShot()
 	{
