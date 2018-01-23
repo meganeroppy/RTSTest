@@ -111,16 +111,16 @@ public class TrackedObjects : NetworkBehaviour
 
         if (b != null)
         {
-            copyTransformHead.copySource = b.CopyTransformHead;
+            copyTransformHead.copySource = b.CopyTransformHead.gameObject;
             copyTransformHead.offsetObject = b.OffsetObject;
 
-            copyTransformRightHand.copySource = b.CopyTransformRightHand;
+            copyTransformRightHand.copySource = b.CopyTransformRightHand.gameObject;
             copyTransformRightHand.offsetObject = b.OffsetObject;
 
-            copyTransformLeftHand.copySource = b.CopyTransformLeftHand;
+            copyTransformLeftHand.copySource = b.CopyTransformLeftHand.gameObject;
             copyTransformLeftHand.offsetObject = b.OffsetObject;
 
-            copyTransformBody.copySource = b.CopyTransformBody;
+            copyTransformBody.copySource = b.CopyTransformBody.gameObject;
             copyTransformBody.offsetObject = b.OffsetObject;
         }
     }

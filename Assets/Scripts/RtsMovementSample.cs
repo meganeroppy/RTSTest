@@ -45,31 +45,32 @@ public class RtsMovementSample : MonoBehaviour
         // 各オブジェクトのTrackerSettingを削除
         TrackerSettings component = null;
         component = rh.GetComponent<TrackerSettings>();
-        if (component != null) {
+        if (component != null)
+        {
+            component.StopFlag();
             component.transform.localPosition = rhOriginPos;
             component.transform.localRotation = Quaternion.identity;
-            Destroy(component);
         }
         component = lh.GetComponent<TrackerSettings>();
         if (component != null)
         {
+            component.StopFlag();
             component.transform.localPosition = lhOriginPos;
             component.transform.localRotation = Quaternion.identity;
-            Destroy(component);
         }
         component = head.GetComponent<TrackerSettings>();
         if (component != null)
         {
+            component.StopFlag();
             component.transform.localPosition = headOriginPos;
             component.transform.localRotation = Quaternion.identity;
-            Destroy(component);
         }
         component = body.GetComponent<TrackerSettings>();
         if (component != null)
         {
+            component.StopFlag();
             component.transform.localPosition = bodyOriginPos;
             component.transform.localRotation = Quaternion.identity;
-            Destroy(component);
         }
 
         initialized = true;

@@ -14,6 +14,8 @@ public class TrackerSettings : MonoBehaviour
     [SerializeField]
     private bool trackRotation = true;
 
+    private bool stopFlag = false;
+
     public TrackerHostSettings HostSettings
     {
         get { return hostSettings; }
@@ -102,9 +104,9 @@ public class TrackerSettings : MonoBehaviour
 
     private IEnumerator Position()
     {
-        while (true)
+        while (true && !stopFlag)
         {
-            // Debug.Log("position coroutine");
+             Debug.Log("position coroutine");
             transform.position = hostSettings.GetPosition(objectName, channel);
             yield return null;
         }
@@ -112,11 +114,16 @@ public class TrackerSettings : MonoBehaviour
 
     private IEnumerator Rotation()
     {
-        while (true)
+        while (true && !stopFlag)
         {
-            // Debug.LogWarning("rotation coroutine");
+             Debug.LogWarning("rotation coroutine");
             transform.rotation = hostSettings.GetRotation(objectName, channel);
             yield return null;
         }
+    }
+
+    public void StopFlag()
+    {
+        stopFlag = true;
     }
 }

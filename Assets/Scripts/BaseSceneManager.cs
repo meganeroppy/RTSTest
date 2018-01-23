@@ -16,20 +16,20 @@ public class BaseSceneManager : MonoBehaviour
     private Camera[] presetCameras;
 
     [SerializeField]
-    private Transform copyTransformHead;
-    public GameObject CopyTransformHead { get { return copyTransformHead.gameObject; } }
+    private TrackerSettings copyTransformHead;
+    public TrackerSettings CopyTransformHead { get { return copyTransformHead; } }
 
     [SerializeField]
-    private Transform copyTransformRightHand;
-    public GameObject CopyTransformRightHand { get { return copyTransformRightHand.gameObject; } }
+    private TrackerSettings copyTransformRightHand;
+    public TrackerSettings CopyTransformRightHand { get { return copyTransformRightHand; } }
 
     [SerializeField]
-    private Transform copyTransformLeftHand;
-    public GameObject CopyTransformLeftHand { get { return copyTransformLeftHand.gameObject; } }
+    private TrackerSettings copyTransformLeftHand;
+    public TrackerSettings CopyTransformLeftHand { get { return copyTransformLeftHand; } }
 
     [SerializeField]
-    private Transform copyTransformBody;
-    public GameObject CopyTransformBody { get { return copyTransformBody.gameObject; } }
+    private TrackerSettings copyTransformBody;
+    public TrackerSettings CopyTransformBody { get { return copyTransformBody; } }
 
     [SerializeField]
     private GameObject offsetObject;
@@ -38,7 +38,7 @@ public class BaseSceneManager : MonoBehaviour
 	private bool serverOnly = false;
 
     // Use this for initialization
-    void Start ()
+    void Start()
     {
         instance = this;
 
@@ -51,7 +51,7 @@ public class BaseSceneManager : MonoBehaviour
         }
 
         // RTSモーションシミュレーションフラグがあったら設定する
-        if( RtsTestNetworkManager.instance.SimulateRtsMovement )
+        if (RtsTestNetworkManager.instance.SimulateRtsMovement)
         {
             var obj = GetComponent<RtsMovementSample>();
             if (obj != null) obj.Init();
@@ -60,22 +60,21 @@ public class BaseSceneManager : MonoBehaviour
         int playerId = 0;
         if (RtsTestNetworkManager.instance != null) playerId = RtsTestNetworkManager.instance.GetPlayerId();
 
-        if (copyTransformHead.gameObject.name.EndsWith("Head"))
-            copyTransformHead.gameObject.name = copyTransformHead.gameObject.name + playerId.ToString();
+        // プレイヤーIDに従って参照するRTSのリジットボディ名を指定する
+        {
+            if (copyTransformHead.ObjectName.EndsWith("Head"))
+                copyTransformHead.ObjectName += playerId.ToString();
 
-        if (copyTransformRightHand.gameObject.name.EndsWith("RH"))
-            copyTransformRightHand.gameObject.name = copyTransformRightHand.gameObject.name + playerId.ToString();
+            if (copyTransformRightHand.ObjectName.EndsWith("RH"))
+                copyTransformRightHand.ObjectName += playerId.ToString();
 
-        if (copyTransformLeftHand.gameObject.name.EndsWith("LH"))
-            copyTransformLeftHand.gameObject.name = copyTransformLeftHand.gameObject.name + playerId.ToString();
+            if (copyTransformLeftHand.ObjectName.EndsWith("LH"))
+                copyTransformLeftHand.ObjectName += playerId.ToString();
 
-        if (copyTransformBody.gameObject.name.EndsWith("Body"))
-            copyTransformBody.gameObject.name = copyTransformBody.gameObject.name + playerId.ToString();
-
-
+            if (copyTransformBody.ObjectName.EndsWith("Body"))
+                copyTransformBody.ObjectName += playerId.ToString();
+        }
     }
-
-
     private IEnumerator LoadFirstScene()
     {
         var operation = SceneManager.LoadSceneAsync(firstSceneName, LoadSceneMode.Additive);
