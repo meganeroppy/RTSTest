@@ -2,10 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CollapseFloor : MonoBehaviour
+/// <summary>
+/// ガーデンシーンの制御
+/// 現状ほぼ床崩壊イベント管理のみ
+/// </summary>
+public class GardenSceneManager : MonoBehaviour
 {
-	public ExplosionSource expSource;
+    public static GardenSceneManager instance;
 
+    public ExplosionSource expSource;
+
+    // 崩れ力
 	public float force = 0f;
 
 	public float startScale = 0;
@@ -14,20 +21,17 @@ public class CollapseFloor : MonoBehaviour
 
 	public float gainScaleRate = 0.1f;
 
-
 	public FracturedObject fractuedObject;
 	public float upperForce = 15f;
 
 	public Transform propsParent;
 
 	// Use this for initialization
-	void Start () {
+	void Start ()
+    {
+        instance = this;
+
 		currentScale = startScale;
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
 	}
 
 	public void PlayEvent()

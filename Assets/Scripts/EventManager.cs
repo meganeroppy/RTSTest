@@ -18,20 +18,23 @@ public class EventManager : NetworkBehaviour
     [SerializeField]
     private GameObject mushroomPrefab;
 
+    /// <summary>
+    /// シナリオの流れ
+    /// </summary>
     private enum Sequence
     {
-        Garden,
-        CollapseGround_Event,
-        Falling,
-        TeaRoom,
-        PopCakes1_Event,
-        SmallenDrothy_Event,
-        TeaRoomLarge,
-        PopCakes2_Event,
-        LargenDrothy_Event,
-        TeaRoomSmall,
-        PopMushrooms_Event,
-        Ending_Event,
+        Garden, // 一番初めのシーン
+        CollapseGround_Event, // 床が崩れていく
+        Falling, // 落下中のシーン
+        TeaRoom, // ティールーム
+        PopCakes1_Event, // ケーキが出現する
+        SmallenDrothy_Event, // ドロシー達が小さくなる
+        TeaRoomLarge, // ドロシーが小さくなったあとのティールーム
+        PopCakes2_Event, // ケーキが出現する
+        LargenDrothy_Event, // ドロシー達が巨大化する
+        TeaRoomSmall, // 小さな（破壊された）ティールーム
+        PopMushrooms_Event, // きのこが出現する
+        Ending_Event, // 終了演出
         Count_,
     }
 
@@ -198,10 +201,10 @@ public class EventManager : NetworkBehaviour
                 // 地面か崩れるイベント
                 // やりかたかえてもいいかも？
 
-                GameObject　obj = GameObject.Find("GardenSceneManager");
-                if (!obj) break;
+                var manager = GardenSceneManager.instance;
+                if (manager == null) break;
 
-                obj.SendMessage("PlayEvent");
+                manager.PlayEvent();
 
                 break;
             case Sequence.PopCakes1_Event:
