@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class SwordShot : NetworkBehaviour {
+/// <summary>
+/// 観測者がプレイヤーをナビするときに使うショット
+/// </summary>
+public class NavigateShot : NetworkBehaviour {
 
 	[SerializeField]
 	private GameObject effect;
@@ -35,7 +38,7 @@ public class SwordShot : NetworkBehaviour {
 		{
 			dead = true;
 
-			CreateEffect();
+			CmdCreateEffect();
 		}
 	}
 
@@ -45,12 +48,15 @@ public class SwordShot : NetworkBehaviour {
 
 		dead = true;
 
-		CreateEffect();
+		CmdCreateEffect();
 	}
 
-	private void CreateEffect()
+    [Command]
+	private void CmdCreateEffect()
 	{
-		Instantiate(effect, transform.position, Quaternion.identity, transform);
+		var obj = Instantiate(effect, transform.position, Quaternion.identity, transform);
+
+        NetworkServer.Spawn(obj);
 
 		Destroy(gameObject, 2f);
 	}

@@ -11,7 +11,7 @@ public class SwordShooter : NetworkBehaviour
 	private Transform shotOriginLeft;
 
 	[SerializeField]
-	private SwordShot shot;
+	private NavigateShot shot;
 
 	// Use this for initialization
 	void Start () {

@@ -26,6 +26,9 @@ public class ObserverController : NetworkBehaviour {
     [SerializeField]
     private bool behaveAsOnePlayer = false;
 
+    [SerializeField]
+    GameObject navigateShotPrefab;
+
     // Use this for initialization
     void Start () 
 	{
@@ -44,6 +47,7 @@ public class ObserverController : NetworkBehaviour {
             UpdateRotaition();
     //    }
         UpdateEvent();
+        CheckKeyInput();
 	}
 
 	void UpdatePosition()
@@ -111,15 +115,31 @@ public class ObserverController : NetworkBehaviour {
 		{
             em.CmdProceedSequence();
 		}
-
-        // Tはテスト用のキー
-        if (!behaveAsOnePlayer && Input.GetKeyDown(KeyCode.T) )
-		{
-			ExecTest();
-		}
 	}
 
-	private void ExecTest()
+    private void CheckKeyInput()
+    {
+        if( Input.GetButtonDown("Fire1") ||
+            Input.GetButtonDown("Oculus_GearVR_RIndexTrigger") ||
+            Input.GetButtonDown("Oculus_GearVR_RIndexTrigger") )
+        {
+            CmdFireNavigateShot();
+        }
+    }
+
+    [Command]
+    private void CmdFireNavigateShot()
 	{
+        var obj = Instantiate(navigateShotPrefab);
+        obj.transform.position = transform.position;
+
+        var clickPosition = Input.mousePosition;
+        // Z軸修正
+        clickPosition.z = 10f;
+        var targetPos = Camera.main.ScreenToWorldPoint(clickPosition);
+
+        obj.transform.LookAt(targetPos);
+
+        NetworkServer.Spawn(obj);
 	}
 }
