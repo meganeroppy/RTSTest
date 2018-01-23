@@ -89,12 +89,12 @@ public class PlayerTest : NetworkBehaviour
     /// <summary>
     /// つかめる距離にあるアイテム
     /// </summary>
-    private Mushroom holdTarget = null;
+    private DrothyItem holdTarget = null;
 
     /// <summary>
     /// つかんでいるアイテム
     /// </summary>
-    private Mushroom holdItem = null;
+    private DrothyItem holdItem = null;
 
     /// <summary>
     /// カメライメージ
@@ -109,6 +109,12 @@ public class PlayerTest : NetworkBehaviour
 
     [SyncVar]
     private bool biggenFlag = false;
+
+    /// <summary>
+    /// アイテムの効果が発生している時間
+    /// </summary>
+    private float itemEffectTimer = 0;
+    public float ItemEffectTimer { get { return itemEffectTimer; } }
 
     // Use this for initialization
     void Start()
@@ -272,6 +278,9 @@ public class PlayerTest : NetworkBehaviour
             }
         }
 
+        // アイテム効果タイマーの更新
+        UpdateItemEffectTimer();
+
         /////////////////////////////////////////
         // ■ここから↓はローカルプレイヤーのみ■
         /////////////////////////////////////////
@@ -325,7 +334,6 @@ public class PlayerTest : NetworkBehaviour
             //    photonView.RPC("SetObserver", PhotonTargets.AllBuffered, !_isObserver);
             //    photonView.RPC("SetObserver", PhotonTargets.AllBuffered, !_isObserver);
         }
-        
     }
 
     /// <summary>
@@ -440,7 +448,7 @@ public class PlayerTest : NetworkBehaviour
         {
             Debug.Log(System.Reflection.MethodBase.GetCurrentMethod() + other.name);
 
-            var mush = other.GetComponent<Mushroom>();
+            var mush = other.GetComponent<DrothyItem>();
             if (mush != null)
             {
                 holdTarget = mush;
@@ -459,7 +467,7 @@ public class PlayerTest : NetworkBehaviour
 
         var obj = NetworkServer.FindLocalObject(id);
         if (!obj) return;
-        var mush = obj.GetComponent<Mushroom>();
+        var mush = obj.GetComponent<DrothyItem>();
         if( mush != null )
         {
             holdTarget = mush;
@@ -486,7 +494,7 @@ public class PlayerTest : NetworkBehaviour
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
         if (!holdTarget) return;
 
-        holdItem = holdTarget.GetComponent<Mushroom>();
+        holdItem = holdTarget.GetComponent<DrothyItem>();
 
         holdTarget = null;
 
@@ -509,7 +517,7 @@ public class PlayerTest : NetworkBehaviour
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
         if (!holdTarget) return;
 
-        holdItem = holdTarget.GetComponent<Mushroom>();
+        holdItem = holdTarget.GetComponent<DrothyItem>();
         holdTarget = null;
     }
 
@@ -519,14 +527,34 @@ public class PlayerTest : NetworkBehaviour
     [Command]
     private void CmdEatItem( )
     {
+        // アイテムを持っていなかったらなにもしない
         if (!holdItem) return;
 
-        NetworkServer.Destroy(holdItem.gameObject);
+        // アイテムを食べられるタイミングでなかったらなにもしない
+        if (EventManager.instance.CurrentSequence != EventManager.Sequence.SmallenDrothy_Event) return;            
 
-        if( !biggenFlag )
+        // たべる
+        holdItem.CmdEaten();
+
+        // アイテムの効果を得る
+        itemEffectTimer = holdItem.EffectTime;
+
+//        if( !biggenFlag )
+//        {
+//            biggenFlag = true;
+//            ChangeScale();
+//        }
+    }
+
+    /// <summary>
+    /// アイテム効果タイマーを減少させる
+    /// </summary>
+    [Server]
+    private void UpdateItemEffectTimer()
+    {
+        if( itemEffectTimer > 0 )
         {
-            biggenFlag = true;
-            ChangeScale();
+            itemEffectTimer -= Time.deltaTime;
         }
     }
 

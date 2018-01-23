@@ -16,7 +16,12 @@ public class EventManager : NetworkBehaviour
     public static EventManager instance;
 
     [SerializeField]
-    private GameObject mushroomPrefab;
+    private DrothyItem itemPrefab;
+
+    /// <summary>
+    /// いらないかも
+    /// </summary>
+    public static List<DrothyItem> itemList;
 
     /// <summary>
     /// シナリオの流れ
@@ -106,82 +111,15 @@ public class EventManager : NetworkBehaviour
 
         StartCoroutine(ExecSequence(newSequence));
     }
-
-    private IEnumerator ExecSequence(Sequence newSequence)
-    {
-        if (!newSequence.ToString().Contains("Event"))
-        {
-            Debug.Log("シーン遷移 ->" + newSequence.ToString());
-
-            // シーンの切り替え
-            var newSceneName = newSequence.ToString();
-
-            if (string.IsNullOrEmpty(newSceneName))
-            {
-                Debug.LogWarning(newSequence.ToString() + " シーンは存在しない ");
-                yield break;
-            }
-
-            // TODO: 暗転演出
-
-            // 必要なオブジェクトの所属シーンを引っ越し
-            {        
-                var baseScene = SceneManager.GetSceneByName(baseSceneName);
-
-                var players = GameObject.FindGameObjectsWithTag("Player");
-
-                foreach(  GameObject g in players )
-                {
-                	SceneManager.MoveGameObjectToScene( g, baseScene );
-                }
-
-                var drothies = GameObject.FindGameObjectsWithTag("Drothy");
-                foreach (GameObject d in drothies)
-                {
-                    SceneManager.MoveGameObjectToScene(d, baseScene);
-                }
-                
-            }
-
-            // もともとのシーンをアンロード
-            {
-                var scene = SceneManager.GetActiveScene();
-
-                // アンロード実行
-                var operation = SceneManager.UnloadSceneAsync(scene.name);
-
-                // アンロードが終わるまで待機
-                while (!operation.isDone) yield return null;
-            }
-
-            // 次のシーンをロードし、アクティブシーンにする
-            {
-                var operation = SceneManager.LoadSceneAsync(newSceneName, LoadSceneMode.Additive);
-
-                // ロードが終わるまで待機
-                while (!operation.isDone) yield return null;
-
-                var scene = SceneManager.GetSceneByName(newSceneName);
-                SceneManager.SetActiveScene(scene);
-            }
-
-            // TODO: 暗転解除
-        }
-        else
-        {
-            // シーン切り替えなし
-            ExecEvent(newSequence);
-        }
-    }
-
     /// <summary>
-    /// シーンの変更を伴わないイベントの実行
+    /// イベントの実行
+    /// 場合によってはシーン切り替えを含む
     /// </summary>
-	private void ExecEvent(Sequence newEvent)
+	private IEnumerator ExecSequence(Sequence newSequence)
     {
-        Debug.Log("イベント " + newEvent.ToString() + "の実行");
+        Debug.Log("イベント " + newSequence.ToString() + "の実行");
 
-        switch (newEvent)
+        switch (newSequence)
         {
             case Sequence.CollapseGround_Event:
 
@@ -233,6 +171,65 @@ public class EventManager : NetworkBehaviour
                 // エンディングから待機画面にもどる                
                 break;
         }
+
+        // シーン切り替えを伴う場合は切り替え処理
+        if (!newSequence.ToString().Contains("Event"))
+        {
+            Debug.Log("シーン遷移 ->" + newSequence.ToString());
+
+            // シーンの切り替え
+            var newSceneName = newSequence.ToString();
+
+            if (string.IsNullOrEmpty(newSceneName))
+            {
+                Debug.LogWarning(newSequence.ToString() + " シーンは存在しない ");
+                yield break;
+            }
+
+            // TODO: 暗転演出
+
+            // 必要なオブジェクトの所属シーンを引っ越し
+            {
+                var baseScene = SceneManager.GetSceneByName(baseSceneName);
+
+                var players = GameObject.FindGameObjectsWithTag("Player");
+
+                foreach (GameObject g in players)
+                {
+                    SceneManager.MoveGameObjectToScene(g, baseScene);
+                }
+
+                var drothies = GameObject.FindGameObjectsWithTag("Drothy");
+                foreach (GameObject d in drothies)
+                {
+                    SceneManager.MoveGameObjectToScene(d, baseScene);
+                }
+            }
+
+            // もともとのシーンをアンロード
+            {
+                var scene = SceneManager.GetActiveScene();
+
+                // アンロード実行
+                var operation = SceneManager.UnloadSceneAsync(scene.name);
+
+                // アンロードが終わるまで待機
+                while (!operation.isDone) yield return null;
+            }
+
+            // 次のシーンをロードし、アクティブシーンにする
+            {
+                var operation = SceneManager.LoadSceneAsync(newSceneName, LoadSceneMode.Additive);
+
+                // ロードが終わるまで待機
+                while (!operation.isDone) yield return null;
+
+                var scene = SceneManager.GetSceneByName(newSceneName);
+                SceneManager.SetActiveScene(scene);
+            }
+
+            // TODO: 暗転解除
+        }
     }
 
     /// <summary>
@@ -244,17 +241,39 @@ public class EventManager : NetworkBehaviour
         if (TeaRoomSceneManager.instance == null) return;
 
         // 出現候補を取得
-        var positions =
-            type == ItemType.SmallenCake ? TeaRoomSceneManager.instance.SmallenCakePositions :
-            type == ItemType.LargenCake ? TeaRoomSceneManager.instance.LargenCakePosition :            
-            TeaRoomSceneManager.instance.MushroomPositions;
+        var Transforms =
+            type == ItemType.SmallenCake ? TeaRoomSceneManager.instance.SmallenCakeTrans :
+            type == ItemType.LargenCake ? TeaRoomSceneManager.instance.LargenCakeTrans :            
+            TeaRoomSceneManager.instance.MushroomTrans;
 
         // TODO プレイヤー数を取得
-        int PlayerNum = 1; 
+        int PlayerNum = 1;
 
-        var obj = Instantiate(mushroomPrefab);
-        obj.transform.position = positions[Random.Range(0, positions.Length)].position;
+        // 候補の数繰り返す
+        foreach (Transform trans in Transforms)
+        {
+            var item = Instantiate(itemPrefab);
+            item.transform.position = trans.position;
 
-        NetworkServer.Spawn(obj);
+            if (itemList == null) itemList = new List<DrothyItem>();
+
+            itemList.Add(item);
+
+            NetworkServer.Spawn(item.gameObject);
+        }
+    }
+
+    /// <summary>
+    /// 配置済みアイテムを削除
+    /// </summary>
+    [Command]
+    private void CmdRemoveItems()
+    {
+        for( int i = itemList.Count-1; i <= 0; --i )
+        {
+            var item = itemList[i];
+            itemList.RemoveAt(i);
+            NetworkServer.Destroy(item.gameObject);
+        }
     }
 }

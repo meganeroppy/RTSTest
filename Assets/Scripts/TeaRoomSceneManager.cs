@@ -36,21 +36,21 @@ public class TeaRoomSceneManager : MonoBehaviour
     /// </summary>
     [SerializeField]
     private Transform[] largenCakePositions;
-    public Transform[] LargenCakePosition { get { return largenCakePositions; } }
+    public Transform[] LargenCakeTrans { get { return largenCakePositions; } }
 
     /// <summary>
     /// 縮小化ケーキの出現位置候補
     /// </summary>
     [SerializeField]
     private Transform[] smallenCakePositions;
-    public Transform[] SmallenCakePositions { get { return smallenCakePositions; } }
+    public Transform[] SmallenCakeTrans { get { return smallenCakePositions; } }
 
     /// <summary>
     /// キノコの出現位置候補
     /// </summary>
     [SerializeField]
     private Transform[] mushroomPositions;
-    public Transform[] MushroomPositions { get { return mushroomPositions; } }
+    public Transform[] MushroomTrans { get { return mushroomPositions; } }
 
     private void Awake()
     {
