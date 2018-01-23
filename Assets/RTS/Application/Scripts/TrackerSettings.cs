@@ -106,7 +106,7 @@ public class TrackerSettings : MonoBehaviour
     {
         while (true && !stopFlag)
         {
-             Debug.Log("position coroutine");
+//             Debug.Log("position coroutine");
             transform.position = hostSettings.GetPosition(objectName, channel);
             yield return null;
         }
@@ -116,7 +116,7 @@ public class TrackerSettings : MonoBehaviour
     {
         while (true && !stopFlag)
         {
-             Debug.LogWarning("rotation coroutine");
+//             Debug.LogWarning("rotation coroutine");
             transform.rotation = hostSettings.GetRotation(objectName, channel);
             yield return null;
         }
