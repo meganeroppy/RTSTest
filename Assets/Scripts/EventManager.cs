@@ -21,7 +21,7 @@ public class EventManager : NetworkBehaviour
     /// <summary>
     /// シナリオの流れ
     /// </summary>
-    private enum Sequence
+    public enum Sequence
     {
         Garden, // 一番初めのシーン
         CollapseGround_Event, // 床が崩れていく
@@ -38,21 +38,8 @@ public class EventManager : NetworkBehaviour
         Count_,
     }
 
-    private int currentSequence = 0;
-
-    /// <summary>
-    /// 削除候補
-    /// </summary>
-    [System.Obsolete]
-    [SerializeField]
-    private string[] sceneNameList;
-
-    /// <summary>
-    /// 現在のシーンインデックス
-    /// </summary>
-    [System.Obsolete]
-    [SyncVar]
-    private int currentSceneIndex = 0;
+    private Sequence currentSequence = 0;
+    public Sequence CurrentSequence { get { return currentSequence; } }
 
     private enum ItemType
     {
@@ -84,7 +71,7 @@ public class EventManager : NetworkBehaviour
     {
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
-        currentSequence = (currentSequence + 1) % (int)Sequence.Count_;
+        currentSequence = (Sequence)(((int)currentSequence + 1) % (int)Sequence.Count_);
 
         var nextSequence = (Sequence)currentSequence;
 
@@ -115,7 +102,7 @@ public class EventManager : NetworkBehaviour
     {
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
-        currentSequence = (int)newSequence;
+        currentSequence = newSequence;
 
         StartCoroutine(ExecSequence(newSequence));
     }
