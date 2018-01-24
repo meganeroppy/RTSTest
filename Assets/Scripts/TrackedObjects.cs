@@ -77,6 +77,23 @@ public class TrackedObjects : NetworkBehaviour
         get { return bodyObject; }
     }
 
+    /// <summary>
+    /// RTSの頭リジッドボディのY回転がこの値の時にHMDのRecenterを行うとベストな回転になる
+    /// プレイヤーが生まれた時点で自動的に正面の値をセットできればベストだが、現状「今の角度が正面！」という設定しかできなそう（軽く調べたが情報なかった）なので
+    /// 苦肉の策として頭リジッドボディのY回転がこの値に近くなったタイミングでRecenterをコールすることにする
+    /// 美しい方法ではないので追々改善したい
+    /// </summary>
+    [SerializeField]
+    private float bestTrackerHeadRotationY = 90f;
+
+    /// <summary>
+    /// RTSの頭リジッドボディY回転とベスト角度（↑）との差がこの値以下になったらそこを正面として定義する
+    /// </summary>
+    [SerializeField]
+    private float centeringThreshold = 0.1f;
+
+    private bool defineHmdCenter = false;
+
 	/// <summary>
 	/// CopyTransformのついた子要素の位置を0にした上で無効にする
 	/// </summary>
@@ -131,5 +148,17 @@ public class TrackedObjects : NetworkBehaviour
 		{
 			OVRManager.display.RecenterPose();
 		}
+
+        if( !defineHmdCenter )
+        {
+            if( copyTransformHead.copySource != null )
+            {
+                if( Mathf.Abs( copyTransformHead.copySource.transform.rotation.eulerAngles.y - bestTrackerHeadRotationY ) < centeringThreshold )
+                {
+                    OVRManager.display.RecenterPose();
+                    defineHmdCenter = true;
+                }
+            }
+        }
     }
 }
