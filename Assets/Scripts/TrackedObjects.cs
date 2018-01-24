@@ -77,12 +77,6 @@ public class TrackedObjects : NetworkBehaviour
         get { return bodyObject; }
     }
 
-	[SerializeField]
-	private Transform rotateCopyFrom;
-
-	[SerializeField]
-	private Transform rotateCopyTo;
-
 	/// <summary>
 	/// CopyTransformのついた子要素の位置を0にした上で無効にする
 	/// </summary>
@@ -138,15 +132,4 @@ public class TrackedObjects : NetworkBehaviour
 			OVRManager.display.RecenterPose();
 		}
     }
-
-	/// <summary>
-	/// モデルの回転 自分自身の時はあまり意味がないが、人から見られるときに重要になる
-	/// </summary>
-	public void UpdateVisualRotation()
-	{
-		if( rotateCopyFrom != null && rotateCopyTo != null )
-		{
-			rotateCopyTo.forward = rotateCopyFrom.forward;
-		}
-	}
 }
