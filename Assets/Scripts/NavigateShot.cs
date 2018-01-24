@@ -39,7 +39,7 @@ public class NavigateShot : NetworkBehaviour {
 		{
 			dead = true;
 
-			CmdCreateEffect();
+			CreateEffect();
 		}
 	}
 
@@ -50,11 +50,10 @@ public class NavigateShot : NetworkBehaviour {
 
 		dead = true;
 
-		CmdCreateEffect();
+		CreateEffect();
 	}
 
-    [Command]
-	private void CmdCreateEffect()
+	private void CreateEffect()
 	{
 		var obj = Instantiate(effect, transform.position, Quaternion.identity, transform);
 
