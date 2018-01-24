@@ -18,14 +18,6 @@ public class ObserverController : NetworkBehaviour {
 
     Quaternion cameraRotate;
 
-    /// <summary>
-    /// 有効の時はほかのプレイヤーと同様にHMDを被りエリア内を歩き回る観測者となる
-    /// 無効の時はキーボード操作で遠隔からシーン内を飛び回る観測者となる
-    /// false時は実質キーボード操作
-    /// </summary>
-    [SerializeField]
-    private bool behaveAsOnePlayer = false;
-
     [SerializeField]
     GameObject navigateShotPrefab;
 
@@ -52,7 +44,7 @@ public class ObserverController : NetworkBehaviour {
 
 	void UpdatePosition()
 	{
-        if (!behaveAsOnePlayer)
+        if (!RtsTestNetworkManager.instance.ForceRelatedToTracking)
         {
             var move_x = Input.GetAxis("Horizontal");
             var move_z = Input.GetAxis("Vertical");
@@ -78,7 +70,7 @@ public class ObserverController : NetworkBehaviour {
 
     void UpdateRotaition()
     {
-        if (!behaveAsOnePlayer)
+        if (!RtsTestNetworkManager.instance.ForceRelatedToTracking)
         {
             var xRotate = Input.GetAxis("Mouse Y") * rot_speed;
             var yRotate = Input.GetAxis("Mouse X") * rot_speed;
@@ -111,7 +103,7 @@ public class ObserverController : NetworkBehaviour {
         var em = EventManager.instance;
 
 		// シーケンス開始
-		if(!behaveAsOnePlayer && Input.GetKeyDown(KeyCode.P) )
+		if(!RtsTestNetworkManager.instance.ForceRelatedToTracking && Input.GetKeyDown(KeyCode.P) )
 		{
             em.CmdProceedSequence();
 		}
