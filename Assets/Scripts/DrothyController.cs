@@ -24,12 +24,25 @@ public class DrothyController : NetworkBehaviour
 	[SerializeField]
 	private Texture[] dressTexture;
 
-    [SyncVar]
-    private Transform owner;
+    private Transform owner = null;
 
     [SyncVar]
+    private Vector3 ownerPosition;
+
+    [SyncVar]
+    private Quaternion ownerRotation;
+
+    [SyncVar]
+    private Vector3 targetPosition;
+
+    [SyncVar]
+    private bool deleteFlag = false;
+
     private bool initialized = false;
-
+    /// <summary>
+    /// サーバーからのみ呼ぶこと
+    /// </summary>
+    /// <param name="owner"></param>
     public void SetOwner(Transform owner)
     {
         this.owner = owner;
@@ -78,22 +91,42 @@ public class DrothyController : NetworkBehaviour
 			var speed = fallingSpeedMin + Mathf.PingPong(Time.time * interval, speedDif);
 			transform.position += Vector3.down * speed * Time.deltaTime;
 
-		}
-
-        // DrothySampleから引っ越しされた部分
-        {
-            if (owner != null)
-            {
-                transform.SetPositionAndRotation(owner.position, owner.rotation);
-            }
-            else if (initialized)
-            {
-                // 初期化後にマスターがいなくなったら削除
-                Destroy(gameObject);
-            }
-
         }
 
+        UpdateOwnerPositionAndRotation();
+
+        transform.SetPositionAndRotation(ownerPosition, ownerRotation);
+
+        UpdateDeleteFlag();
+
+        if (deleteFlag)
+        {
+            Destroy(gameObject);
+        }        
+    }
+
+    /// <summary>
+    /// サーバーのみ
+    /// オーナーの位置と回転をSyncVar付きの変数に設定する
+    /// ＊直接ownerをSyncVarにすると文句言われる＊
+    /// </summary>
+    [Server]
+    private void UpdateOwnerPositionAndRotation()
+    {
+        if (owner == null) return;
+
+        ownerPosition = owner.position;
+        ownerRotation = owner.rotation;
+    }
+
+    /// <summary>
+    /// サーバーのみ
+    /// 初期化後にオーナーがいなくなったら削除フラグを立てる
+    /// </summary>
+    [Server]
+    private void UpdateDeleteFlag()
+    {
+        deleteFlag = initialized && owner == null;
     }
 
 	public void SetDressColor(int colorIdx)

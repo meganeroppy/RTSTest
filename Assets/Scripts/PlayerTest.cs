@@ -376,7 +376,7 @@ public class PlayerTest : NetworkBehaviour
         }
 
         var body = drothyIK.bodyObj;
-        myDrothy.SetOwner(body.transform);
+        myDrothy.SetOwner(transform.GetComponent<TrackedObjects>().BodyObject);
 
         // どちらが正しいかはまだ不明
 //      NetworkServer.Spawn(drothy.gameObject);
