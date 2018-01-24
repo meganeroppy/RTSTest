@@ -27,6 +27,7 @@ public class NavigateShot : NetworkBehaviour {
 	}
 	
 	// Update is called once per frame
+    [ServerCallback]
 	void Update () 
 	{
 		if(dead)return;
@@ -42,6 +43,7 @@ public class NavigateShot : NetworkBehaviour {
 		}
 	}
 
+    [ServerCallback]
 	void OnCollisionEnter( Collision col )
 	{
 		if( dead ) return;
