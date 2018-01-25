@@ -71,6 +71,7 @@ public class EventManager : NetworkBehaviour
         instance = this;
     }
 
+    [ServerCallback]
     private void Update()
     {
         CheckPlayerEffect();
@@ -93,7 +94,6 @@ public class EventManager : NetworkBehaviour
         foreach( PlayerTest p in PlayerTest.list )
         {
             bool inEffect = p.ItemEffectTimer > 0;
-
 
             Debug.Log( "ID" + p.netId.ToString() + " : " + ( inEffect ? "効果中" : "効果なし" ) );
             if (!inEffect) allPlayersInEffect = false;

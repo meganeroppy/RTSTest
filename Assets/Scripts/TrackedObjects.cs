@@ -109,8 +109,6 @@ public class TrackedObjects : NetworkBehaviour
 
 	private void Start () 
 	{
-		Debug.Log( System.Reflection.MethodBase.GetCurrentMethod());
-
         if (!isLocalPlayer)
         {
 			SetEnable(false);

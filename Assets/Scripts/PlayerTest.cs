@@ -170,7 +170,7 @@ public class PlayerTest : NetworkBehaviour
     /// </summary>
     public override void OnStartLocalPlayer()
     {
-        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
+    //    Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
 		// プレイヤー名を変更する
 		gameObject.name = "[YOU] " + gameObject.name;
@@ -223,7 +223,7 @@ public class PlayerTest : NetworkBehaviour
 
     public override void OnStartClient()
     {
-        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
+    //    Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
     }
 
     // Update is called once per frame
@@ -295,7 +295,10 @@ public class PlayerTest : NetworkBehaviour
         }
 
         // アイテム効果タイマーの更新
-        UpdateItemEffectTimer();
+        if (isServer)
+        {
+            UpdateItemEffectTimer();
+        }
 
         /////////////////////////////////////////
         // ■ここから↓はローカルプレイヤーのみ■
@@ -409,7 +412,7 @@ public class PlayerTest : NetworkBehaviour
     [ClientRpc]
     private void RpcPassDrothyReference( NetworkInstanceId netId )
     {
-        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
+    //    Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
         var obj = ClientScene.FindLocalObject(netId);
 
