@@ -259,9 +259,8 @@ public class EventManager : NetworkBehaviour
 
 		StartCoroutine( ExecGotoNewScene( newSceneName ) );
 
-		// クライアントでも同様のイベントを発生させる ただしホストの場合は多重に呼ばれてしまうためなにもしない
-		if( !(isServer && isClient) )
-			RpcGotoNewScene(newSceneName);
+		// クライアントでも同様のイベントを発生させる
+		RpcGotoNewScene(newSceneName);
 	}
 
 	/// <summary>
@@ -273,6 +272,13 @@ public class EventManager : NetworkBehaviour
 	private void RpcGotoNewScene( string newSceneName )
 	{
 		Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
+
+		// ホストの場合は多重に呼ばれてしまうためなにもしない
+		if( !(isServer && isClient) )
+		{
+			Debug.Log("ホスト");
+			return;			
+		}
 
 		StartCoroutine( ExecGotoNewScene( newSceneName ) );
 	}
@@ -349,9 +355,8 @@ public class EventManager : NetworkBehaviour
 
 		manager.PlayEvent();
 
-		// クライアントでも同様のイベントを発生させる ただしホストの場合は多重に呼ばれてしまうためなにもしない
-		if( !(isServer && isClient) )
-			RpcExecCollapseFloorEvent();
+		// クライアントでも同様のイベントを発生させる
+		RpcExecCollapseFloorEvent();
 	}
 
 	/// <summary>
@@ -361,6 +366,13 @@ public class EventManager : NetworkBehaviour
 	[ClientRpc]
 	private void RpcExecCollapseFloorEvent()
 	{
+		// ホストの場合は多重に呼ばれてしまうためなにもしない
+		if( !(isServer && isClient) ) 
+		{
+			Debug.Log("ホスト");
+			return;
+		}
+
 		// 地面が崩れるイベント
 		var manager = GardenSceneManager.instance;
 		if (manager == null) return;
