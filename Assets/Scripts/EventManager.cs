@@ -71,11 +71,53 @@ public class EventManager : NetworkBehaviour
         instance = this;
     }
 
+    private void Update()
+    {
+        CheckPlayerEffect();
+    }
+
+    /// <summary>
+    /// 参加しているプレイヤーのアイテム使用状況をチェックする
+    /// </summary>
+    [Server]
+    private void CheckPlayerEffect()
+    {
+        // ふさわしいシーケンスでなければなにもしない
+        if (currentSequence != Sequence.PopCakes1_Event && currentSequence != Sequence.PopCakes2_Event && currentSequence != Sequence.PopMushrooms_Event) return;
+
+        // プレイヤーリストがなければなにもしない
+        if (PlayerTest.list == null) return;
+
+        // 全員アイテム効果中だったら次のシーンに移行
+        bool allPlayersInEffect = true;
+        foreach( PlayerTest p in PlayerTest.list )
+        {
+            bool inEffect = p.ItemEffectTimer > 0;
+
+
+            Debug.Log( "ID" + p.netId.ToString() + " : " + ( inEffect ? "効果中" : "効果なし" ) );
+            if (!inEffect) allPlayersInEffect = false;
+        }
+
+        if( allPlayersInEffect )
+        {
+            // 全員効果中なので次のシーケンスに移行
+            Debug.Log("全員効果中なので次のシーケンスに移行");
+
+            ProceedSequence();
+        }
+    }
+
     [Command]
     public void CmdProceedSequence()
     {
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
+        ProceedSequence();
+    }
+
+    private void ProceedSequence()
+    {
         currentSequence = (Sequence)(((int)currentSequence + 1) % (int)Sequence.Count_);
 
         var nextSequence = (Sequence)currentSequence;
@@ -100,6 +142,7 @@ public class EventManager : NetworkBehaviour
 
         // 各クライアントでイベントを進める
         RpcProceedSequence(nextSequence);
+
     }
 
     [ClientRpc]

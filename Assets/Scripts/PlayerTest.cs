@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -111,10 +112,25 @@ public class PlayerTest : NetworkBehaviour
     private bool biggenFlag = false;
 
     /// <summary>
+    /// プレイヤーのリスト
+    /// サーバーでのみ使用可能
+    /// </summary>
+    public static List<PlayerTest> list;
+
+    /// <summary>
     /// アイテムの効果が発生している時間
     /// </summary>
     private float itemEffectTimer = 0;
     public float ItemEffectTimer { get { return itemEffectTimer; } }
+
+    [ServerCallback]
+    private void Awake()
+    {
+        if (list == null) list = new List<PlayerTest>();
+        list.Add(this);
+
+        Debug.Log("AddPlayer() : プレイヤー数 -> " + list.Count.ToString());
+    }
 
     // Use this for initialization
     void Start()
@@ -532,7 +548,11 @@ public class PlayerTest : NetworkBehaviour
         if (!holdItem) return;
 
         // アイテムを食べられるタイミングでなかったらなにもしない
-        if (EventManager.instance.CurrentSequence != EventManager.Sequence.SmallenDrothy_Event) return;            
+        if (EventManager.instance.CurrentSequence != EventManager.Sequence.PopCakes1_Event &&
+            EventManager.instance.CurrentSequence != EventManager.Sequence.PopCakes2_Event &&
+            EventManager.instance.CurrentSequence != EventManager.Sequence.PopMushrooms_Event
+        )
+            return;            
 
         // たべる
         holdItem.CmdEaten();
@@ -563,5 +583,18 @@ public class PlayerTest : NetworkBehaviour
     private void ChangeScale()
     {
         drothyScale = 10f;
+    }
+
+    /// <summary>
+    /// サーバーの時は削除時にリストから自身を削除
+    /// </summary>
+    [ServerCallback]
+    private void OnDestroy()
+    {
+        if( list != null && list.Contains(this) )
+        {
+            list.Remove(this);
+            Debug.Log("プレイヤーリストから自身を削除");
+        }
     }
 }
