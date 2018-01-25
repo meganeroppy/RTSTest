@@ -45,12 +45,12 @@ public class DrothyItem : NetworkBehaviour
         originPosition = transform.position;
     }
 
-    [ServerCallback]
     private void Update()
     {
         visual.SetActive(enable);
 
-        UpdateTimer();
+        if( isServer )
+            UpdateTimer();
     }
 
     /// <summary>
