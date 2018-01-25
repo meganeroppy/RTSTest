@@ -84,9 +84,6 @@ public class PlayerTest : NetworkBehaviour
     /// </summary>
     private ObserverController observerController;
 
-    [SyncVar]
-    private bool biggenFlag = false;
-
     /// <summary>
     /// プレイヤーのリスト
     /// サーバーでのみ使用可能
@@ -451,7 +448,6 @@ public class PlayerTest : NetworkBehaviour
             return;
         }
 
-        var body = drothyIK.bodyObj;
         myDrothy.SetOwner(transform.GetComponent<TrackedObjects>().BodyObject);
 
         // どちらが正しいかはまだ不明
