@@ -37,40 +37,61 @@ public class RtsTestNetworkManager : NetworkBehaviour
 	[SerializeField]
 	private Role role;
 
-    /// <summary>
-    /// 後々動的に設定できるようにする
-    /// </summary>
-    [SerializeField]
-    private string localServerAddress;
+	/// <summary>
+	/// 開始時に自動で自身の役割を実行するか？
+	/// </summary>
+	[SerializeField]
+	private bool autoExecRole = false;
 
-    [SerializeField]
-    private bool autoExecRole = false;
+	/// <summary>
+	/// 後々アプリケーションと同じディレクトリに保存したファイルなどから設定できるようにする
+	/// </summary>
+	[SerializeField]
+	private string localServerAddress;
 
-    /// <summary>
-    /// 観測者フラグ
-    /// 後々動的に設定できるようにする
-    /// </summary>
-    [SerializeField]
-    private bool isObserver;
-    public bool IsObserver
-    {
-        get { return isObserver; }
-    }
+	/// <summary>
+	/// 観測者フラグ
+	/// 後々動的に設定できるようにする
+	/// </summary>
+	[SerializeField]
+	private bool isObserver = false;
+	public bool IsObserver
+	{
+		get { return isObserver; }
+	}
 
-    /// <summary>
-    /// 強制トラッカー依存
-    /// 有効にすると観測者フラグが立っていてもトラッカー依存の操作系になる
-    /// 後々動的に設定できるようにする
-    /// </summary>
-    [SerializeField]
-    private bool forceRelatedToTracking;
-    public bool ForceRelatedToTracking
-    {
-        get { return forceRelatedToTracking; }
-    }
+	/// <summary>
+	/// 観測者タイプ
+	/// </summary>
+	public enum ObserverType
+	{
+		Default,	// 通常の観測者 キーボードで操作する
+		Participatory, // 参加型観測者 他のプレイヤーと同様にプレイスペース内に入りトラッキングにより操作する InputTypeの強制キーボード操作が有効でもこちらが優先される
+	}
+
+	[SerializeField]
+	private ObserverType observerType = ObserverType.Default;
+	public ObserverType MyObserverType{get{ return observerType;}}
+
+
+	/// <summary>
+	/// 入力モード
+	/// 実稼働時にはデフォルトの使用を前提とする
+	/// </summary>
+	public enum InputMode
+	{
+		ForceByKeyboard, // 強制キーボード操作 プレイヤーであってもキーボードで操作する
+		ForceByTracking, // 強制トラッカー依存操作 観測者であってもトラッカー経由での操作となる ObserverTypeの参加型観測者が有効の時は無意味になる
+		Default, // 基本操作 プレイヤーはトラッカー依存操作 & 観測者はキーボード操作 ただし参加型観測者の場合は観測者もトラッカー依存操作
+	}
+
+	[SerializeField]
+	private InputMode inputMode = InputMode.Default;
+	public InputMode MyInputMode{ get{ return inputMode;} }
 
     /// <summary>
     /// RTS空間内のプレイヤーの動きをシミュレートするか？
+	/// RTS設備がない環境での開発用
     /// </summary>
     [SerializeField]
     private bool simulateRtsMovement = false;
@@ -79,7 +100,32 @@ public class RtsTestNetworkManager : NetworkBehaviour
         get { return simulateRtsMovement; }
     }
 
-    private bool executed = false;
+	/// <summary>
+	/// 脚の動きのシミュレーションを有効にするか？
+	/// </summary>
+	[SerializeField]
+	private bool useSimulateFoot = false;
+	public bool UseSimulateFoot
+	{
+		get { return useSimulateFoot; }
+	}
+
+	/// <summary>
+	/// 自身であってもドロシーを表示するか？
+	/// 完全に開発用
+	/// 「ドロシー」でなく自身を表示にし、いもむしの表示にも対応させるとよいかも
+	/// </summary>
+	[SerializeField]
+	private bool forceDisplayDrothy = false;
+	public bool ForceDisplayDrothy
+	{
+		get { return forceDisplayDrothy; }
+	}
+
+	/// <summary>
+	/// 自身の役割を実行済みか？
+	/// </summary>
+	private bool executedOwnRole = false;
 
     private void Awake()
     {
@@ -116,9 +162,9 @@ public class RtsTestNetworkManager : NetworkBehaviour
 
     public void ExecRole()
     {
-        if (executed) return;
+        if (executedOwnRole) return;
 
-        executed = true;
+        executedOwnRole = true;
 
         switch( role )
         {

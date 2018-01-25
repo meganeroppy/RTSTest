@@ -24,18 +24,6 @@ public class PlayerTest : NetworkBehaviour
     public bool IsObserver { get { return isObserver; } }
 
     /// <summary>
-    /// 脚の動きのシミュレーションを有効にするか？
-    /// </summary>
-    [SerializeField]
-    private bool useSimulateFoot = false;
-
-    /// <summary>
-    /// 自身であってもドロシーを表示する
-    /// </summary>
-    [SerializeField]
-    private bool forceDisplayDrothy = false;
-
-    /// <summary>
     /// 削除予定
     /// 観測者だと赤くなるだけのキューブ
     /// </summary>
@@ -68,11 +56,6 @@ public class PlayerTest : NetworkBehaviour
     /// （仮）プリセットのプレイヤーカラー
     /// </summary>
     Color[] playerColor = new Color[] { Color.gray, Color.red, Color.green, Color.blue, Color.yellow };
-
-    /// <summary>
-    /// キーボード操作を有効にするか？
-    /// </summary>
-    public bool forceUseKeyboardControl = false;
 
     /// <summary>
     /// 情報表示ラベル
@@ -195,6 +178,7 @@ public class PlayerTest : NetworkBehaviour
         if(RtsTestNetworkManager.instance.IsObserver)
         {
             // 観測者の場合
+
             var obj = GameObject.Find("BaseSceneManager");
             if( obj )
             {
@@ -205,18 +189,26 @@ public class PlayerTest : NetworkBehaviour
                 }
             }
 
-            if( RtsTestNetworkManager.instance.ForceRelatedToTracking)
+			if( RtsTestNetworkManager.instance.MyObserverType == RtsTestNetworkManager.ObserverType.Participatory )
+			{
+				// 参加型の時は有効にする
+					GetComponent<TrackedObjects>().SetEnable(true);
+			}
+			else if( RtsTestNetworkManager.instance.MyInputMode == RtsTestNetworkManager.InputMode.ForceByTracking )
             {
-                var to = GetComponent<TrackedObjects>();
-                to.SetEnable(true);
+				// 強制トラッカー依存操作フラグがあったらコンポーネントを有効にする
+				   GetComponent<TrackedObjects>().SetEnable(true);
             }
+			else
+			{
+				// そうでなければ無効にする
+				GetComponent<TrackedObjects>().SetEnable(false);
+			}
         }
 		else
 		{
-            // 通常プレイヤーの場合
-
-			var to = GetComponent<TrackedObjects>();
-			to.SetEnable(!forceUseKeyboardControl);
+            // 通常プレイヤーの場合 強制キーボード操作フラグがなければトラッキングによる制御
+			GetComponent<TrackedObjects>().SetEnable(RtsTestNetworkManager.instance.MyInputMode != RtsTestNetworkManager.InputMode.ForceByKeyboard);
 		}
     }
 
@@ -241,24 +233,7 @@ public class PlayerTest : NetworkBehaviour
         {
             if (isObserver != isObserverPrev)
             {
-                observerSign.material.color = isObserver ? Color.red : Color.white;
-
-                if (observerController == null)
-                {
-                    observerController = GetComponent<ObserverController>();
-                }
-
-                if (observerController != null)
-                {
-                    observerController.enabled = isObserver;
-                }
-
-				// 観測者かつ自身ではないときにビジュアルを有効にする
-				cameraImage.SetActive(isObserver && !isLocalPlayer);
-
-				// トラッキングによる移動の有効を設定
-				var to = GetComponent<TrackedObjects>();
-				to.SetEnable((!isObserver && !forceUseKeyboardControl) || RtsTestNetworkManager.instance.ForceRelatedToTracking);
+				SetObserverEnable();
             }
             isObserverPrev = isObserver;
         }
@@ -307,51 +282,135 @@ public class PlayerTest : NetworkBehaviour
 			return;
 		}
 
-        if (forceUseKeyboardControl)
-        {
-            Vector3 move = new Vector3(
-                Input.GetAxisRaw("Horizontal"),
-                0,
-                Input.GetAxisRaw("Vertical"));
+		// 強制キーボード操作の時の操作
+		// TODO: オブザーバーの操作と一緒でいい気がする 
+		{
+			if (RtsTestNetworkManager.instance.MyInputMode == RtsTestNetworkManager.InputMode.ForceByKeyboard)
+	        {
+	            Vector3 move = new Vector3(
+	                Input.GetAxisRaw("Horizontal"),
+	                0,
+	                Input.GetAxisRaw("Vertical"));
 
-            transform.Translate(move * moveSpeed * Time.deltaTime);
-            //	myRigidbody.velocity = (transform.forward + move.normalized) * fSpeed ;
+	            transform.Translate(move * moveSpeed * Time.deltaTime);
+	            //	myRigidbody.velocity = (transform.forward + move.normalized) * fSpeed ;
 
-            var rot = Input.GetKey(KeyCode.I) ? -1 : Input.GetKey(KeyCode.O) ? 1 : 0;
-            if (rot != 0)
-            {
-                transform.Rotate(Vector3.up * rot * rotSpeed * Time.deltaTime);
-            }
-        }
+	            var rot = Input.GetKey(KeyCode.I) ? -1 : Input.GetKey(KeyCode.O) ? 1 : 0;
+	            if (rot != 0)
+	            {
+	                transform.Rotate(Vector3.up * rot * rotSpeed * Time.deltaTime);
+	            }
+	        }
+		}			
 
-        if( forceUseKeyboardControl && Input.GetKeyDown( KeyCode.Space ) )
-        {
+		CheckInput();
 
-        }
-
-        if ( !holdItem && forceUseKeyboardControl && Input.GetKeyDown(KeyCode.H))
-        {
-            CmdSetHoldItem();
-        }
-
-        if ( forceUseKeyboardControl && Input.GetKeyDown(KeyCode.Y))
-        {
-            CmdEatItem();
-        }
-
+		// つかみ候補アイテムから一定距離はなれたら候補から外す
         // サーバーのみ
         if ( isServer && holdTarget && Vector3.Distance( transform.position, holdTarget.transform.position ) > 5f)
         {
             holdTarget = null;
         }
-
-        // キーボードでOを押すと観測者になる(仮）
-        if (Input.GetKeyDown(KeyCode.O))
-        {
-            //    photonView.RPC("SetObserver", PhotonTargets.AllBuffered, !_isObserver);
-            //    photonView.RPC("SetObserver", PhotonTargets.AllBuffered, !_isObserver);
-        }
     }
+
+	/// <summary>
+	/// 観測者設定の有効を切り替え
+	/// </summary>
+	private void SetObserverEnable()
+	{
+		// 削除候補
+		// 観測者サインの色を変える
+		observerSign.material.color = isObserver ? Color.red : Color.white;
+
+		if (observerController == null) observerController = GetComponent<ObserverController>();
+
+		observerController.enabled = isObserver;
+
+		// 観測者かつ自身ではないときにビジュアル（いもむし）を有効にする
+		// TODO: 参加型観測者の見た目をいもむしで無くす場合は要処理変更
+		cameraImage.SetActive(isObserver && !isLocalPlayer);
+
+		// トラッキングによる移動の有効を設定 結構難解なので間違いがないか再三確認する
+		bool enableTracking;
+
+		if( isObserver )
+		{
+			// 観測者の場合
+			if( RtsTestNetworkManager.instance.MyObserverType == RtsTestNetworkManager.ObserverType.Participatory )
+			{
+				// 参加型観測者の場合は有効
+				enableTracking = true;
+			}
+			else if( RtsTestNetworkManager.instance.MyInputMode == RtsTestNetworkManager.InputMode.ForceByTracking )
+			{
+				// 強制トラッカー依存操作の時は有効
+				enableTracking = true;
+			}
+			else
+			{
+				// 上記のどちらでもなければ無効
+				enableTracking = false;
+			}
+		}
+		else
+		{
+			// プレイヤーの場合
+			if( RtsTestNetworkManager.instance.MyInputMode == RtsTestNetworkManager.InputMode.ForceByKeyboard )
+			{
+				// 強制キーボード操作の時は無効
+				enableTracking = false;
+			}
+			else
+			{
+				// そうでなければ有効
+				enableTracking = true;
+			}
+		}
+
+		GetComponent<TrackedObjects>().SetEnable(enableTracking);	
+	}
+
+	[Client]
+	private void CheckInput()
+	{
+		
+		// アイテムをつかむ
+		// TODO: タッチでの操作は追追改善する
+		if( Input.GetKeyDown(KeyCode.H) ||
+			OVRInput.GetDown(OVRInput.RawButton.RIndexTrigger) || // 右人差し指トリガー
+			OVRInput.GetDown(OVRInput.RawButton.LIndexTrigger) // 左人差し指トリガー
+		)
+		{
+			CmdSetHoldItem();
+		}
+
+		// アイテムを食べる
+		if( Input.GetKeyDown(KeyCode.Y) ||
+			OVRInput.GetDown(OVRInput.RawButton.RHandTrigger) || // 右中指トリガー
+			OVRInput.GetDown(OVRInput.RawButton.LHandTrigger) // 左中指トリガー
+		)
+		{
+			CmdEatItem();
+		}	
+	
+		// 観測者になる
+		// 現状いらなそう 必要になったら実装する
+		if (Input.GetKeyDown(KeyCode.O) || 
+			OVRInput.GetDown(OVRInput.RawButton.RThumbstick) // 右スティック押し込み
+		)
+		{
+			Debug.LogWarning("観測者とプレイヤー切り替え機能は未実装");
+		}
+
+		// 観測者モード切り替え
+		// 現状いらなそう 必要になったら実装する
+		if (Input.GetKeyDown(KeyCode.M) || 
+			OVRInput.GetDown(OVRInput.RawButton.LThumbstick) // 左スティック押し込み
+		)
+		{
+			Debug.LogWarning("観測者モード切り替え機能は未実装");
+		}
+	}
 
     /// <summary>
     /// ドロシーを生成する
@@ -378,7 +437,7 @@ public class PlayerTest : NetworkBehaviour
         }
 
         // 設定が有効になっている場合は脚の動きのシミュレートを行う
-        if (useSimulateFoot)
+		if (RtsTestNetworkManager.instance.UseSimulateFoot)
         {
             drothyIK.SetSimulateFoot();
         }
@@ -399,8 +458,6 @@ public class PlayerTest : NetworkBehaviour
 //      NetworkServer.Spawn(drothy.gameObject);
         NetworkServer.SpawnWithClientAuthority(myDrothy.gameObject, gameObject);
 
-    //    drothyNetId = myDrothy.netId;
-
         RpcPassDrothyReference(myDrothy.netId);
     }
 
@@ -410,11 +467,11 @@ public class PlayerTest : NetworkBehaviour
     [ClientRpc]
     private void RpcPassDrothyReference( NetworkInstanceId netId )
     {
-    //    Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
+        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
-        var obj = ClientScene.FindLocalObject(netId);
+		var drothyObj = ClientScene.FindLocalObject(netId);
 
-        myDrothy = obj.GetComponent<DrothyController>();
+        myDrothy = drothyObj.GetComponent<DrothyController>();
 
         // まだクライアント側はIKターゲットが未指定なのでセットする
         {
@@ -429,21 +486,35 @@ public class PlayerTest : NetworkBehaviour
             }
         }
 
-        // 仮 自分のドロシーは無効にする
-        if (isLocalPlayer && !forceDisplayDrothy)
-        {
-            obj.SetActive(false);
-        }
-    }
-
-    /// <summary>
-    /// ドロシーへの参照を要求する
-    /// </summary>
-    [Command]
-    private void CmdRequestDrothyReference()
-    {
-        if (myDrothy == null) return;
-        RpcPassDrothyReference(myDrothy.netId);
+        // 自分のドロシーは無効にする
+		bool drothyVisible;
+		if( RtsTestNetworkManager.instance.ForceDisplayDrothy )
+		{
+			// 強制ドロシー表示フラグがあったら確実に表示する
+			drothyVisible = true;
+		}
+		else if( isObserver )
+		{
+			// 管理者の時
+			if( isLocalPlayer )
+			{
+				// ローカルの時は表示しない
+				drothyVisible = false;
+			}
+			else
+			{
+				// リモートかつ参加型の時は表示し、そうでなければ表示しない 
+				// 表示しない場合はいもむしが表示される
+				drothyVisible = RtsTestNetworkManager.instance.MyObserverType == RtsTestNetworkManager.ObserverType.Participatory;
+			}
+		}
+		else
+		{
+			// プレイヤーの時
+			// ローカルでなければ表示する
+			drothyVisible = !isLocalPlayer;
+		}
+		drothyObj.SetActive( drothyVisible );
     }
 
     /// <summary>
@@ -537,12 +608,6 @@ public class PlayerTest : NetworkBehaviour
         itemEffectTimer = holdItem.EffectTime;
 
         holdItem = null;
-
-        //        if( !biggenFlag )
-        //        {
-        //            biggenFlag = true;
-        //            ChangeScale();
-        //        }
     }
 
     /// <summary>
