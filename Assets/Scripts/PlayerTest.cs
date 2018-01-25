@@ -331,20 +331,20 @@ public class PlayerTest : NetworkBehaviour
 
         }
 
-        if ( holdTarget && !holdItem && forceUseKeyboardControl && Input.GetKeyDown(KeyCode.H))
+        if ( !holdItem && forceUseKeyboardControl && Input.GetKeyDown(KeyCode.H))
         {
             CmdSetHoldItem();
         }
 
-        if (holdItem && forceUseKeyboardControl && Input.GetKeyDown(KeyCode.Y))
+        if ( forceUseKeyboardControl && Input.GetKeyDown(KeyCode.Y))
         {
             CmdEatItem();
         }
 
-        if ( holdTarget && Vector3.Distance( transform.position, holdTarget.transform.position ) > 5f)
+        // サーバーのみ
+        if ( isServer && holdTarget && Vector3.Distance( transform.position, holdTarget.transform.position ) > 5f)
         {
             holdTarget = null;
-            CmdReleaseHoldTarget();
         }
 
         // キーボードでOを押すと観測者になる(仮）
@@ -458,51 +458,41 @@ public class PlayerTest : NetworkBehaviour
     }
 
     /// <summary>
-    /// ローカルでのみ衝突を判定する
+    /// サーバーでのみ衝突を判定する
     /// </summary>
+    [ServerCallback]
     private void OnTriggerEnter(Collider other)
     {
-        if ((isObserver ) || !isLocalPlayer ) return;
+    //    if ((isObserver ) || !isLocalPlayer ) return;
 
         if (other.tag.Equals("Item"))
         {
             Debug.Log(System.Reflection.MethodBase.GetCurrentMethod() + other.name);
 
-            var mush = other.GetComponent<DrothyItem>();
-            if (mush != null)
+            var item = other.GetComponent<DrothyItem>();
+            if (item != null)
             {
-                holdTarget = mush;
-                CmdSetHoldTarget(mush.netId);
+                holdTarget = item;
+                SetHoldTarget(item.netId);
             } 
         }
     }
 
     /// <summary>
-    /// つかみ候補のアイテムのセットをサーバーに反映する
+    /// つかみ候補のアイテムのセット
     /// </summary>
-    [Command]
-    private void CmdSetHoldTarget( NetworkInstanceId id )
+    [Server]
+    private void SetHoldTarget( NetworkInstanceId id )
     {
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
         var obj = NetworkServer.FindLocalObject(id);
         if (!obj) return;
-        var mush = obj.GetComponent<DrothyItem>();
-        if( mush != null )
+        var item = obj.GetComponent<DrothyItem>();
+        if( item != null )
         {
-            holdTarget = mush;
+            holdTarget = item;
         }
-    }
-
-    /// <summary>
-    /// つかみ候補の解放をサーバーに反映する
-    /// </summary>
-    [Command]
-    private void CmdReleaseHoldTarget()
-    {
-        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
-
-        holdTarget = null;
     }
 
     /// <summary>
@@ -524,23 +514,8 @@ public class PlayerTest : NetworkBehaviour
         {
             nIdentity.AssignClientAuthority(connectionToClient);
         }
-
-        RpcSetHoldItem();
     }
-
-    /// <summary>
-    /// つかんでいるアイテムのセットをクライアントに反映する
-    /// </summary>
-    [ClientRpc]
-    private void RpcSetHoldItem()
-    {
-        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
-        if (!holdTarget) return;
-
-        holdItem = holdTarget.GetComponent<DrothyItem>();
-        holdTarget = null;
-    }
-
+    
     /// <summary>
     /// アイテムを消費する
     /// </summary>
@@ -559,7 +534,6 @@ public class PlayerTest : NetworkBehaviour
 
         // たべる
         holdItem.CmdEaten();
-
 
         // アイテムの効果を得る
         itemEffectTimer = holdItem.EffectTime;
