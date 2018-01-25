@@ -118,6 +118,24 @@ public class PlayerTest : NetworkBehaviour
     /// </summary>
     public static List<PlayerTest> list;
 
+	/// <summary>
+	/// 観測者の数 ただしプレイヤー風観測者は除外する
+	/// </summary>
+	public static int PureObserverCount{
+		get
+		{
+			if( list == null ) return 0;
+
+			int count = 0;
+			foreach( PlayerTest p in list )
+			{
+				if( p.IsObserver ) count++;
+			}
+
+			return count;
+		}
+	}
+
     /// <summary>
     /// アイテムの効果が発生している時間
     /// </summary>
