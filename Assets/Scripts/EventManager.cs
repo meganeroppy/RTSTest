@@ -6,7 +6,8 @@ using UnityEngine.Networking;
 
 /// <summary>
 /// イベントの進行を管理
-/// 基本的に観測者からの命令で動作する
+/// 観測者からの命令で制御し、イベント関連のプレイヤーステートの監視なども行う
+/// 基本的にサーバーで動かし、クライアント側にも命令を送る必要があるときだけRPCを使用する
 /// </summary>
 public class EventManager : NetworkBehaviour
 {
@@ -108,7 +109,7 @@ public class EventManager : NetworkBehaviour
     }
 
     /// <summary>
-    /// オブザーバークライアントから呼ばれる用
+    /// オブザーバーのクライアントから呼ばれる用
     /// </summary>
     [Command]
     public void CmdProceedSequence()
@@ -123,27 +124,10 @@ public class EventManager : NetworkBehaviour
     /// </summary>
     private void ProceedSequence()
     {
+		// シーケンスを+1する。最後のシーケンスだったら最初のシーケンスに戻る
         currentSequence = (Sequence)(((int)currentSequence + 1) % (int)Sequence.Count_);
 
         var nextSequence = (Sequence)currentSequence;
-
-        {
-            var baseScene = SceneManager.GetSceneByName(baseSceneName);
-
-            var players = GameObject.FindGameObjectsWithTag("Player");
-
-            foreach (GameObject g in players)
-            {
-                SceneManager.MoveGameObjectToScene(g, baseScene);
-            }
-
-            var drothies = GameObject.FindGameObjectsWithTag("Drothy");
-            foreach (GameObject d in drothies)
-            {
-                SceneManager.MoveGameObjectToScene(d, baseScene);
-            }
-
-        }
 
         // 各クライアントでイベントを進める
         RpcProceedSequence(nextSequence);
