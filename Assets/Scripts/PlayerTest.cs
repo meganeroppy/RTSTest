@@ -53,14 +53,6 @@ public class PlayerTest : NetworkBehaviour
     private GameObject youIcon;
 
     /// <summary>
-    /// 削除候補
-    /// NetId
-    /// Cmdでサーバー側にセットしなくても勝手に同期されるかも？
-    /// </summary>
-    [SyncVar]
-    private string netIdStr;
-
-    /// <summary>
     /// アイテムをつかんでいる時のアイテムの位置
     /// </summary>
     [SerializeField]
@@ -197,9 +189,6 @@ public class PlayerTest : NetworkBehaviour
         // サーバー上でドロシーを生成
         CmdCreateDrothy();
 
-        // ＊不要説あり＊ NetIDをサーバーにセット 
-        CmdSetNetIdStr();
-
         // サーバー上で観測者フラグをセットする syncVarなのでのちにクライアントにも反映される
         CmdSetIsObserver(RtsTestNetworkManager.instance.IsObserver);
 
@@ -231,15 +220,6 @@ public class PlayerTest : NetworkBehaviour
 		}
     }
 
-    /// <summary>
-    /// 不要説
-    /// </summary>
-    [Command]
-    private void CmdSetNetIdStr()
-    {
-        netIdStr = netId.Value.ToString();
-    }
-
     public override void OnStartClient()
     {
     //    Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
@@ -255,8 +235,7 @@ public class PlayerTest : NetworkBehaviour
         }
 
         // ラベルを更新
-    //    textMesh.text = netId.Value.ToString();
-        textMesh.text = netIdStr;
+        textMesh.text = netId.Value.ToString();
 
         // 観測者フラグに変更があった場合のみ処理する
         {
