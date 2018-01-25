@@ -44,9 +44,18 @@ public class EventManager : NetworkBehaviour
         Count_,
     }
 
+	/// <summary>
+	/// 現在のシーケンス
+	/// 適宜クライアント側にも同期させる
+	/// </summary>
+	[SyncVar]
     private Sequence currentSequence = 0;
     public Sequence CurrentSequence { get { return currentSequence; } }
 
+	/// <summary>
+	/// アイテム種類
+	/// 小さくなるケーキと巨大化ケーキ、きのこ
+	/// </summary>
     private enum ItemType
     {
         SmallenCake,
@@ -54,6 +63,10 @@ public class EventManager : NetworkBehaviour
         Mushroom,
     }
 
+	/// <summary>
+	/// 演出中か？
+	/// 演出に入っているのにさらに同じ演出が始まらないように定義
+	/// </summary>
     private bool inExpression = false;
 
     /// <summary>
@@ -102,8 +115,6 @@ public class EventManager : NetworkBehaviour
         if( allPlayersInEffect )
         {
             // 全員効果中なので次のシーケンスに移行
-            Debug.Log("全員効果中なので次のシーケンスに移行");
-
             ProceedSequence();
         }
     }
@@ -114,7 +125,7 @@ public class EventManager : NetworkBehaviour
     [Command]
     public void CmdProceedSequence()
     {
-        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
+       Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
         ProceedSequence();
     }
@@ -122,17 +133,26 @@ public class EventManager : NetworkBehaviour
     /// <summary>
     /// 自身で呼ぶ用
     /// </summary>
+	[Server]
     private void ProceedSequence()
     {
-		// シーケンスを+1する。最後のシーケンスだったら最初のシーケンスに戻る
+		Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
+
+		// シーケンスを+1する。最後のシーケンスだったら最初のシーケンスに戻る この値はSyncVarなのでクライアント側の値は勝手に同期される。ゆえにここでは操作しない
         currentSequence = (Sequence)(((int)currentSequence + 1) % (int)Sequence.Count_);
 
-        var nextSequence = (Sequence)currentSequence;
+		ExecSequence(currentSequence);
+
+    //    var nextSequence = (Sequence)currentSequence;
 
         // 各クライアントでイベントを進める
-        RpcProceedSequence(nextSequence);
+    //    RpcProceedSequence(nextSequence);
     }
 
+	/*
+	/// <summary>
+	/// ＊＊＊一旦RPCを挟む必要性はないかもしれない、クライアント側にも発生させないといけないイベントはRPCで、アイテムを生成させるだけならサーバー側のみでよい？＊＊＊
+	/// </summary>
     [ClientRpc]
     private void RpcProceedSequence(Sequence newSequence)
     {
@@ -142,54 +162,54 @@ public class EventManager : NetworkBehaviour
 
         StartCoroutine(ExecSequence(newSequence));
     }
+	*/
 
     /// <summary>
     /// イベントの実行
     /// 場合によってはシーン切り替えを含む
-    /// ＊＊＊一旦RPCを挟む必要性はないかもしれない、クライアント側にも発生させないといけないイベントはRPCで、アイテムを生成させるだけならサーバー側のみでよい？＊＊＊
+	/// ProceedSequenceとくっつけてしまってもよいかも
     /// </summary>
-	private IEnumerator ExecSequence(Sequence newSequence)
+	[Server]
+	private void ExecSequence(Sequence newSequence)
     {
+		Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
+
         Debug.Log("イベント " + newSequence.ToString() + "の実行");
 
         switch (newSequence)
         {
             case Sequence.CollapseGround_Event:
 
-                // 地面が崩れるイベント
-                var manager = GardenSceneManager.instance;
-                if (manager == null) break;
-
-                manager.PlayEvent();
+				// サーバーとクライアント両方でイベントを発生させる
+				ExecCollapseFloorEvent();
 
                 break;
 
             case Sequence.PopCakes1_Event:
 
-                // 縮小化ケーキが出現するイベント                
-                CmdCreateItems( ItemType.SmallenCake );
+                // 縮小化ケーキが出現する サーバー側のみでOK       
+                CreateItems( ItemType.SmallenCake );
 
                 break;
 
             case Sequence.SmallenDrothy_Event:
 
-                // ドロシー縮小化イベント
+			// ドロシー縮小化イベント サーバーとクライアント両方でイベントを発生させる
                 if (!inExpression)
                     StartCoroutine(ExpressionAndProceedSequence());
-
 
                 break;
 
             case Sequence.PopCakes2_Event:
 
-                // 巨大化ケーキ出現
-                CmdCreateItems(ItemType.LargenCake);
+			// 巨大化ケーキ出現 サーバー側のみでOK
+                CreateItems(ItemType.LargenCake);
 
                 break;
 
             case Sequence.LargenDrothy_Event:
 
-                // ドロシー巨大化イベント
+			// ドロシー巨大化イベント サーバーとクライアント両方でイベントを発生させる
                 if (!inExpression)
                     StartCoroutine(ExpressionAndProceedSequence());
 
@@ -197,14 +217,14 @@ public class EventManager : NetworkBehaviour
 
             case Sequence.PopMushrooms_Event:
 
-                // きのこ出現
-                CmdCreateItems(ItemType.Mushroom);
+			// きのこ出現 サーバー側のみでOK
+                CreateItems(ItemType.Mushroom);
 
                 break;
 
             case Sequence.Ending_Event:
 
-                // エンディングから待機画面にもどる    
+			// エンディングから待機画面にもどる サーバーとクライアント両方でイベントを発生させる 
 
                 if (!inExpression)
                     StartCoroutine(ExpressionAndProceedSequence());
@@ -219,94 +239,177 @@ public class EventManager : NetworkBehaviour
         // シーン切り替えを伴う場合は切り替え処理
         if (!newSequence.ToString().Contains("Event"))
         {
-            Debug.Log("シーン遷移 ->" + newSequence.ToString());
+			Debug.Log("シーン遷移 ->" + newSequence.ToString());
 
-            // シーンの切り替え
-            var newSceneName = newSequence.ToString();
+			// シーンの切り替え
+			var newSceneName = newSequence.ToString();
 
-            if (string.IsNullOrEmpty(newSceneName))
-            {
-                Debug.LogWarning(newSequence.ToString() + " シーンは存在しない ");
-                yield break;
-            }
-
-            // TODO: 暗転演出
-
-            // 必要なオブジェクトの所属シーンを引っ越し
-            {
-                var baseScene = SceneManager.GetSceneByName(baseSceneName);
-
-                var players = GameObject.FindGameObjectsWithTag("Player");
-
-                foreach (GameObject g in players)
-                {
-                    SceneManager.MoveGameObjectToScene(g, baseScene);
-                }
-
-                var drothies = GameObject.FindGameObjectsWithTag("Drothy");
-                foreach (GameObject d in drothies)
-                {
-                    SceneManager.MoveGameObjectToScene(d, baseScene);
-                }
-            }
-
-            // もともとのシーンをアンロード
-            {
-                var scene = SceneManager.GetActiveScene();
-
-                // アンロード実行
-                var operation = SceneManager.UnloadSceneAsync(scene.name);
-
-                // アンロードが終わるまで待機
-                while (!operation.isDone) yield return null;
-            }
-
-            // 次のシーンをロードし、アクティブシーンにする
-            {
-                var operation = SceneManager.LoadSceneAsync(newSceneName, LoadSceneMode.Additive);
-
-                // ロードが終わるまで待機
-                while (!operation.isDone) yield return null;
-
-                var scene = SceneManager.GetSceneByName(newSceneName);
-                SceneManager.SetActiveScene(scene);
-            }
-
-            // TODO: 暗転解除
+			GotoNewScene( newSceneName );
         }
     }
 
+	/// <summary>
+	/// シーン遷移
+	/// サーバーとクライアント両方で呼ぶために間にこれを挟む
+	/// </summary>
+	[Server]
+	private void GotoNewScene( string newSceneName )
+	{
+		Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
+
+		StartCoroutine( ExecGotoNewScene( newSceneName ) );
+
+		// クライアントでも同様のイベントを発生させる ただしホストの場合は多重に呼ばれてしまうためなにもしない
+		if( !(isServer && isClient) )
+			RpcGotoNewScene(newSceneName);
+	}
+
+	/// <summary>
+	/// シーン遷移クライアント用
+	/// RPCで直接コルーチンを呼べないため挟む
+	/// </summary>
+	/// <param name="newSceneName">New scene name.</param>
+	[ClientRpc]
+	private void RpcGotoNewScene( string newSceneName )
+	{
+		Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
+
+		StartCoroutine( ExecGotoNewScene( newSceneName ) );
+	}
+
+	/// <summary>
+	/// シーン遷移
+	/// サーバーでもクライアントでも呼ばれる
+	/// </summary>
+	private IEnumerator ExecGotoNewScene( string newSceneName )
+	{
+		Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
+
+		if (string.IsNullOrEmpty(newSceneName))
+		{
+			Debug.LogWarning(newSceneName + " シーンは存在しない ");
+			yield break;
+		}
+
+		// TODO: 暗転演出
+
+		// 必要なオブジェクトの所属シーンを引っ越し
+		{
+			var baseScene = SceneManager.GetSceneByName(baseSceneName);
+
+			var players = GameObject.FindGameObjectsWithTag("Player");
+
+			foreach (GameObject g in players)
+			{
+				SceneManager.MoveGameObjectToScene(g, baseScene);
+			}
+
+			var drothies = GameObject.FindGameObjectsWithTag("Drothy");
+			foreach (GameObject d in drothies)
+			{
+				SceneManager.MoveGameObjectToScene(d, baseScene);
+			}
+		}
+
+		// もともとのシーンをアンロード
+		{
+			var scene = SceneManager.GetActiveScene();
+
+			// アンロード実行
+			var operation = SceneManager.UnloadSceneAsync(scene.name);
+
+			// アンロードが終わるまで待機
+			while (!operation.isDone) yield return null;
+		}
+
+		// 次のシーンをロードし、アクティブシーンにする
+		{
+			var operation = SceneManager.LoadSceneAsync(newSceneName, LoadSceneMode.Additive);
+
+			// ロードが終わるまで待機
+			while (!operation.isDone) yield return null;
+
+			var scene = SceneManager.GetSceneByName(newSceneName);
+			SceneManager.SetActiveScene(scene);
+		}
+
+		// TODO: 暗転解除
+
+	}
+
+	/// <summary>
+	/// 地面が崩れるイベント
+	/// </summary>
+	[Server]
+	private void ExecCollapseFloorEvent()
+	{
+		// 地面が崩れるイベント
+		var manager = GardenSceneManager.instance;
+		if (manager == null) return;
+
+		manager.PlayEvent();
+
+		// クライアントでも同様のイベントを発生させる ただしホストの場合は多重に呼ばれてしまうためなにもしない
+		if( !(isServer && isClient) )
+			RpcExecCollapseFloorEvent();
+	}
+
+	/// <summary>
+	/// 床が崩れるイベントRpc版
+	/// 無印版と同じ処理なのであたまのいい方法があったら知りたい
+	/// </summary>
+	[ClientRpc]
+	private void RpcExecCollapseFloorEvent()
+	{
+		// 地面が崩れるイベント
+		var manager = GardenSceneManager.instance;
+		if (manager == null) return;
+
+		manager.PlayEvent();
+	}
+
+	/// <summary>
+	/// 演出ののちシーケンスを進める
+	/// </summary>
+	/// <returns>The and proceed sequence.</returns>
+	[Server]
     private IEnumerator ExpressionAndProceedSequence()
     {
         inExpression = true;
-        // TODO: 現在のシーケンスによって演出
+
+        // TODO: 現在のシーケンスによって演出 サーバーとクライアント両方に対して行う
         yield return null;
 
         inExpression = false;
 
-        CmdProceedSequence();
+		ProceedSequence();
     }
 
     /// <summary>
-    /// きのこ配置
+    /// アイテム配置
     /// </summary>
-    [Command]
-    private void CmdCreateItems( ItemType type )
+	[Server]
+    private void CreateItems( ItemType type )
     {
-        if (TeaRoomSceneManager.instance == null) return;
+        if (TeaRoomSceneManager.instance == null) 
+		{
+			Debug.LogError("TeaRoomSceneManager.instanceがない");
+			return;
+		}
 
         // 出現候補を取得
-        var Transforms =
+		var transforms =
             type == ItemType.SmallenCake ? TeaRoomSceneManager.instance.SmallenCakeTrans :
             type == ItemType.LargenCake ? TeaRoomSceneManager.instance.LargenCakeTrans :            
             TeaRoomSceneManager.instance.MushroomTrans;
 
-        // TODO プレイヤー数を取得
-        int PlayerNum = 1;
+        // プレイヤー数を取得
+		int playerNum = PlayerTest.list.Count - PlayerTest.PureObserverCount;
 
+		int setCount = 0;
         // 候補の数繰り返す
-        foreach (Transform trans in Transforms)
-        {
+		foreach( Transform trans in transforms )
+		{	
             var item = Instantiate(itemPrefab);
             item.transform.position = trans.position;
 
@@ -315,6 +418,9 @@ public class EventManager : NetworkBehaviour
             itemList.Add(item);
 
             NetworkServer.Spawn(item.gameObject);
+
+			// 生成数がプレイヤーと一緒になったら終了
+			if( ++setCount >= playerNum ) break;
         }
     }
 
