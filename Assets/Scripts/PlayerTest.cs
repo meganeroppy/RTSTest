@@ -116,15 +116,17 @@ public class PlayerTest : NetworkBehaviour
     private float itemEffectTimer = 0;
     public float ItemEffectTimer { get { return itemEffectTimer; } }
 
-    [ServerCallback]
     private void Awake()
     {
-        if (list == null) list = new List<PlayerTest>();
-        list.Add(this);
+		if (isServer)
+		{
+	        if (list == null) list = new List<PlayerTest>();
+	        list.Add(this);
+			
+	        Debug.Log("AddPlayer : プレイヤー数 -> " + list.Count.ToString());
+		}
 
-        Debug.Log("AddPlayer() : プレイヤー数 -> " + list.Count.ToString());
-
-        trackedObjects = GetComponent<TrackedObjects>();
+		trackedObjects = GetComponent<TrackedObjects>();
     }
 
     // Use this for initialization
@@ -143,13 +145,8 @@ public class PlayerTest : NetworkBehaviour
         // ラベルの設定
         { 
             int id = 0;
-            //	var obj = photonView.instantiationData;
-            //	if( obj.Length > 0 )
-            //	{
-            //		id = System.Convert.ToInt32( obj[0] );
-            //	}
 
-            var nIdentity = GetComponent<NetworkIdentity>();
+			var nIdentity = GetComponent<NetworkIdentity>();
             if (nIdentity != null)
             {
                 //    id = nIdentity.netId;
