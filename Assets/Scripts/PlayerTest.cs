@@ -560,14 +560,17 @@ public class PlayerTest : NetworkBehaviour
         // たべる
         holdItem.CmdEaten();
 
+
         // アイテムの効果を得る
         itemEffectTimer = holdItem.EffectTime;
 
-//        if( !biggenFlag )
-//        {
-//            biggenFlag = true;
-//            ChangeScale();
-//        }
+        holdItem = null;
+
+        //        if( !biggenFlag )
+        //        {
+        //            biggenFlag = true;
+        //            ChangeScale();
+        //        }
     }
 
     /// <summary>
