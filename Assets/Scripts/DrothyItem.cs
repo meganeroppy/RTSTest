@@ -33,11 +33,17 @@ public class DrothyItem : NetworkBehaviour
     /// 最初に生まれた場所
     /// 食べられてから一定時間たつとここに再配置される
     /// </summary>
-    private Transform originTransform;
+    private Vector3 originPosition;
 
     [SerializeField]
     private float effectTime = 2f;
     public float EffectTime { get { return effectTime; } }
+
+    [ServerCallback]
+    private void Start()
+    {
+        originPosition = transform.position;
+    }
 
     [ServerCallback]
     private void Update()
@@ -75,9 +81,10 @@ public class DrothyItem : NetworkBehaviour
     /// <summary>
     /// 再出現
     /// </summary>
+    [Server]
     private void Respawn()
     {
-        transform.SetPositionAndRotation(originTransform.position, originTransform.rotation);
+        transform.position = originPosition;
 
         enable = true;
     }
