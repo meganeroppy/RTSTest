@@ -300,7 +300,7 @@ public class EventManager : NetworkBehaviour
 
         inExpression = false;
 
-        ProceedSequence();
+        CmdProceedSequence();
     }
 
     /// <summary>
