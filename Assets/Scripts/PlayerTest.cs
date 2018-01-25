@@ -242,21 +242,10 @@ public class PlayerTest : NetworkBehaviour
         if (holdItem)
         {
             holdItem.transform.position = holdPos.position;
- //           holdItem.GetComponent<NetworkIdentity>().AssignClientAuthority( connectionToClient );
-//            CmdUpdateHoldItemPosition();
         }
 
         if (isClient)
         {
-        //    if (myDrothy == null)
-        //    {
-        //        var obj = ClientScene.FindLocalObject(drothyNetId);
-        //        if( obj )
-        //        {
-        //            myDrothy = obj.GetComponent<DrothyController>();
-        //        }
-        //    }
-
             // サーバーの値が同期されるdrothyScaleの値でドロシーのスケールを更新
             if (myDrothy != null)
             {
