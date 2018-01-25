@@ -52,7 +52,7 @@ public class TeaRoomSceneManager : MonoBehaviour
     private Transform[] mushroomPositions;
     public Transform[] MushroomTrans { get { return mushroomPositions; } }
 
-    private void Awake()
+    private void Start()
     {
         instance = this;
     }

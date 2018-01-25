@@ -118,20 +118,20 @@ public class PlayerTest : NetworkBehaviour
 
     private void Awake()
     {
-		if (isServer)
-		{
-	        if (list == null) list = new List<PlayerTest>();
-	        list.Add(this);
-			
-	        Debug.Log("AddPlayer : プレイヤー数 -> " + list.Count.ToString());
-		}
-
 		trackedObjects = GetComponent<TrackedObjects>();
     }
 
     // Use this for initialization
     void Start()
     {
+		if (isServer)
+		{
+			if (list == null) list = new List<PlayerTest>();
+			list.Add(this);
+
+			Debug.Log("AddPlayer : プレイヤー数 -> " + list.Count.ToString());
+		}
+
         if (!isLocalPlayer)
         {
             // カメラ無効（一緒にオーディオリスナーも無効になる）
