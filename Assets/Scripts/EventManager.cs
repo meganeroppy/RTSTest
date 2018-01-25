@@ -125,7 +125,7 @@ public class EventManager : NetworkBehaviour
     [Command]
     public void CmdProceedSequence()
     {
-       Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
+    //   Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
         ProceedSequence();
     }
@@ -136,47 +136,14 @@ public class EventManager : NetworkBehaviour
 	[Server]
     private void ProceedSequence()
     {
-		Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
+	//	Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
 		// シーケンスを+1する。最後のシーケンスだったら最初のシーケンスに戻る この値はSyncVarなのでクライアント側の値は勝手に同期される。ゆえにここでは操作しない
         currentSequence = (Sequence)(((int)currentSequence + 1) % (int)Sequence.Count_);
 
-		ExecSequence(currentSequence);
+        Debug.Log("イベント " + currentSequence.ToString() + "の実行");
 
-    //    var nextSequence = (Sequence)currentSequence;
-
-        // 各クライアントでイベントを進める
-    //    RpcProceedSequence(nextSequence);
-    }
-
-	/*
-	/// <summary>
-	/// ＊＊＊一旦RPCを挟む必要性はないかもしれない、クライアント側にも発生させないといけないイベントはRPCで、アイテムを生成させるだけならサーバー側のみでよい？＊＊＊
-	/// </summary>
-    [ClientRpc]
-    private void RpcProceedSequence(Sequence newSequence)
-    {
-        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
-
-        currentSequence = newSequence;
-
-        StartCoroutine(ExecSequence(newSequence));
-    }
-	*/
-
-    /// <summary>
-    /// イベントの実行
-    /// 場合によってはシーン切り替えを含む
-	/// ProceedSequenceとくっつけてしまってもよいかも
-    /// </summary>
-	[Server]
-	private void ExecSequence(Sequence newSequence)
-    {
-		Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
-
-        Debug.Log("イベント " + newSequence.ToString() + "の実行");
-
-        switch (newSequence)
+        switch (currentSequence)
         {
             case Sequence.CollapseGround_Event:
 
@@ -237,12 +204,12 @@ public class EventManager : NetworkBehaviour
         }
 
         // シーン切り替えを伴う場合は切り替え処理
-        if (!newSequence.ToString().Contains("Event"))
+        if (!currentSequence.ToString().Contains("Event"))
         {
-			Debug.Log("シーン遷移 ->" + newSequence.ToString());
+			Debug.Log("シーン遷移 ->" + currentSequence.ToString());
 
 			// シーンの切り替え
-			var newSceneName = newSequence.ToString();
+			var newSceneName = currentSequence.ToString();
 
 			GotoNewScene( newSceneName );
         }
@@ -255,7 +222,7 @@ public class EventManager : NetworkBehaviour
 	[Server]
 	private void GotoNewScene( string newSceneName )
 	{
-		Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
+	//	Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
 		StartCoroutine( ExecGotoNewScene( newSceneName ) );
 
@@ -267,16 +234,14 @@ public class EventManager : NetworkBehaviour
 	/// シーン遷移クライアント用
 	/// RPCで直接コルーチンを呼べないため挟む
 	/// </summary>
-	/// <param name="newSceneName">New scene name.</param>
 	[ClientRpc]
 	private void RpcGotoNewScene( string newSceneName )
 	{
-		Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
+	//	Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
 		// ホストの場合は多重に呼ばれてしまうためなにもしない
 		if( isServer && isClient )
 		{
-			Debug.Log("ホスト");
 			return;			
 		}
 
@@ -289,7 +254,7 @@ public class EventManager : NetworkBehaviour
 	/// </summary>
 	private IEnumerator ExecGotoNewScene( string newSceneName )
 	{
-		Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
+	//	Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
 		if (string.IsNullOrEmpty(newSceneName))
 		{
@@ -340,7 +305,6 @@ public class EventManager : NetworkBehaviour
 		}
 
 		// TODO: 暗転解除
-
 	}
 
 	/// <summary>
@@ -369,7 +333,6 @@ public class EventManager : NetworkBehaviour
 		// ホストの場合は多重に呼ばれてしまうためなにもしない
 		if( isServer && isClient ) 
 		{
-			Debug.Log("ホスト");
 			return;
 		}
 
@@ -383,7 +346,6 @@ public class EventManager : NetworkBehaviour
 	/// <summary>
 	/// 演出ののちシーケンスを進める
 	/// </summary>
-	/// <returns>The and proceed sequence.</returns>
 	[Server]
     private IEnumerator ExpressionAndProceedSequence()
     {
@@ -398,7 +360,7 @@ public class EventManager : NetworkBehaviour
     }
 
     /// <summary>
-    /// アイテム配置
+    /// アイテム配置クライアントにも同期されるのでコールはサーバーのみ
     /// </summary>
 	[Server]
     private void CreateItems( ItemType type )
