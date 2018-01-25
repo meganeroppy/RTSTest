@@ -597,7 +597,7 @@ public class PlayerTest : NetworkBehaviour
         if( list != null && list.Contains(this) )
         {
             list.Remove(this);
-            Debug.Log("プレイヤーリストから自身を削除");
+            Debug.Log("プレイヤーリストから自身を削除 -> プレイヤー数 " + list.Count.ToString() );
         }
     }
 }
