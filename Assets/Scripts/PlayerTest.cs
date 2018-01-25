@@ -10,6 +10,8 @@ using UnityEngine.UI;
 /// </summary>
 public class PlayerTest : NetworkBehaviour
 {
+    private TrackedObjects trackedObjects;
+
     [SerializeField]
     private float moveSpeed = 10f;
     [SerializeField]
@@ -121,6 +123,8 @@ public class PlayerTest : NetworkBehaviour
         list.Add(this);
 
         Debug.Log("AddPlayer() : プレイヤー数 -> " + list.Count.ToString());
+
+        trackedObjects = GetComponent<TrackedObjects>();
     }
 
     // Use this for initialization
@@ -188,24 +192,24 @@ public class PlayerTest : NetworkBehaviour
 
 			if( RtsTestNetworkManager.instance.MyObserverType == RtsTestNetworkManager.ObserverType.Participatory )
 			{
-				// 参加型の時は有効にする
-					GetComponent<TrackedObjects>().SetEnable(true);
+                // 参加型の時は有効にする
+                trackedObjects.SetEnable(true);
 			}
 			else if( RtsTestNetworkManager.instance.MyInputMode == RtsTestNetworkManager.InputMode.ForceByTracking )
             {
-				// 強制トラッカー依存操作フラグがあったらコンポーネントを有効にする
-				   GetComponent<TrackedObjects>().SetEnable(true);
+                // 強制トラッカー依存操作フラグがあったらコンポーネントを有効にする
+                trackedObjects.SetEnable(true);
             }
 			else
 			{
-				// そうでなければ無効にする
-				GetComponent<TrackedObjects>().SetEnable(false);
+                // そうでなければ無効にする
+                trackedObjects.SetEnable(false);
 			}
         }
 		else
 		{
             // 通常プレイヤーの場合 強制キーボード操作フラグがなければトラッキングによる制御
-			GetComponent<TrackedObjects>().SetEnable(RtsTestNetworkManager.instance.MyInputMode != RtsTestNetworkManager.InputMode.ForceByKeyboard);
+            trackedObjects.SetEnable(RtsTestNetworkManager.instance.MyInputMode != RtsTestNetworkManager.InputMode.ForceByKeyboard);
 		}
     }
 
@@ -353,7 +357,7 @@ public class PlayerTest : NetworkBehaviour
 			}
 		}
 
-		GetComponent<TrackedObjects>().SetEnable(enableTracking);	
+        trackedObjects.SetEnable(enableTracking);	
 	}
 
 	[Client]
@@ -412,14 +416,10 @@ public class PlayerTest : NetworkBehaviour
 
         // IKのターゲットをトラッキングオブジェクトから取得
         {
-            var trackedObj = GetComponent<TrackedObjects>();
-            if( trackedObj != null )
-            {
-                drothyIK.rightHandObj = trackedObj.RightHandObject;
-                drothyIK.leftHandObj = trackedObj.LeftHandObject;
-                drothyIK.bodyObj = trackedObj.BodyObject;
-                drothyIK.lookObj = trackedObj.LookTarget;
-            }
+            drothyIK.rightHandObj = trackedObjects.RightHandObject;
+            drothyIK.leftHandObj = trackedObjects.LeftHandObject;
+            drothyIK.bodyObj = trackedObjects.BodyObject;
+            drothyIK.lookObj = trackedObjects.LookTarget;
         }
 
         // 設定が有効になっている場合は脚の動きのシミュレートを行う
@@ -437,7 +437,7 @@ public class PlayerTest : NetworkBehaviour
             return;
         }
 
-        myDrothy.SetOwner(transform.GetComponent<TrackedObjects>().BodyObject);
+        myDrothy.SetOwner(trackedObjects.BodyObject);
 
         // どちらが正しいかはまだ不明
 //      NetworkServer.Spawn(drothy.gameObject);
@@ -460,14 +460,13 @@ public class PlayerTest : NetworkBehaviour
 
         // まだクライアント側はIKターゲットが未指定なのでセットする
         {
-            var trackedObj = GetComponent<TrackedObjects>();
             var drothyIK = myDrothy.GetComponent<IKControl>();
-            if (trackedObj != null && drothyIK != null)
+            if ( drothyIK != null)
             {
-                drothyIK.rightHandObj = trackedObj.RightHandObject;
-                drothyIK.leftHandObj = trackedObj.LeftHandObject;
-                drothyIK.bodyObj = trackedObj.BodyObject;
-                drothyIK.lookObj = trackedObj.LookTarget;
+                drothyIK.rightHandObj = trackedObjects.RightHandObject;
+                drothyIK.leftHandObj = trackedObjects.LeftHandObject;
+                drothyIK.bodyObj = trackedObjects.BodyObject;
+                drothyIK.lookObj = trackedObjects.LookTarget;
             }
         }
 
