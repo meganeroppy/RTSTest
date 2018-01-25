@@ -53,6 +53,8 @@ public class EventManager : NetworkBehaviour
         Mushroom,
     }
 
+    private bool inExpression = false;
+
     /// <summary>
     /// 削除候補
     /// シーン遷移時に生成済みオブジェクトの配置シーン移動を行う際に必要になる可能性がある
@@ -87,11 +89,12 @@ public class EventManager : NetworkBehaviour
         bool allPlayersInEffect = true;
         foreach( PlayerTest p in PlayerTest.list )
         {
-            if (p.IsObserver) continue;
+            // オブザーバーについてはスキップ ただしオブザーバーのみの時は例外
+            if (p.IsObserver && PlayerTest.list.Count >= 2) continue;
 
             bool inEffect = p.ItemEffectTimer > 0;
 
-            Debug.Log( "ID" + p.netId.ToString() + " : " + ( inEffect ? "効果中" : "効果なし" ) );
+        //    Debug.Log( "ID" + p.netId.ToString() + " : " + ( inEffect ? "効果中" : "効果なし" ) );
             if (!inEffect) allPlayersInEffect = false;
         }
 
@@ -104,6 +107,9 @@ public class EventManager : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// オブザーバークライアントから呼ばれる用
+    /// </summary>
     [Command]
     public void CmdProceedSequence()
     {
@@ -112,6 +118,9 @@ public class EventManager : NetworkBehaviour
         ProceedSequence();
     }
 
+    /// <summary>
+    /// 自身で呼ぶ用
+    /// </summary>
     private void ProceedSequence()
     {
         currentSequence = (Sequence)(((int)currentSequence + 1) % (int)Sequence.Count_);
@@ -149,9 +158,11 @@ public class EventManager : NetworkBehaviour
 
         StartCoroutine(ExecSequence(newSequence));
     }
+
     /// <summary>
     /// イベントの実行
     /// 場合によってはシーン切り替えを含む
+    /// ＊＊＊一旦RPCを挟む必要性はないかもしれない、クライアント側にも発生させないといけないイベントはRPCで、アイテムを生成させるだけならサーバー側のみでよい？＊＊＊
     /// </summary>
 	private IEnumerator ExecSequence(Sequence newSequence)
     {
@@ -179,6 +190,9 @@ public class EventManager : NetworkBehaviour
             case Sequence.SmallenDrothy_Event:
 
                 // ドロシー縮小化イベント
+                if (!inExpression)
+                    StartCoroutine(ExpressionAndProceedSequence());
+
 
                 break;
 
@@ -192,6 +206,8 @@ public class EventManager : NetworkBehaviour
             case Sequence.LargenDrothy_Event:
 
                 // ドロシー巨大化イベント
+                if (!inExpression)
+                    StartCoroutine(ExpressionAndProceedSequence());
 
                 break;
 
@@ -203,9 +219,16 @@ public class EventManager : NetworkBehaviour
                 break;
 
             case Sequence.Ending_Event:
+
+                // エンディングから待機画面にもどる    
+
+                if (!inExpression)
+                    StartCoroutine(ExpressionAndProceedSequence());
+
+                break;
+
             default:
 
-                // エンディングから待機画面にもどる                
                 break;
         }
 
@@ -267,6 +290,17 @@ public class EventManager : NetworkBehaviour
 
             // TODO: 暗転解除
         }
+    }
+
+    private IEnumerator ExpressionAndProceedSequence()
+    {
+        inExpression = true;
+        // TODO: 現在のシーケンスによって演出
+        yield return null;
+
+        inExpression = false;
+
+        ProceedSequence();
     }
 
     /// <summary>
