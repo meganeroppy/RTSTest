@@ -54,12 +54,6 @@ public class EventManager : NetworkBehaviour
     }
 
     /// <summary>
-    /// このフラグが有効な時に各プレイヤーが同時にケーキを食べるとドロシーが小さくなる
-    /// 論理値で管理しなくてもシーケンスをみて判断できそうなきもするので削除候補
-    /// </summary>
-    private bool enableSmallenDrothy = false;
-
-    /// <summary>
     /// 削除候補
     /// シーン遷移時に生成済みオブジェクトの配置シーン移動を行う際に必要になる可能性がある
     /// </summary>
@@ -144,7 +138,6 @@ public class EventManager : NetworkBehaviour
 
         // 各クライアントでイベントを進める
         RpcProceedSequence(nextSequence);
-
     }
 
     [ClientRpc]
@@ -185,8 +178,7 @@ public class EventManager : NetworkBehaviour
 
             case Sequence.SmallenDrothy_Event:
 
-                // ドロシー縮小化フラグを有効
-                enableSmallenDrothy = true;
+                // ドロシー縮小化イベント
 
                 break;
 
@@ -199,7 +191,7 @@ public class EventManager : NetworkBehaviour
 
             case Sequence.LargenDrothy_Event:
 
-                // ドロシー巨大化フラグを有効
+                // ドロシー巨大化イベント
 
                 break;
 
