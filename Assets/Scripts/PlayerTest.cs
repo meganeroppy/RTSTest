@@ -21,6 +21,7 @@ public class PlayerTest : NetworkBehaviour
 	[SyncVar]
 	private bool isObserver = false;
     private bool isObserverPrev = false;
+    public bool IsObserver { get { return isObserver; } }
 
     /// <summary>
     /// 脚の動きのシミュレーションを有効にするか？

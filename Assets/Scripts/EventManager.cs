@@ -93,6 +93,8 @@ public class EventManager : NetworkBehaviour
         bool allPlayersInEffect = true;
         foreach( PlayerTest p in PlayerTest.list )
         {
+            if (p.IsObserver) continue;
+
             bool inEffect = p.ItemEffectTimer > 0;
 
             Debug.Log( "ID" + p.netId.ToString() + " : " + ( inEffect ? "効果中" : "効果なし" ) );
