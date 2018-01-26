@@ -55,10 +55,13 @@ public class NavigateShot : NetworkBehaviour {
 
 	private void CreateEffect()
 	{
-		var obj = Instantiate(effect, transform.position, Quaternion.identity, transform);
+		NetworkServer.Destroy( gameObject );
+//		Destroy(gameObject, 2f);
+	}
 
-        NetworkServer.Spawn(obj);
-
-		Destroy(gameObject, 2f);
+	private void OnDestroy()
+	{
+		var obj = Instantiate(effect, transform.position, Quaternion.identity);
+		NetworkServer.Spawn(obj);
 	}
 }
