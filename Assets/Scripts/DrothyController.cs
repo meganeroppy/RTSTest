@@ -38,11 +38,15 @@ public class DrothyController : NetworkBehaviour
     [SyncVar]
     private bool deleteFlag = false;
 
+	[SyncVar]
+	private int colorIdx;
+	public int ColorIdx { get{ return colorIdx; } set{ colorIdx = value; }}
+
     private bool initialized = false;
+
     /// <summary>
     /// サーバーからのみ呼ぶこと
     /// </summary>
-    /// <param name="owner"></param>
     public void SetOwner(Transform owner)
     {
         this.owner = owner;
@@ -90,12 +94,13 @@ public class DrothyController : NetworkBehaviour
 
 			var speed = fallingSpeedMin + Mathf.PingPong(Time.time * interval, speedDif);
 			transform.position += Vector3.down * speed * Time.deltaTime;
-
         }
 
         UpdateOwnerPositionAndRotation();
 
         transform.SetPositionAndRotation(ownerPosition, ownerRotation);
+
+		SetDressColor();
 
         UpdateDeleteFlag();
 
@@ -129,9 +134,16 @@ public class DrothyController : NetworkBehaviour
         deleteFlag = initialized && owner == null;
     }
 
-	public void SetDressColor(int colorIdx)
+	/// <summary>
+	/// カラーインデックスに応じてドレス色を変更
+	/// </summary>
+	public void SetDressColor()
 	{
-		skinMesh.materials[ dressMatIdx ].mainTexture = dressTexture[ colorIdx % dressTexture.Length ];
+		var newTex = dressTexture[ colorIdx % dressTexture.Length];
+		if( skinMesh.materials[ dressMatIdx ].mainTexture != newTex )
+		{
+			skinMesh.materials[ dressMatIdx ].mainTexture = newTex;
+		}
 	}
 
 	private bool falling = false;

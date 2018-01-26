@@ -425,8 +425,7 @@ public class PlayerTest : NetworkBehaviour
         }
 			
         // プレイヤーIDによってカラバリを変更する
-		int colorIdx = playerId % playerColor.Length;
-		drothyIK.GetComponent<DrothyController>().SetDressColor(colorIdx);
+		drothyIK.GetComponent<DrothyController>().ColorIdx = playerId;
 
         myDrothy = drothyIK.GetComponent<DrothyController>();
         if( myDrothy == null )
