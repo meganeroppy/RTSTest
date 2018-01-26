@@ -35,6 +35,7 @@ public class TeaRoomSceneManager : MonoBehaviour
     /// 巨大化ケーキの出現位置候補
     /// </summary>
     [SerializeField]
+    private Transform largenCakePositionsParent = null;
     private Transform[] largenCakePositions;
     public Transform[] LargenCakeTrans { get { return largenCakePositions; } }
 
@@ -42,6 +43,7 @@ public class TeaRoomSceneManager : MonoBehaviour
     /// 縮小化ケーキの出現位置候補
     /// </summary>
     [SerializeField]
+    private Transform smallenCakePositionsParent = null;
     private Transform[] smallenCakePositions;
     public Transform[] SmallenCakeTrans { get { return smallenCakePositions; } }
 
@@ -49,12 +51,31 @@ public class TeaRoomSceneManager : MonoBehaviour
     /// キノコの出現位置候補
     /// </summary>
     [SerializeField]
+    private Transform mushroomPositionsParent = null;
     private Transform[] mushroomPositions;
     public Transform[] MushroomTrans { get { return mushroomPositions; } }
 
     private void Start()
     {
         instance = this;
+
+        largenCakePositions = new Transform[largenCakePositionsParent.childCount];
+        for( int i=0; i < largenCakePositionsParent.childCount; ++i )
+        {
+            largenCakePositions[i] = largenCakePositionsParent.GetChild(i);
+        }
+
+        smallenCakePositions = new Transform[smallenCakePositionsParent.childCount];
+        for (int i = 0; i < smallenCakePositionsParent.childCount; ++i)
+        {
+            smallenCakePositions[i] = smallenCakePositionsParent.GetChild(i);
+        }
+
+        mushroomPositions = new Transform[mushroomPositionsParent.childCount];
+        for (int i = 0; i < mushroomPositionsParent.childCount; ++i)
+        {
+            mushroomPositions[i] = mushroomPositionsParent.GetChild(i);
+        }
     }
 
     /// <summary>

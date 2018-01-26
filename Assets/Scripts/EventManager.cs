@@ -377,8 +377,11 @@ public class EventManager : NetworkBehaviour
             type == ItemType.LargenCake ? TeaRoomSceneManager.instance.LargenCakeTrans :            
             TeaRoomSceneManager.instance.MushroomTrans;
 
+        Debug.Log(transforms.Length.ToString() + "この候補場所があるよ");
+
         // プレイヤー数を取得
-		int playerNum = PlayerTest.list.Count - PlayerTest.PureObserverCount;
+        int playerNum = PlayerTest.list.Count - PlayerTest.PureObserverCount;
+        Debug.Log(PlayerTest.list.Count.ToString() + " - " + PlayerTest.PureObserverCount.ToString() + " = " + playerNum.ToString());
 
 		int setCount = 0;
         // 候補の数繰り返す
@@ -393,9 +396,19 @@ public class EventManager : NetworkBehaviour
 
             NetworkServer.Spawn(item.gameObject);
 
-			// 生成数がプレイヤーと一緒になったら終了
-			if( ++setCount >= playerNum ) break;
+            // 生成数がプレイヤーと一緒になったら終了
+            if (++setCount >= playerNum)
+            {
+                Debug.Log(setCount.ToString() + "こ作った おしまい");
+                break;
+            }
+            else
+            {
+                Debug.Log(setCount.ToString() + "こ作った まだつくる");
+            }
+
         }
+
     }
 
     /// <summary>
