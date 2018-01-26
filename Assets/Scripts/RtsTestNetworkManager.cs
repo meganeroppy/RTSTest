@@ -18,11 +18,12 @@ public class RtsTestNetworkManager : NetworkBehaviour
 
     [SerializeField]
     private int playerId = 1;
-    public int GetPlayerId()
-    {
-        return playerId;
-    }
-
+    public int PlayerId
+	{
+		get{
+        	return playerId;
+    	}
+	}
     public enum Role
     {
         Server,

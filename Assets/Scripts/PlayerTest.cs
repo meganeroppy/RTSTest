@@ -404,7 +404,6 @@ public class PlayerTest : NetworkBehaviour
     /// </summary>
     [Command]
     private void CmdCreateDrothy()
-    //   private void CmdCreateDrothy( int colorIdx=1 ) // カラバリ対応用
     {
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
@@ -424,9 +423,10 @@ public class PlayerTest : NetworkBehaviour
         {
             drothyIK.SetSimulateFoot();
         }
-
-        // TODO プレイヤーIDによってカラバリを変更する
-    //    drothyIK.GetComponent<DrothyController>().SetDressColor(colorIdx);
+			
+        // プレイヤーIDによってカラバリを変更する
+		int playerId = RtsTestNetworkManager.instance.PlayerId % playerColor.Length;
+		drothyIK.GetComponent<DrothyController>().SetDressColor(playerId);
 
         myDrothy = drothyIK.GetComponent<DrothyController>();
         if( myDrothy == null )

@@ -58,7 +58,7 @@ public class BaseSceneManager : MonoBehaviour
         }
 
         int playerId = 0;
-        if (RtsTestNetworkManager.instance != null) playerId = RtsTestNetworkManager.instance.GetPlayerId();
+        if (RtsTestNetworkManager.instance != null) playerId = RtsTestNetworkManager.instance.PlayerId;
 
         // プレイヤーIDに従って参照するRTSのリジットボディ名を指定する
         {
