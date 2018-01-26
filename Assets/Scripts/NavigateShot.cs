@@ -39,7 +39,7 @@ public class NavigateShot : NetworkBehaviour {
 		{
 			dead = true;
 
-			CreateEffect();
+			Dead();
 		}
 	}
 
@@ -50,18 +50,20 @@ public class NavigateShot : NetworkBehaviour {
 
 		dead = true;
 
-		CreateEffect();
+		Dead();
 	}
 
-	private void CreateEffect()
+	[Server]
+	private void Dead()
 	{
 		NetworkServer.Destroy( gameObject );
-//		Destroy(gameObject, 2f);
 	}
 
+	/// <summary>
+	/// サーバーでもクライアントでも呼ばれる
+	/// </summary>
 	private void OnDestroy()
 	{
-		var obj = Instantiate(effect, transform.position, Quaternion.identity);
-		NetworkServer.Spawn(obj);
+		Instantiate(effect, transform.position, Quaternion.identity);
 	}
 }
