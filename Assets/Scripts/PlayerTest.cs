@@ -168,7 +168,7 @@ public class PlayerTest : NetworkBehaviour
 		gameObject.name = "[YOU] " + gameObject.name;
 
         // サーバー上でドロシーを生成
-        CmdCreateDrothy();
+		CmdCreateDrothy( RtsTestNetworkManager.instance.PlayerId );
 
         // サーバー上で観測者フラグをセットする syncVarなのでのちにクライアントにも反映される
         CmdSetIsObserver(RtsTestNetworkManager.instance.IsObserver);
@@ -403,7 +403,7 @@ public class PlayerTest : NetworkBehaviour
     /// ドロシーを生成する
     /// </summary>
     [Command]
-    private void CmdCreateDrothy()
+	private void CmdCreateDrothy( int playerId )
     {
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
@@ -425,8 +425,8 @@ public class PlayerTest : NetworkBehaviour
         }
 			
         // プレイヤーIDによってカラバリを変更する
-		int playerId = RtsTestNetworkManager.instance.PlayerId % playerColor.Length;
-		drothyIK.GetComponent<DrothyController>().SetDressColor(playerId);
+		int colorIdx = playerId % playerColor.Length;
+		drothyIK.GetComponent<DrothyController>().SetDressColor(colorIdx);
 
         myDrothy = drothyIK.GetComponent<DrothyController>();
         if( myDrothy == null )
