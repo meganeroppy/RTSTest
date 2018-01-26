@@ -103,7 +103,7 @@ public class TrackedObjects : NetworkBehaviour
 		foreach( CopyTransform c in children )
 		{
 			c.enabled = key;
-			c.transform.localPosition = Vector3.zero;
+			c.transform.localPosition = c.name.Contains("Head") ? Vector3.up * 1f : Vector3.zero;
 		}
 	}
 
