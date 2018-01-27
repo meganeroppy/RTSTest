@@ -15,46 +15,49 @@ public class MovingWallManager : MonoBehaviour
 	/// ２枚の前提
 	/// </summary>
 	[SerializeField]
-	private Transform[] walls = null;
+	private Transform wall = null;
 
 	[SerializeField]
-	private float wallScale = 10f;
+	private float wallTall = 10f;
+
+	[SerializeField]
+	private float wallRadius = 10f;
 
 	[SerializeField]
 	private float moveSpeed = 10f;
 
-	private float offset;
+	private float flapLate = 0.5f;
+
+	[SerializeField]
+	private Transform topWall;
+
+	[SerializeField]
+	private Transform bottomWall;
 
 	// Use this for initialization
 	void Start ()
 	{
-		// 初期位置をセット
-		if( walls.Length != 2 )
-		{
-			Debug.LogError("壁の数は２枚の前提");
-		}
+		var flapLimit = wallTall * flapLate;
 
-		int index = 0;
-		offset = wallScale * 2f;
-		foreach( Transform w in walls )
-		{
-			w.localScale = Vector3.one * wallScale;
-			w.localPosition = (wallBase.position - Vector3.up * wallScale ) + ( Vector3.up * offset * index++ );
-		}
+		wall.localScale = new Vector3( wallRadius, wallTall, wallRadius);
+		wall.localPosition = wallBase.position - Vector3.up * flapLimit;
+
+		topWall.localScale = bottomWall.localScale = new Vector3( wallRadius, 1f, wallRadius );
+		topWall.localPosition = Vector3.up * wallTall * flapLate;
+		bottomWall.localPosition = Vector3.down * wallTall * flapLate;
 	}
 	
 	// Update is called once per frame
 	void Update () 
 	{
+		var flapLimit = wallTall * flapLate;
+
 		// 壁の位置更新
-		foreach( Transform w in walls )
+		wall.Translate(Vector3.up * moveSpeed * Time.deltaTime);
+		if( wall.localPosition.y >= flapLimit  )
 		{
-			w.Translate(Vector3.up * moveSpeed * Time.deltaTime);
-			if( w.localPosition.y >= wallScale  )
-			{
-				// 限界になったら位置を循環させる
-				w.Translate( Vector3.down * offset * 2); 
-			}
+			// 限界になったら位置を循環させる
+			wall.Translate( Vector3.down * flapLimit * 2); 
 		}
 	}
 }
