@@ -34,6 +34,12 @@ public class MovingWallManager : MonoBehaviour
 	[SerializeField]
 	private Transform bottomWall;
 
+	[SerializeField]
+	private float bottomWallRotSpeed = 300;
+
+	[SerializeField]
+	private float topWallRotSpeed = 10;
+
 	// Use this for initialization
 	void Start ()
 	{
@@ -59,5 +65,8 @@ public class MovingWallManager : MonoBehaviour
 			// 限界になったら位置を循環させる
 			wall.Translate( Vector3.down * flapLimit * 2); 
 		}
+
+		topWall.Rotate(Vector3.up * topWallRotSpeed * Time.deltaTime);
+		bottomWall.Rotate(Vector3.up * bottomWallRotSpeed * Time.deltaTime);
 	}
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GiantCaterpillar : MonoBehaviour
+public class FloatingObject : MonoBehaviour
 {
 	public float range = 0.2f;
 	public float speed = 0.2f;
