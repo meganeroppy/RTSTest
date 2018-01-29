@@ -26,6 +26,9 @@ public class GardenSceneManager : MonoBehaviour
 
 	public Transform propsParent;
 
+    [SerializeField]
+    private AudioSource collapseSound;
+
 	// Use this for initialization
 	void Start ()
     {
@@ -48,6 +51,8 @@ public class GardenSceneManager : MonoBehaviour
 				rb.isKinematic = false;
 			}
 		}
+
+        collapseSound.Play();
 	}
 
 	private IEnumerator ExecEvent()

@@ -39,10 +39,19 @@ public class DrothyItem : NetworkBehaviour
     private float effectTime = 2f;
     public float EffectTime { get { return effectTime; } }
 
+    private AudioSource audioSource;
+
+    [SerializeField]
+    private AudioClip popSound;
+
+    [SerializeField]
+    private AudioClip EatenSound;
+
+
     [ServerCallback]
     private void Start()
     {
-        originPosition = transform.position;
+        originPosition = transform.position;        
     }
 
     private void Update()
@@ -64,6 +73,8 @@ public class DrothyItem : NetworkBehaviour
         enable = false;
 
         respawnTimer = respawnWait;
+
+
     }
 
     [Server]
@@ -87,5 +98,34 @@ public class DrothyItem : NetworkBehaviour
         transform.position = originPosition;
 
         enable = true;
+    }
+
+    /// <summary>
+    /// 食べられた時のSE再生
+    /// </summary>
+    [ClientRpc]
+    private void RpcPlayEatenSound()
+    {
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
+
+        audioSource.PlayOneShot(EatenSound);
+
+    }
+
+    /// <summary>
+    /// オブジェクト有効時の処理
+    /// </summary>
+    private void OnEnable()
+    {
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
+
+        // 生まれた時のSE
+        audioSource.PlayOneShot(popSound);
     }
 }

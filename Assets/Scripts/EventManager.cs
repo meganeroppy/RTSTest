@@ -76,9 +76,25 @@ public class EventManager : NetworkBehaviour
     [SerializeField]
     private string baseSceneName = "StartScene";
 
+    private AudioSource audioSource;
+
+    /// <summary>
+    /// ドロシーが縮小化するときの効果音
+    /// </summary>
+    [SerializeField]
+    private AudioClip itemEffectToSmall;
+
+    /// <summary>
+    /// ドロシーが巨大化するときの効果音
+    /// </summary>
+    [SerializeField]
+    private AudioClip itemEffectToLarge;
+
+
     private void Awake()
     {
         instance = this;
+        audioSource = GetComponent<AudioSource>();
     }
 
     [ServerCallback]
@@ -343,17 +359,54 @@ public class EventManager : NetworkBehaviour
 		manager.PlayEvent();
 	}
 
-	/// <summary>
-	/// 演出ののちシーケンスを進める
-	/// </summary>
-	[Server]
+    /// <summary>
+    /// 演出ののちシーケンスを進める
+    /// </summary>
+    [Server]
     private IEnumerator ExpressionAndProceedSequence()
     {
         inExpression = true;
 
-        // TODO: 現在のシーケンスによって演出 サーバーとクライアント両方に対して行う
-        yield return null;
+        // 演出
+        {
+            // TODO: 現在のシーケンスによって演出 サーバーとクライアント両方に対して行う
+            if (currentSequence == Sequence.SmallenDrothy_Event)
+            {
+                // ドロシーが縮小
 
+                // 効果音
+                RpcPlaySmallenSound();
+
+                // ビジュアルエフェクト
+
+                yield return new WaitForSeconds(5);
+
+                RpcStopSound();
+            }
+            else if (currentSequence == Sequence.LargenDrothy_Event)
+            {
+                // ドロシーが巨大化
+
+                // 効果音
+                RpcPlayLargenSound();
+
+                // ビジュアルエフェクト
+
+                yield return new WaitForSeconds(5);
+
+                RpcStopSound();
+            }
+            else if (currentSequence == Sequence.Ending_Event)
+            {
+
+                // 効果音
+
+                // ビジュアルエフェクト
+
+                yield return new WaitForSeconds(5);
+            }
+
+        }
         inExpression = false;
 
 		ProceedSequence();
@@ -423,5 +476,34 @@ public class EventManager : NetworkBehaviour
             itemList.RemoveAt(i);
             NetworkServer.Destroy(item.gameObject);
         }
+    }
+
+    /// <summary>
+    /// ドロシー縮小化サウンド再生
+    /// </summary>
+    [ClientRpc]
+    private void RpcPlaySmallenSound()
+    {
+        audioSource.clip = itemEffectToSmall;
+        audioSource.Play();
+    }
+
+    /// <summary>
+    /// ドロシー巨大化サウンド再生
+    /// </summary>
+    [ClientRpc]
+    private void RpcPlayLargenSound()
+    {
+        audioSource.clip = itemEffectToLarge;
+        audioSource.Play();
+    }
+
+    /// <summary>
+    /// サウンド停止
+    /// </summary>
+    [ClientRpc]
+    private void RpcStopSound()
+    {
+        audioSource.Stop();
     }
 }
