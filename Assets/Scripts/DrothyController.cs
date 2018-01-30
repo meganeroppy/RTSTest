@@ -42,6 +42,12 @@ public class DrothyController : NetworkBehaviour
 	private int colorIdx;
 	public int ColorIdx { get{ return colorIdx; } set{ colorIdx = value; }}
 
+    /// <summary>
+    /// プレイヤーが発言しているか？
+    /// </summary>
+    [SyncVar]
+    private float talking = 0;
+
     private bool initialized = false;
 
     /// <summary>
@@ -121,6 +127,9 @@ public class DrothyController : NetworkBehaviour
 
         // まばたき
         UpdateBlinking();
+
+        // 口ぱく
+        UpdateTalk();
     }
 
     /// <summary>
@@ -191,6 +200,21 @@ public class DrothyController : NetworkBehaviour
         {
             anim.SetTrigger("EyeClose");
             blinkingTimer = 0;
-        }
+        }        
+    }
+
+    /// <summary>
+    /// 口ぱく更新
+    /// </summary>
+    private void UpdateTalk()
+    {
+        if (talking > 0) talking -= Time.deltaTime;
+        anim.SetBool("MouseOpen", talking > 0);
+    }
+
+    [Command]
+    public void CmdTalk()
+    {
+        talking = 3f;
     }
 }
