@@ -45,6 +45,16 @@ public class DrothyController : NetworkBehaviour
     private bool initialized = false;
 
     /// <summary>
+    /// まばたき頻度
+    /// </summary>
+    private float blinkingInterval = 5f;
+
+    /// <summary>
+    /// まばたきタイマー
+    /// </summary>
+    private float blinkingTimer = 0;
+
+    /// <summary>
     /// サーバーからのみ呼ぶこと
     /// </summary>
     public void SetOwner(Transform owner)
@@ -107,7 +117,10 @@ public class DrothyController : NetworkBehaviour
         if (deleteFlag)
         {
             Destroy(gameObject);
-        }        
+        }
+
+        // まばたき
+        UpdateBlinking();
     }
 
     /// <summary>
@@ -167,4 +180,17 @@ public class DrothyController : NetworkBehaviour
 		originHeight = transform.position.y;
 		SetIsFalling( true );
 	}
+
+    /// <summary>
+    ///  まばたき更新
+    /// </summary>
+    private void UpdateBlinking()
+    {
+        blinkingTimer += Time.deltaTime;
+        if (blinkingTimer >= blinkingInterval)
+        {
+            anim.SetTrigger("EyeClose");
+            blinkingTimer = 0;
+        }
+    }
 }
