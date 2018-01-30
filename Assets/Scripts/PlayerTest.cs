@@ -116,6 +116,11 @@ public class PlayerTest : NetworkBehaviour
     private float itemEffectTimer = 0;
     public float ItemEffectTimer { get { return itemEffectTimer; } }
 
+    /// <summary>
+    /// 音声送信トリガー
+    /// </summary>
+    private Dissonance.VoiceBroadcastTrigger broadcastTrigger;
+
     private void Awake()
     {
 		trackedObjects = GetComponent<TrackedObjects>();
@@ -291,6 +296,8 @@ public class PlayerTest : NetworkBehaviour
 		}			
 
 		CheckInput();
+
+        CheckTalking();
 
 		// つかみ候補アイテムから一定距離はなれたら候補から外す
         // サーバーのみ
@@ -618,6 +625,24 @@ public class PlayerTest : NetworkBehaviour
         {
             list.Remove(this);
             Debug.Log("プレイヤーリストから自身を削除 -> プレイヤー数 " + list.Count.ToString() );
+        }
+    }
+
+    /// <summary>
+    /// ＊要テスト＊
+    /// プレイヤーが発言している時はドロシーを口パクさせる
+    /// </summary>
+    [Client]
+    void CheckTalking()
+    {
+        if( broadcastTrigger == null )
+            broadcastTrigger = GetComponent<Dissonance.VoiceBroadcastTrigger>();
+
+        if (broadcastTrigger == null || myDrothy == null) return;
+
+        if( broadcastTrigger.IsTransmitting )
+        {
+            myDrothy.CmdTalk();
         }
     }
 }
