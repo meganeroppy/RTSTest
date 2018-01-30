@@ -215,6 +215,6 @@ public class DrothyController : NetworkBehaviour
     [Command]
     public void CmdTalk()
     {
-        talking = 3f;
+        talking = 1f;
     }
 }
