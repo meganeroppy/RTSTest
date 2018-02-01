@@ -29,46 +29,108 @@ public class GardenSceneManager : MonoBehaviour
     [SerializeField]
     private AudioSource collapseSound;
 
-	// Use this for initialization
-	void Start ()
+    [SerializeField]
+    private GameObject terrainOutside;
+
+    [SerializeField]
+    private Transform bottomWall;
+
+    [SerializeField]
+    private float bottomWallRotSpeed = 300;
+
+    [SerializeField]
+    private float fogEndDistance = 50f;
+
+    [SerializeField]
+    private float gainFogDensityRate = 0.2f;
+
+    [SerializeField]
+    private float terrainEndPosOffset = -60f;
+
+    // Use this for initialization
+    void Start ()
     {
         instance = this;
 
 		currentScale = startScale;
 	}
 
-	public void PlayEvent()
+    private void Update()
+    {
+        bottomWall.Rotate(Vector3.up * bottomWallRotSpeed * Time.deltaTime);
+    }
+
+    public void PlayEvent()
 	{
-		expSource.enabled = true;
-		expSource.Force = force;
 		StartCoroutine( ExecEvent() );
 	//	StartCoroutine( AscendChunks() );
-		if( propsParent != null )
-		{
-			var props = propsParent.gameObject.GetComponentsInChildren<Rigidbody>();
-			foreach( Rigidbody rb in props )
-			{
-				rb.isKinematic = false;
-			}
-		}
 
-        collapseSound.Play();
 	}
 
-	private IEnumerator ExecEvent()
-	{
-		var diff = endScale - startScale;
+    private IEnumerator ExecEvent()
+    {
+        // TODO: 地鳴りみたいな音あってもいいかも
 
-		while( currentScale < endScale )
-		{
-			currentScale += diff * gainScaleRate * Time.deltaTime;
+        // フォグを徐々に強くし、テラインの位置を下げる
+        {
+            var originFogDensity = RenderSettings.fogEndDistance;
+            var fogDiff = Mathf.Abs( fogEndDistance - originFogDensity );
 
-			expSource.InfluenceRadius = currentScale;
+            var terrainOriginPos = terrainOutside.transform.position;
 
-			yield return null;
-		}
+            float progress = 0;
+            while (progress < 1)
+            {
+                progress += Time.deltaTime * gainFogDensityRate;
 
-		Debug.Log("CollapseFloor::ExecEvent End");
+                Debug.Log(RenderSettings.fogEndDistance);
+
+                RenderSettings.fogEndDistance = originFogDensity - fogDiff * progress;
+
+                terrainOutside.transform.position = terrainOriginPos + Vector3.up * terrainEndPosOffset * progress;
+
+                yield return null;
+            }
+
+        }
+
+        // テラインを非表示にする
+        terrainOutside.SetActive(false);
+
+        // 地面の上の置物のIsKinematicを無効にする
+        if (propsParent != null)
+        {
+            var props = propsParent.gameObject.GetComponentsInChildren<Rigidbody>();
+            foreach (Rigidbody rb in props)
+            {
+                rb.isKinematic = false;
+            }
+        }
+
+        // 地面が崩れる効果音を鳴らす
+        collapseSound.Play();
+
+        // 地面が崩れる
+        {
+            expSource.enabled = true;
+            expSource.Force = force;
+
+            var diff = endScale - startScale;
+
+            while (currentScale < endScale)
+            {
+                currentScale += diff * gainScaleRate * Time.deltaTime;
+
+                expSource.InfluenceRadius = currentScale;
+
+                yield return null;
+            }
+        }
+
+        // 崩れる効果音停止
+        collapseSound.Stop();
+
+        Debug.Log("CollapseFloor::ExecEvent End");
 	}
 
 	private IEnumerator AscendChunks()
