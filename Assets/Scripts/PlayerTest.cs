@@ -429,16 +429,32 @@ public class PlayerTest : NetworkBehaviour
 
         // アイテムを食べる
         {
-            if (Input.GetKeyDown(KeyCode.Y) ||
-                OVRInput.GetDown(OVRInput.RawButton.RHandTrigger) // 右中指トリガー
-            )
+            /*    
+                if (Input.GetKeyDown(KeyCode.Y) ||
+                    OVRInput.GetDown(OVRInput.RawButton.RHandTrigger) // 右中指トリガー
+                )
+                {
+                    CmdEatItem(HandIndex.Right);
+                }
+                if (Input.GetKeyDown(KeyCode.U) || OVRInput.GetDown(OVRInput.RawButton.LHandTrigger))// 左中指トリガー
+                {
+                    CmdEatItem(HandIndex.Left);
+                }
+                */
+
+            // コントローラ操作による食事操作シミュレート
+            if (RtsTestNetworkManager.instance.MyInputMode == RtsTestNetworkManager.InputMode.ForceByKeyboard)
             {
-                CmdEatItem(HandIndex.Right);
+                if (Input.GetKey(KeyCode.Y) || Input.GetKey(KeyCode.U))
+                {
+                    SimulateEatWithTouch(true);
+                }               
+                else
+                {
+                    SimulateEatWithTouch(false);
+                }
             }
-            if (Input.GetKeyDown(KeyCode.U) || OVRInput.GetDown(OVRInput.RawButton.LHandTrigger))// 左中指トリガー
-            {
-                CmdEatItem(HandIndex.Left);
-            }
+
         }
 
         // 観測者になる
@@ -782,4 +798,16 @@ public class PlayerTest : NetworkBehaviour
             myDrothy.CmdTalk();
         }
     }
+
+    /// <summary>
+    /// キーボード操作でTouchでアイテムを食べる操作を再現
+    /// 両手は( 0, 0, 0 ) 頭は( 0, 1, 0 )の位置なので徐々に両手の位置を上げる
+    /// </summary>
+    [Client]
+    private void SimulateEatWithTouch( bool on )
+    {
+        holdPosRight.localPosition = holdPosLeft.localPosition = Vector3.up * ( on ? 1f : 0 );
+    }
+
+    
 }
