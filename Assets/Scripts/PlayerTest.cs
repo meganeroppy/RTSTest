@@ -488,12 +488,24 @@ public class PlayerTest : NetworkBehaviour
         {
 //            Debug.LogWarning("右手位置に更新");
             holdItemRight.transform.position = holdPosRight.position;
+
+            // 頭との距離が閾値以下になったらアイテムを食べる
+            if( Vector3.Distance( holdItemRight.transform.position, headObject.transform.position) < eatThreshold )
+            {
+                EatItem( HandIndex.Right );
+            }
         }
 
         if (holdItemLeft != null)
         {
 //            Debug.LogWarning("左手位置に更新");
             holdItemLeft.transform.position = holdPosLeft.position;
+            // 頭との距離が閾値以下になったらアイテムを食べる
+            if (Vector3.Distance(holdItemLeft.transform.position, headObject.transform.position) < eatThreshold)
+            {
+                EatItem(HandIndex.Left);
+            }
+
         }
     }
 
@@ -713,8 +725,8 @@ public class PlayerTest : NetworkBehaviour
     /// <summary>
     /// アイテムを消費する
     /// </summary>
-    [Command]
-    private void CmdEatItem(HandIndex hIndex)
+    [Server]
+    private void EatItem(HandIndex hIndex)
     {
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
