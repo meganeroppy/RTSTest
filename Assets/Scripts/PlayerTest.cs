@@ -284,9 +284,11 @@ public class PlayerTest : NetworkBehaviour
         youIcon.SetActive(isLocalPlayer);
 
         // アイテムをつかんでいる時はつかんでいる位置にマイフレーム設定
-        // TODO: クライアント側でチェックするべきかも？
-        UpdateHoldItem();
-
+        // TODO: ローカルとサーバーどちらで行うべきかいまいち定かではないので適宜調整する
+        if (isServer)
+        {
+            UpdateHoldItem();
+        }
 
         if (isClient)
         {
@@ -462,6 +464,7 @@ public class PlayerTest : NetworkBehaviour
     /// <summary>
     /// つかんでいるアイテムの状態を更新
     /// </summary>    
+    [Server]
     private void UpdateHoldItem()
     {
         // アイテムの位置を該当する手の位置に更新
@@ -476,7 +479,6 @@ public class PlayerTest : NetworkBehaviour
 //            Debug.LogWarning("左手位置に更新");
             holdItemLeft.transform.position = holdPosLeft.position;
         }
-
     }
 
     /// <summary>
@@ -633,7 +635,8 @@ public class PlayerTest : NetworkBehaviour
     }
 
     /// <summary>
-    /// つかんでいるアイテムをサーバーにも反映する
+    /// アイテムをつかむ
+    /// サーバー処理
     /// </summary>
     [Command]
     private void CmdSetHoldItem( HandIndex hIndex )
@@ -647,12 +650,20 @@ public class PlayerTest : NetworkBehaviour
             return;
         }
 
+        // つかめる状態でない（他のプレイヤーがつかんでいるなど）ときはなにもしない
+        if( !holdTarget.Holdable )
+        {
+            Debug.Log("つかめる状態でない");
+            return;
+        }
+
         // すでにものをつかんでいる手でつかもうとしたらなにもしない
-        if( ( hIndex == HandIndex.Right && holdItemRight != null ) || (hIndex == HandIndex.Left && holdItemLeft != null))
+        if ( ( hIndex == HandIndex.Right && holdItemRight != null ) || (hIndex == HandIndex.Left && holdItemLeft != null))
         {
             Debug.Log((hIndex == HandIndex.Right ? "右手" : "左手") + "はすでにアイテムをつかんでいる");
         }
 
+    
         DrothyItem targetItem;
         if(hIndex == HandIndex.Right)
         {
@@ -668,18 +679,18 @@ public class PlayerTest : NetworkBehaviour
         //        holdTarget = null;
 
         // つかんでいるプレイヤーに権限を与える
-        var nIdentity = targetItem.GetComponent<NetworkIdentity>();
-        if (nIdentity == null)
-        {
-            Debug.Log("NetworkIdentityなし");
-            return;
-        }
+        // TODO: 不要または問題を起こしている可能性がある
+        //        var nIdentity = targetItem.GetComponent<NetworkIdentity>();
+        //        if (nIdentity == null)
+        //        {
+        //            Debug.Log("NetworkIdentityなし");
+        //            return;
+        //        }
+        //        nIdentity.AssignClientAuthority(connectionToClient);
 
-        // つかんだSE再生
-        targetItem.RpcPlayHeldSound();
+        // つかむ
+        targetItem.SetHeld();
 
-        nIdentity.AssignClientAuthority(connectionToClient);
-        
         Debug.Log((hIndex == HandIndex.Right ? "右手" : "左手") + "でアイテムをつかんだ");
     }
 
@@ -694,7 +705,7 @@ public class PlayerTest : NetworkBehaviour
         var target = hIndex == HandIndex.Right ? holdItemRight : holdItemLeft;
 
         // アイテムを持っていなかったらなにもしない
-        if ((hIndex == HandIndex.Right && holdItemRight == null) || (hIndex == HandIndex.Left && holdItemLeft == null))
+        if ( target == null )
         {
             Debug.Log((hIndex == HandIndex.Right ? "右手" : "左手") + "はアイテムをつかんでいない");
             return;
@@ -716,7 +727,15 @@ public class PlayerTest : NetworkBehaviour
         // アイテムの効果を得る
         itemEffectTimer = target.EffectTime;
 
-        target = null;
+        // アイテムをもっていない状態にする
+        if( hIndex == HandIndex.Right )
+        {
+            holdItemRight = null;
+        }
+        else
+        {
+            holdItemLeft = null;
+        }
 
         Debug.Log((hIndex == HandIndex.Right ? "右手" : "左手") + "のアイテムを食べた");
     }

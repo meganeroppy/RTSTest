@@ -59,18 +59,43 @@ public class DrothyItem : NetworkBehaviour
     [SerializeField]
     private AudioClip heldSound;
 
+    /// <summary>
+    /// すでにほかの人がつかんでいるアイテムを奪ったりできないようにフラグを作る
+    /// </summary>
+    [SyncVar]
+    private bool holdable = true;
+    public bool Holdable { get { return holdable; } }
+
     [ServerCallback]
     private void Start()
     {
         originPosition = transform.position;
+
+        // SE再生
+        RpcPlaySpawnSound();
+
+        holdable = true;
     }
 
     private void Update()
     {
+        // ビジュアルの有効をセット enableはSyncVar
         visual.SetActive(enable);
 
+        // サーバー側のみタイマーを更新する
         if (isServer)
             UpdateTimer();
+    }
+
+    /// <summary>
+    /// つかまれる
+    /// </summary>
+    [Server]
+    public void SetHeld()
+    {
+        holdable = false;
+
+        RpcPlayHeldSound();
     }
 
     /// <summary>
@@ -109,6 +134,10 @@ public class DrothyItem : NetworkBehaviour
         transform.position = originPosition;
 
         enable = true;
+        holdable = true;
+
+        // SE再生
+        RpcPlaySpawnSound();
     }
 
     /// <summary>
@@ -117,6 +146,9 @@ public class DrothyItem : NetworkBehaviour
     [ClientRpc]
     private void RpcPlayEatenSound()
     {
+        // 本人しか聞こえない?
+//        if (!isLocalPlayer) return;
+
         if (audioSource == null)
         {
             audioSource = GetComponent<AudioSource>();
@@ -126,16 +158,16 @@ public class DrothyItem : NetworkBehaviour
     }
 
     /// <summary>
-    /// オブジェクト有効時の処理
-    /// </summary>
-    private void OnEnable()
+    /// 出現したときのSEを再生
+    /// </summary>    
+    [ClientRpc]
+    public void RpcPlaySpawnSound()
     {
         if (audioSource == null)
         {
             audioSource = GetComponent<AudioSource>();
         }
 
-        // 生まれた時のSE
         audioSource.PlayOneShot(popSound);
     }
 
@@ -143,15 +175,17 @@ public class DrothyItem : NetworkBehaviour
     /// つかまれたときのSEを再生
     /// </summary>    
     [ClientRpc]
-    public void RpcPlayHeldSound()
+    private void RpcPlayHeldSound()
     {
+        // 本人しか聞こえない?
+ //       if (!isLocalPlayer) return;
+
         if (audioSource == null)
         {
             audioSource = GetComponent<AudioSource>();
         }
 
         audioSource.PlayOneShot(heldSound);
-
     }
 }
 
