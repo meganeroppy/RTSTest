@@ -21,16 +21,23 @@ public class PlayerTest : NetworkBehaviour
     /// 管理者か？
     /// </summary>
 	[SyncVar]
-	private bool isObserver = false;
+    private bool isObserver = false;
     private bool isObserverPrev = false;
     public bool IsObserver { get { return isObserver; } }
+
+    /// <summary>
+    /// 参加型管理者か？
+    /// </summary>
+    [SyncVar]
+    private RtsTestNetworkManager.ObserverType observerType = RtsTestNetworkManager.ObserverType.Default;
+    public RtsTestNetworkManager.ObserverType ObserverType { get { return observerType; } }
 
     /// <summary>
     /// 削除予定
     /// 観測者だと赤くなるだけのキューブ
     /// </summary>
     [SerializeField]
-	private MeshRenderer observerSign;
+    private MeshRenderer observerSign;
 
     [SerializeField]
     private IKControl drothyIKPrefab;
@@ -43,10 +50,16 @@ public class PlayerTest : NetworkBehaviour
     private GameObject youIcon;
 
     /// <summary>
-    /// アイテムをつかんでいる時のアイテムの位置
+    /// 右手でアイテムをつかんでいる時の位置
     /// </summary>
     [SerializeField]
-    private Transform holdPos;
+    private Transform holdPosRight;
+
+    /// <summary>
+    /// 右手でアイテムをつかんでいる時の位置
+    /// </summary>
+    [SerializeField]
+    private Transform holdPosLeft;
 
     /// <summary>
     /// 現在のドロシーのスケール
@@ -71,15 +84,23 @@ public class PlayerTest : NetworkBehaviour
     private DrothyItem holdTarget = null;
 
     /// <summary>
-    /// つかんでいるアイテム
+    /// 右手でつかんでいるアイテム
     /// </summary>
-    private DrothyItem holdItem = null;
+    private DrothyItem holdItemRight = null;
 
     /// <summary>
-    /// カメライメージ
+    /// 左手でつかんでいるアイテム
+    /// </summary>
+    private DrothyItem holdItemLeft = null;
+
+    /// <summary>
+    /// 頭オブジェクト
+    /// 自身にカメライメージがついている
+    /// 子要素にいもむしがある
+    /// アイテムを食べるときにも使用する
     /// </summary>
     [SerializeField]
-    private GameObject cameraImage;
+    private GameObject headObject = null;
 
     /// <summary>
     /// 観測者クラス
@@ -92,23 +113,23 @@ public class PlayerTest : NetworkBehaviour
     /// </summary>
     public static List<PlayerTest> list;
 
-	/// <summary>
-	/// 観測者の数 ただしプレイヤー風観測者は除外する
-	/// </summary>
-	public static int PureObserverCount{
-		get
-		{
-			if( list == null ) return 0;
+    /// <summary>
+    /// 観測者の数 ただしプレイヤー風観測者は除外する
+    /// </summary>
+    public static int PureObserverCount {
+        get
+        {
+            if (list == null) return 0;
 
-			int count = 0;
-			foreach( PlayerTest p in list )
-			{
-				if( p.IsObserver ) count++;
-			}
+            int count = 0;
+            foreach (PlayerTest p in list)
+            {
+                if (p.IsObserver && p.ObserverType != RtsTestNetworkManager.ObserverType.Participatory) count++;
+            }
 
-			return count;
-		}
-	}
+            return count;
+        }
+    }
 
     /// <summary>
     /// アイテムの効果が発生している時間
@@ -121,21 +142,36 @@ public class PlayerTest : NetworkBehaviour
     /// </summary>
     private Dissonance.VoiceBroadcastTrigger broadcastTrigger;
 
+    /// <summary>
+    /// 手の左右判別
+    /// </summary>
+    private enum HandIndex
+    {
+        Right,
+        Left,
+    }
+
+    /// <summary>
+    /// つかんでいるアイテムと頭との距離がこの値以下になったら食べる
+    /// </summary>
+    [SerializeField]
+    private float eatThreshold = 0.1f;
+
     private void Awake()
     {
-		trackedObjects = GetComponent<TrackedObjects>();
+        trackedObjects = GetComponent<TrackedObjects>();
     }
 
     // Use this for initialization
     void Start()
     {
-		if (isServer)
-		{
-			if (list == null) list = new List<PlayerTest>();
-			list.Add(this);
+        if (isServer)
+        {
+            if (list == null) list = new List<PlayerTest>();
+            list.Add(this);
 
-			Debug.Log("AddPlayer : プレイヤー数 -> " + list.Count.ToString());
-		}
+            Debug.Log("AddPlayer : プレイヤー数 -> " + list.Count.ToString());
+        }
 
         if (!isLocalPlayer)
         {
@@ -144,14 +180,14 @@ public class PlayerTest : NetworkBehaviour
             if (camera.gameObject) camera.gameObject.SetActive(false);
 
             // 観測者かつ自身ではないときにビジュアルを有効にする
-            cameraImage.SetActive(isObserver && !isLocalPlayer);
+            headObject.SetActive(isObserver && !isLocalPlayer);
         }
 
         // ラベルの設定
-        { 
+        {
             int id = 0;
 
-			var nIdentity = GetComponent<NetworkIdentity>();
+            var nIdentity = GetComponent<NetworkIdentity>();
             if (nIdentity != null)
             {
                 //    id = nIdentity.netId;
@@ -167,57 +203,60 @@ public class PlayerTest : NetworkBehaviour
     /// </summary>
     public override void OnStartLocalPlayer()
     {
-    //    Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
+        //    Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
-		// プレイヤー名を変更する
-		gameObject.name = "[YOU] " + gameObject.name;
+        // プレイヤー名を変更する
+        gameObject.name = "[YOU] " + gameObject.name;
 
         // サーバー上でドロシーを生成
-		CmdCreateDrothy( RtsTestNetworkManager.instance.PlayerId );
+        CmdCreateDrothy(RtsTestNetworkManager.instance.PlayerId);
 
         // サーバー上で観測者フラグをセットする syncVarなのでのちにクライアントにも反映される
         CmdSetIsObserver(RtsTestNetworkManager.instance.IsObserver);
 
-        if(RtsTestNetworkManager.instance.IsObserver)
+        // サーバー上で参加型フラグをセットする syncVarなのでのちにクライアントにも反映される
+        CmdSetIsParticipatory(RtsTestNetworkManager.instance.MyObserverType);
+
+        if (RtsTestNetworkManager.instance.IsObserver)
         {
             // 観測者の場合
 
             var obj = GameObject.Find("BaseSceneManager");
-            if( obj )
+            if (obj)
             {
                 var manager = obj.GetComponent<BaseSceneManager>();
-                if( manager != null )
+                if (manager != null)
                 {
                     manager.ActivatePresetCameras();
                 }
             }
 
-			if( RtsTestNetworkManager.instance.MyObserverType == RtsTestNetworkManager.ObserverType.Participatory )
-			{
+            if (RtsTestNetworkManager.instance.MyObserverType == RtsTestNetworkManager.ObserverType.Participatory)
+            {
                 // 参加型の時は有効にする ただし強制キーボード操作の時は無効にする
                 trackedObjects.SetEnable(RtsTestNetworkManager.instance.MyInputMode != RtsTestNetworkManager.InputMode.ForceByKeyboard);
-			}
-			else if( RtsTestNetworkManager.instance.MyInputMode == RtsTestNetworkManager.InputMode.ForceByTracking )
+            }
+            else if (RtsTestNetworkManager.instance.MyInputMode == RtsTestNetworkManager.InputMode.ForceByTracking)
             {
                 // 強制トラッカー依存操作フラグがあったらコンポーネントを有効にする
                 trackedObjects.SetEnable(true);
             }
-			else
-			{
+            else
+            {
                 // そうでなければ無効にする
                 trackedObjects.SetEnable(false);
-			}
+            }
         }
-		else
-		{
+        else
+        {
             // 通常プレイヤーの場合 強制キーボード操作フラグがなければトラッキングによる制御
             trackedObjects.SetEnable(RtsTestNetworkManager.instance.MyInputMode != RtsTestNetworkManager.InputMode.ForceByKeyboard);
-		}
+        }
     }
 
     public override void OnStartClient()
     {
-    //    Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
+        //    Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
     }
 
     // Update is called once per frame
@@ -236,7 +275,7 @@ public class PlayerTest : NetworkBehaviour
         {
             if (isObserver != isObserverPrev)
             {
-				SetObserverEnable();
+                SetObserverEnable();
             }
             isObserverPrev = isObserver;
         }
@@ -245,10 +284,9 @@ public class PlayerTest : NetworkBehaviour
         youIcon.SetActive(isLocalPlayer);
 
         // アイテムをつかんでいる時はつかんでいる位置にマイフレーム設定
-        if (holdItem)
-        {
-            holdItem.transform.position = holdPos.position;
-        }
+        // TODO: クライアント側でチェックするべきかも？
+        UpdateHoldItem();
+
 
         if (isClient)
         {
@@ -269,150 +307,183 @@ public class PlayerTest : NetworkBehaviour
         // ■ここから↓はローカルプレイヤーのみ■
         /////////////////////////////////////////
 
-        if ( !isLocalPlayer )
-		{
-			return;
-		}
+        if (!isLocalPlayer)
+        {
+            return;
+        }
 
-		// 強制キーボード操作の時の操作
-		// TODO: オブザーバーの操作と一緒でいい気がする 
-		{
-			if (RtsTestNetworkManager.instance.MyInputMode == RtsTestNetworkManager.InputMode.ForceByKeyboard)
-	        {
-	            Vector3 move = new Vector3(
-	                Input.GetAxisRaw("Horizontal"),
-	                0,
-	                Input.GetAxisRaw("Vertical"));
+        // 強制キーボード操作の時の操作
+        // TODO: オブザーバーの操作と一緒でいい気がする 
+        {
+            if (RtsTestNetworkManager.instance.MyInputMode == RtsTestNetworkManager.InputMode.ForceByKeyboard)
+            {
+                Vector3 move = new Vector3(
+                    Input.GetAxisRaw("Horizontal"),
+                    0,
+                    Input.GetAxisRaw("Vertical"));
 
-	            transform.Translate(move * moveSpeed * Time.deltaTime);
-	            //	myRigidbody.velocity = (transform.forward + move.normalized) * fSpeed ;
+                transform.Translate(move * moveSpeed * Time.deltaTime);
+                //	myRigidbody.velocity = (transform.forward + move.normalized) * fSpeed ;
 
-	            var rot = Input.GetKey(KeyCode.I) ? -1 : Input.GetKey(KeyCode.O) ? 1 : 0;
-	            if (rot != 0)
-	            {
-	                transform.Rotate(Vector3.up * rot * rotSpeed * Time.deltaTime);
-	            }
-	        }
-		}			
+                var rot = Input.GetKey(KeyCode.I) ? -1 : Input.GetKey(KeyCode.O) ? 1 : 0;
+                if (rot != 0)
+                {
+                    transform.Rotate(Vector3.up * rot * rotSpeed * Time.deltaTime);
+                }
+            }
+        }
 
-		CheckInput();
+        CheckInput();
 
         CheckTalking();
 
-		// つかみ候補アイテムから一定距離はなれたら候補から外す
+        // つかみ候補アイテムから一定距離はなれたら候補から外す
         // サーバーのみ
-        if ( isServer && holdTarget && Vector3.Distance( transform.position, holdTarget.transform.position ) > 5f)
+        if (isServer && holdTarget && Vector3.Distance(transform.position, holdTarget.transform.position) > 5f)
         {
             holdTarget = null;
         }
     }
 
-	/// <summary>
-	/// 観測者設定の有効を切り替え
-	/// </summary>
-	private void SetObserverEnable()
-	{
-		// 削除候補
-		// 観測者サインの色を変える
-		observerSign.material.color = isObserver ? Color.red : Color.white;
+    /// <summary>
+    /// 観測者設定の有効を切り替え
+    /// </summary>
+    private void SetObserverEnable()
+    {
+        // 削除候補
+        // 観測者サインの色を変える
+        observerSign.material.color = isObserver ? Color.red : Color.white;
 
-		if (observerController == null) observerController = GetComponent<ObserverController>();
+        if (observerController == null) observerController = GetComponent<ObserverController>();
 
-		observerController.enabled = isObserver;
+        observerController.enabled = isObserver;
 
-		// 観測者かつ自身ではないときにビジュアル（いもむし）を有効にする
-		// TODO: 参加型観測者の見た目をいもむしで無くす場合は要処理変更
-		cameraImage.SetActive(isObserver && !isLocalPlayer);
+        // 観測者かつ自身ではないときにビジュアル（いもむし）を有効にする
+        // TODO: 参加型観測者の見た目をいもむしで無くす場合は要処理変更
+        headObject.SetActive(isObserver && !isLocalPlayer);
 
-		// トラッキングによる移動の有効を設定 結構難解なので間違いがないか再三確認する
-		bool enableTracking;
+        // トラッキングによる移動の有効を設定 結構難解なので間違いがないか再三確認する
+        bool enableTracking;
 
-		if( isObserver )
-		{
-			// 観測者の場合
-			if( RtsTestNetworkManager.instance.MyObserverType == RtsTestNetworkManager.ObserverType.Participatory )
-			{
-				// 参加型観測者の場合は有効 ただし強制キーボード操作の時は無効
-				enableTracking = RtsTestNetworkManager.instance.MyInputMode != RtsTestNetworkManager.InputMode.ForceByKeyboard;
-			}
-			else if( RtsTestNetworkManager.instance.MyInputMode == RtsTestNetworkManager.InputMode.ForceByTracking )
-			{
-				// 強制トラッカー依存操作の時は有効
-				enableTracking = true;
-			}
-			else
-			{
-				// 上記のどちらでもなければ無効
-				enableTracking = false;
-			}
-		}
-		else
-		{
-			// プレイヤーの場合
-			if( RtsTestNetworkManager.instance.MyInputMode == RtsTestNetworkManager.InputMode.ForceByKeyboard )
-			{
-				// 強制キーボード操作の時は無効
-				enableTracking = false;
-			}
-			else
-			{
-				// そうでなければ有効
-				enableTracking = true;
-			}
-		}
+        if (isObserver)
+        {
+            // 観測者の場合
+            if (RtsTestNetworkManager.instance.MyObserverType == RtsTestNetworkManager.ObserverType.Participatory)
+            {
+                // 参加型観測者の場合は有効 ただし強制キーボード操作の時は無効
+                enableTracking = RtsTestNetworkManager.instance.MyInputMode != RtsTestNetworkManager.InputMode.ForceByKeyboard;
+            }
+            else if (RtsTestNetworkManager.instance.MyInputMode == RtsTestNetworkManager.InputMode.ForceByTracking)
+            {
+                // 強制トラッカー依存操作の時は有効
+                enableTracking = true;
+            }
+            else
+            {
+                // 上記のどちらでもなければ無効
+                enableTracking = false;
+            }
+        }
+        else
+        {
+            // プレイヤーの場合
+            if (RtsTestNetworkManager.instance.MyInputMode == RtsTestNetworkManager.InputMode.ForceByKeyboard)
+            {
+                // 強制キーボード操作の時は無効
+                enableTracking = false;
+            }
+            else
+            {
+                // そうでなければ有効
+                enableTracking = true;
+            }
+        }
 
-        trackedObjects.SetEnable(enableTracking);	
-	}
+        trackedObjects.SetEnable(enableTracking);
+    }
 
-	[Client]
-	private void CheckInput()
-	{
+    [Client]
+    private void CheckInput()
+    {
         // これを呼ばないとOVRInputのメソッドが動かないらしいので呼ぶ
         OVRInput.Update();
 
-		// アイテムをつかむ
-		// TODO: タッチでの操作は追追改善する
-		if( Input.GetKeyDown(KeyCode.H) ||
-			OVRInput.GetDown(OVRInput.RawButton.RIndexTrigger) || // 右人差し指トリガー
-			OVRInput.GetDown(OVRInput.RawButton.LIndexTrigger) // 左人差し指トリガー
-		)
-		{
-			CmdSetHoldItem();
-		}
+        // アイテムをつかむ
+        {
+            // TODO: タッチでの操作は追追改善する
+            if (Input.GetKeyDown(KeyCode.H) ||
+                OVRInput.GetDown(OVRInput.RawButton.RIndexTrigger)// 右人差し指トリガー
+            )
+            {
+                CmdSetHoldItem(HandIndex.Right);
+            }
 
-		// アイテムを食べる
-		if( Input.GetKeyDown(KeyCode.Y) ||
-			OVRInput.GetDown(OVRInput.RawButton.RHandTrigger) || // 右中指トリガー
-			OVRInput.GetDown(OVRInput.RawButton.LHandTrigger) // 左中指トリガー
-		)
-		{
-			CmdEatItem();
-		}	
-	
-		// 観測者になる
-		// 現状いらなそう 必要になったら実装する
-		if (Input.GetKeyDown(KeyCode.O) || 
-			OVRInput.GetDown(OVRInput.RawButton.RThumbstick) // 右スティック押し込み
-		)
-		{
-			Debug.LogWarning("観測者とプレイヤー切り替え機能は未実装");
-		}
+            if (Input.GetKeyDown(KeyCode.J) || OVRInput.GetDown(OVRInput.RawButton.LIndexTrigger) // 左人差し指トリガー
+            )
+            {
+                CmdSetHoldItem(HandIndex.Left);
+            }
+        }
 
-		// 観測者モード切り替え
-		// 現状いらなそう 必要になったら実装する
-		if (Input.GetKeyDown(KeyCode.M) || 
-			OVRInput.GetDown(OVRInput.RawButton.LThumbstick) // 左スティック押し込み
-		)
-		{
-			Debug.LogWarning("観測者モード切り替え機能は未実装");
-		}
-	}
+        // アイテムを食べる
+        {
+            if (Input.GetKeyDown(KeyCode.Y) ||
+                OVRInput.GetDown(OVRInput.RawButton.RHandTrigger) // 右中指トリガー
+            )
+            {
+                CmdEatItem(HandIndex.Right);
+            }
+            if (Input.GetKeyDown(KeyCode.U) || OVRInput.GetDown(OVRInput.RawButton.LHandTrigger))// 左中指トリガー
+            {
+                CmdEatItem(HandIndex.Left);
+            }
+        }
+
+        // 観測者になる
+
+        // 現状いらなそう 必要になったら実装する
+        if (Input.GetKeyDown(KeyCode.O) ||
+            OVRInput.GetDown(OVRInput.RawButton.RThumbstick) // 右スティック押し込み
+        )
+        {
+            Debug.LogWarning("観測者とプレイヤー切り替え機能は未実装");
+        }
+
+        // 観測者モード切り替え
+        // 現状いらなそう 必要になったら実装する
+        if (Input.GetKeyDown(KeyCode.M) ||
+            OVRInput.GetDown(OVRInput.RawButton.LThumbstick) // 左スティック押し込み
+        )
+        {
+            Debug.LogWarning("観測者モード切り替え機能は未実装");
+        }
+    }
+
+    /// <summary>
+    /// つかんでいるアイテムの状態を更新
+    /// </summary>    
+    private void UpdateHoldItem()
+    {
+        // アイテムの位置を該当する手の位置に更新
+        if (holdItemRight != null)
+        {
+//            Debug.LogWarning("右手位置に更新");
+            holdItemRight.transform.position = holdPosRight.position;
+        }
+
+        if (holdItemLeft != null)
+        {
+//            Debug.LogWarning("左手位置に更新");
+            holdItemLeft.transform.position = holdPosLeft.position;
+        }
+
+    }
 
     /// <summary>
     /// ドロシーを生成する
     /// </summary>
     [Command]
-	private void CmdCreateDrothy( int playerId )
+    private void CmdCreateDrothy(int playerId)
     {
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
@@ -428,16 +499,16 @@ public class PlayerTest : NetworkBehaviour
         }
 
         // 設定が有効になっている場合は脚の動きのシミュレートを行う
-		if (RtsTestNetworkManager.instance.UseSimulateFoot)
+        if (RtsTestNetworkManager.instance.UseSimulateFoot)
         {
             drothyIK.SetSimulateFoot();
         }
-			
+
         // プレイヤーIDによってカラバリを変更する
-		drothyIK.GetComponent<DrothyController>().ColorIdx = playerId;
+        drothyIK.GetComponent<DrothyController>().ColorIdx = playerId;
 
         myDrothy = drothyIK.GetComponent<DrothyController>();
-        if( myDrothy == null )
+        if (myDrothy == null)
         {
             return;
         }
@@ -445,7 +516,7 @@ public class PlayerTest : NetworkBehaviour
         myDrothy.SetOwner(trackedObjects.BodyObject);
 
         // どちらが正しいかはまだ不明
-//      NetworkServer.Spawn(drothy.gameObject);
+        //      NetworkServer.Spawn(drothy.gameObject);
         NetworkServer.SpawnWithClientAuthority(myDrothy.gameObject, gameObject);
 
         RpcPassDrothyReference(myDrothy.netId);
@@ -455,18 +526,18 @@ public class PlayerTest : NetworkBehaviour
     /// クライアント側でもドロシーの参照を持たせる
     /// </summary>
     [ClientRpc]
-    private void RpcPassDrothyReference( NetworkInstanceId netId )
+    private void RpcPassDrothyReference(NetworkInstanceId netId)
     {
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
-		var drothyObj = ClientScene.FindLocalObject(netId);
+        var drothyObj = ClientScene.FindLocalObject(netId);
 
         myDrothy = drothyObj.GetComponent<DrothyController>();
 
         // まだクライアント側はIKターゲットが未指定なのでセットする
         {
             var drothyIK = myDrothy.GetComponent<IKControl>();
-            if ( drothyIK != null)
+            if (drothyIK != null)
             {
                 drothyIK.rightHandObj = trackedObjects.RightHandObject;
                 drothyIK.leftHandObj = trackedObjects.LeftHandObject;
@@ -476,43 +547,53 @@ public class PlayerTest : NetworkBehaviour
         }
 
         // 自分のドロシーは無効にする
-		bool drothyVisible;
-		if( RtsTestNetworkManager.instance.ForceDisplayDrothy )
-		{
-			// 強制ドロシー表示フラグがあったら確実に表示する
-			drothyVisible = true;
-		}
-		else if( isObserver )
-		{
-			// 管理者の時
-			if( isLocalPlayer )
-			{
-				// ローカルの時は表示しない
-				drothyVisible = false;
-			}
-			else
-			{
-				// リモートかつ参加型の時は表示し、そうでなければ表示しない 
-				// 表示しない場合はいもむしが表示される
-				drothyVisible = RtsTestNetworkManager.instance.MyObserverType == RtsTestNetworkManager.ObserverType.Participatory;
-			}
-		}
-		else
-		{
-			// プレイヤーの時
-			// ローカルでなければ表示する
-			drothyVisible = !isLocalPlayer;
-		}
-		drothyObj.SetActive( drothyVisible );
+        bool drothyVisible;
+        if (RtsTestNetworkManager.instance.ForceDisplayDrothy)
+        {
+            // 強制ドロシー表示フラグがあったら確実に表示する
+            drothyVisible = true;
+        }
+        else if (isObserver)
+        {
+            // 管理者の時
+            if (isLocalPlayer)
+            {
+                // ローカルの時は表示しない
+                drothyVisible = false;
+            }
+            else
+            {
+                // リモートかつ参加型の時は表示し、そうでなければ表示しない 
+                // 表示しない場合はいもむしが表示される
+                drothyVisible = RtsTestNetworkManager.instance.MyObserverType == RtsTestNetworkManager.ObserverType.Participatory;
+            }
+        }
+        else
+        {
+            // プレイヤーの時
+            // ローカルでなければ表示する
+            drothyVisible = !isLocalPlayer;
+        }
+        drothyObj.SetActive(drothyVisible);
     }
 
     /// <summary>
     /// 観測者フラグを設定する
     /// </summary>
     [Command]
-	private void CmdSetIsObserver( bool value )
-	{
+    private void CmdSetIsObserver(bool value)
+    {
         isObserver = value;
+    }
+
+
+    /// <summary>
+    /// 参加型フラグを設定する
+    /// </summary>
+    [Command]
+    private void CmdSetIsParticipatory(RtsTestNetworkManager.ObserverType value)
+    {
+        observerType = value;
     }
 
     /// <summary>
@@ -521,8 +602,6 @@ public class PlayerTest : NetworkBehaviour
     [ServerCallback]
     private void OnTriggerEnter(Collider other)
     {
-    //    if ((isObserver ) || !isLocalPlayer ) return;
-
         if (other.tag.Equals("Item"))
         {
             Debug.Log(System.Reflection.MethodBase.GetCurrentMethod() + other.name);
@@ -532,7 +611,7 @@ public class PlayerTest : NetworkBehaviour
             {
                 holdTarget = item;
                 SetHoldTarget(item.netId);
-            } 
+            }
         }
     }
 
@@ -540,14 +619,14 @@ public class PlayerTest : NetworkBehaviour
     /// つかみ候補のアイテムのセット
     /// </summary>
     [Server]
-    private void SetHoldTarget( NetworkInstanceId id )
+    private void SetHoldTarget(NetworkInstanceId id)
     {
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
         var obj = NetworkServer.FindLocalObject(id);
         if (!obj) return;
         var item = obj.GetComponent<DrothyItem>();
-        if( item != null )
+        if (item != null)
         {
             holdTarget = item;
         }
@@ -557,46 +636,86 @@ public class PlayerTest : NetworkBehaviour
     /// つかんでいるアイテムをサーバーにも反映する
     /// </summary>
     [Command]
-    private void CmdSetHoldItem()
+    private void CmdSetHoldItem( HandIndex hIndex )
     {
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
-        if (!holdTarget) return;
 
-        holdItem = holdTarget.GetComponent<DrothyItem>();
+        // つかみ候補が無ければなにもしない
+        if (!holdTarget)
+        {
+            Debug.Log("つかみ候補なし");
+            return;
+        }
 
-        holdTarget = null;
+        // すでにものをつかんでいる手でつかもうとしたらなにもしない
+        if( ( hIndex == HandIndex.Right && holdItemRight != null ) || (hIndex == HandIndex.Left && holdItemLeft != null))
+        {
+            Debug.Log((hIndex == HandIndex.Right ? "右手" : "左手") + "はすでにアイテムをつかんでいる");
+        }
+
+        DrothyItem targetItem;
+        if(hIndex == HandIndex.Right)
+        {
+            holdItemRight = holdTarget.GetComponent<DrothyItem>();
+            targetItem = holdItemRight;
+        }
+        else
+        {
+            holdItemLeft = holdTarget.GetComponent<DrothyItem>();
+            targetItem = holdItemLeft;
+        }
+
+        //        holdTarget = null;
 
         // つかんでいるプレイヤーに権限を与える
-        var nIdentity = holdItem.GetComponent<NetworkIdentity>();
-        if (nIdentity != null && !nIdentity.hasAuthority)
+        var nIdentity = targetItem.GetComponent<NetworkIdentity>();
+        if (nIdentity == null)
         {
-            nIdentity.AssignClientAuthority(connectionToClient);
+            Debug.Log("NetworkIdentityなし");
+            return;
         }
+
+        nIdentity.AssignClientAuthority(connectionToClient);
+        
+        Debug.Log((hIndex == HandIndex.Right ? "右手" : "左手") + "でアイテムをつかんだ");
     }
-    
+
     /// <summary>
     /// アイテムを消費する
     /// </summary>
     [Command]
-    private void CmdEatItem( )
+    private void CmdEatItem(HandIndex hIndex)
     {
+        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
+
+        var target = hIndex == HandIndex.Right ? holdItemRight : holdItemLeft;
+
         // アイテムを持っていなかったらなにもしない
-        if (!holdItem) return;
+        if ((hIndex == HandIndex.Right && holdItemRight == null) || (hIndex == HandIndex.Left && holdItemLeft == null))
+        {
+            Debug.Log((hIndex == HandIndex.Right ? "右手" : "左手") + "はアイテムをつかんでいない");
+            return;
+        }
 
         // アイテムを食べられるタイミングでなかったらなにもしない
         if (EventManager.instance.CurrentSequence != EventManager.Sequence.PopCakes1_Event &&
             EventManager.instance.CurrentSequence != EventManager.Sequence.PopCakes2_Event &&
             EventManager.instance.CurrentSequence != EventManager.Sequence.PopMushrooms_Event
         )
-            return;            
+        {
+            Debug.Log("今はその時ではない");
+            return;
+        }
 
         // たべる
-        holdItem.CmdEaten();
+        target.CmdEaten();
 
         // アイテムの効果を得る
-        itemEffectTimer = holdItem.EffectTime;
+        itemEffectTimer = target.EffectTime;
 
-        holdItem = null;
+        target = null;
+
+        Debug.Log((hIndex == HandIndex.Right ? "右手" : "左手") + "のアイテムを食べた");
     }
 
     /// <summary>
@@ -609,12 +728,6 @@ public class PlayerTest : NetworkBehaviour
         {
             itemEffectTimer -= Time.deltaTime;
         }
-    }
-
-    [Server]
-    private void ChangeScale()
-    {
-        drothyScale = 10f;
     }
 
     /// <summary>
@@ -637,12 +750,12 @@ public class PlayerTest : NetworkBehaviour
     [Client]
     void CheckTalking()
     {
-        if( broadcastTrigger == null )
+        if (broadcastTrigger == null)
             broadcastTrigger = GetComponent<Dissonance.VoiceBroadcastTrigger>();
 
         if (broadcastTrigger == null || myDrothy == null) return;
 
-        if( broadcastTrigger.IsTransmitting )
+        if (broadcastTrigger.IsTransmitting)
         {
             myDrothy.CmdTalk();
         }

@@ -119,8 +119,8 @@ public class EventManager : NetworkBehaviour
         bool allPlayersInEffect = true;
         foreach( PlayerTest p in PlayerTest.list )
         {
-            // オブザーバーについてはスキップ ただしオブザーバーのみの時は例外
-            if (p.IsObserver && PlayerTest.list.Count >= 2) continue;
+            // 参加型でないオブザーバーはスキップ ただしオブザーバーのみの時は例外
+            if (p.IsObserver && p.ObserverType != RtsTestNetworkManager.ObserverType.Participatory && PlayerTest.list.Count >= 2) continue;
 
             bool inEffect = p.ItemEffectTimer > 0;
 
