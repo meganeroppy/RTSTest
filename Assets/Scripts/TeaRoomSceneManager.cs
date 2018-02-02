@@ -14,24 +14,6 @@ public class TeaRoomSceneManager : MonoBehaviour
     public static TeaRoomSceneManager instance;
 
     /// <summary>
-    /// 巨大化ケーキのプレハブ
-    /// </summary>
-    [SerializeField]
-    private GameObject largenCakePrefab;
-
-    /// <summary>
-    /// 縮小化ケーキのプレハブ
-    /// </summary>
-    [SerializeField]
-    private GameObject smallenCakePrefab;
-
-    /// <summary>
-    /// キノコのプレハブ
-    /// </summary>
-    [SerializeField]
-    private GameObject mushroomPrefab;
-
-    /// <summary>
     /// 巨大化ケーキの出現位置候補
     /// </summary>
     [SerializeField]
