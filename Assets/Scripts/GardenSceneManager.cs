@@ -83,8 +83,6 @@ public class GardenSceneManager : MonoBehaviour
             {
                 progress += Time.deltaTime * gainFogDensityRate;
 
-                Debug.Log(RenderSettings.fogEndDistance);
-
                 RenderSettings.fogEndDistance = originFogDensity - fogDiff * progress;
 
                 terrainOutside.transform.position = terrainOriginPos + Vector3.up * terrainEndPosOffset * progress;
