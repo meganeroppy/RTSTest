@@ -367,7 +367,9 @@ public class PlayerTest : NetworkBehaviour
 	[Client]
 	private void CheckInput()
 	{
-		
+        // これを呼ばないとOVRInputのメソッドが動かないらしいので呼ぶ
+        OVRInput.Update();
+
 		// アイテムをつかむ
 		// TODO: タッチでの操作は追追改善する
 		if( Input.GetKeyDown(KeyCode.H) ||

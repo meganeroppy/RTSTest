@@ -98,8 +98,11 @@ public class ObserverController : NetworkBehaviour {
 	/// </summary>
     private void CheckInput()
     {
-		// ナビゲートショット発射
-		if(
+        // これを呼ばないとOVRInputのメソッドが動かないらしいので呼ぶ
+        OVRInput.Update();
+
+        // ナビゲートショット発射
+        if (
 			Input.GetButtonDown("Fire1") || // マウス左クリック
 			OVRInput.GetDown(OVRInput.RawButton.RIndexTrigger) || // Touchの右人差し指トリガー
 			OVRInput.GetDown(OVRInput.RawButton.LIndexTrigger)  // Touchの左人差し指トリガー
