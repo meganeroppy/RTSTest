@@ -17,10 +17,13 @@ public class EventManager : NetworkBehaviour
     public static EventManager instance;
 
     [SerializeField]
-    private DrothyItem itemPrefab;
+    private DrothyItem cakePrefab;
+
+    [SerializeField]
+    private DrothyItem mushroomPrefab;
 
     /// <summary>
-    /// いらないかも
+    /// 出現しているアイテムのリスト
     /// </summary>
     public static List<DrothyItem> itemList;
 
@@ -422,6 +425,8 @@ public class EventManager : NetworkBehaviour
 
         Debug.Log(transforms.Length.ToString() + "この候補場所があるよ");
 
+        var prefab = type == ItemType.Mushroom ? mushroomPrefab : cakePrefab;
+
         // プレイヤー数を取得
         int playerNum = PlayerTest.list.Count - PlayerTest.PureObserverCount;
         Debug.Log(PlayerTest.list.Count.ToString() + " - " + PlayerTest.PureObserverCount.ToString() + " = " + playerNum.ToString());
@@ -430,7 +435,7 @@ public class EventManager : NetworkBehaviour
         // 候補の数繰り返す
 		foreach( Transform trans in transforms )
 		{	
-            var item = Instantiate(itemPrefab);
+            var item = Instantiate(prefab);
             item.transform.position = trans.position;
 
             if (itemList == null) itemList = new List<DrothyItem>();
