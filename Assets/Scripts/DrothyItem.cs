@@ -41,24 +41,35 @@ public class DrothyItem : NetworkBehaviour
 
     private AudioSource audioSource;
 
+    /// <summary>
+    /// 出現時SE
+    /// </summary>
     [SerializeField]
     private AudioClip popSound;
 
+    /// <summary>
+    /// 食べられた時のSE
+    /// </summary>
     [SerializeField]
-    private AudioClip EatenSound;
+    private AudioClip eatenSound;
 
+    /// <summary>
+    /// つかまれたときのSE
+    /// </summary>
+    [SerializeField]
+    private AudioClip heldSound;
 
     [ServerCallback]
     private void Start()
     {
-        originPosition = transform.position;        
+        originPosition = transform.position;
     }
 
     private void Update()
     {
         visual.SetActive(enable);
 
-        if( isServer )
+        if (isServer)
             UpdateTimer();
     }
 
@@ -74,7 +85,7 @@ public class DrothyItem : NetworkBehaviour
 
         respawnTimer = respawnWait;
 
-
+        RpcPlayEatenSound();
     }
 
     [Server]
@@ -83,7 +94,7 @@ public class DrothyItem : NetworkBehaviour
         if (enable) return;
 
         respawnTimer -= Time.deltaTime;
-        if( respawnTimer <= 0 )
+        if (respawnTimer <= 0)
         {
             Respawn();
         }
@@ -111,8 +122,7 @@ public class DrothyItem : NetworkBehaviour
             audioSource = GetComponent<AudioSource>();
         }
 
-        audioSource.PlayOneShot(EatenSound);
-
+        audioSource.PlayOneShot(eatenSound);
     }
 
     /// <summary>
@@ -128,4 +138,20 @@ public class DrothyItem : NetworkBehaviour
         // 生まれた時のSE
         audioSource.PlayOneShot(popSound);
     }
+
+    /// <summary>
+    /// つかまれたときのSEを再生
+    /// </summary>    
+    [ClientRpc]
+    public void RpcPlayHeldSound()
+    {
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
+
+        audioSource.PlayOneShot(heldSound);
+
+    }
 }
+

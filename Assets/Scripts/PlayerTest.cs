@@ -675,6 +675,9 @@ public class PlayerTest : NetworkBehaviour
             return;
         }
 
+        // つかんだSE再生
+        targetItem.RpcPlayHeldSound();
+
         nIdentity.AssignClientAuthority(connectionToClient);
         
         Debug.Log((hIndex == HandIndex.Right ? "右手" : "左手") + "でアイテムをつかんだ");
