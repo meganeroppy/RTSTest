@@ -135,22 +135,12 @@ public class EventManager : NetworkBehaviour
         }
     }
 
-    /// <summary>
-    /// オブザーバーのクライアントから呼ばれる用
-    /// </summary>
-    [Command]
-    public void CmdProceedSequence()
-    {
-    //   Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
-
-        ProceedSequence();
-    }
 
     /// <summary>
-    /// 自身で呼ぶ用
+    /// シーケンスを進める
     /// </summary>
 	[Server]
-    private void ProceedSequence()
+    public void ProceedSequence()
     {
 	//	Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 

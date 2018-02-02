@@ -118,10 +118,17 @@ public class ObserverController : NetworkBehaviour {
 			OVRInput.GetDown(OVRInput.RawButton.LHandTrigger)  // Touchの左中指トリガー
 		)
 		{
-			var em = EventManager.instance;
-			if(em == null ) return;
-			em.CmdProceedSequence();
+            CmdProceesSequence();
 		}
+    }
+
+    [Command]
+    private void CmdProceesSequence()
+    {
+        var em = EventManager.instance;
+        if (em == null) return;
+        em.ProceedSequence();
+
     }
 
     /// <summary>
