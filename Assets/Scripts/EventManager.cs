@@ -28,6 +28,14 @@ public class EventManager : NetworkBehaviour
     public static List<DrothyItem> itemList;
 
     /// <summary>
+    /// シーン切り替え時の
+    /// 通常->暗転
+    /// 暗転->通常
+    /// にかかる時間
+    /// </summary>
+    private float sceneChangeFadeDuration = 1f;
+
+    /// <summary>
     /// シナリオの流れ
     /// </summary>
     public enum Sequence
@@ -271,7 +279,20 @@ public class EventManager : NetworkBehaviour
 			yield break;
 		}
 
-		// TODO: 暗転演出
+        // 暗転
+        if (isServer)
+        {
+            float progress = 0;
+            while (progress < 1f)
+            {
+                var newColor = new Color(0f, 0f, 0f, progress);
+                PlayerTest.list.ForEach(p => p.RpcSetCameraMaskColor(newColor));
+
+                progress += Time.deltaTime / sceneChangeFadeDuration;
+                Debug.Log(progress);
+                yield return null;
+            }
+        }
 
 		// 必要なオブジェクトの所属シーンを引っ越し
 		{
@@ -313,13 +334,26 @@ public class EventManager : NetworkBehaviour
 			SceneManager.SetActiveScene(scene);
 		}
 
-		// TODO: 暗転解除
-	}
+        // 暗転解除
+        if (isServer)
+        {
+            float progress = 0;
+            while (progress < 1f)
+            {
+                var newColor = new Color(0f, 0f, 0f, 1f - progress);
+                PlayerTest.list.ForEach(p => p.RpcSetCameraMaskColor(newColor));
 
-	/// <summary>
-	/// 地面が崩れるイベント
-	/// </summary>
-	[Server]
+                progress += Time.deltaTime / sceneChangeFadeDuration;
+                Debug.Log(progress);
+                yield return null;
+            }
+        }
+    }
+
+    /// <summary>
+    /// 地面が崩れるイベント
+    /// </summary>
+    [Server]
 	private void ExecCollapseFloorEvent()
 	{
 		// 地面が崩れるイベント
@@ -371,6 +405,8 @@ public class EventManager : NetworkBehaviour
                 RpcPlaySmallenSound();
 
                 // ビジュアルエフェクト
+
+                // 暗転
 
                 yield return new WaitForSeconds(5);
 
