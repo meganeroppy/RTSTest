@@ -279,19 +279,17 @@ public class EventManager : NetworkBehaviour
 			yield break;
 		}
 
-        // 暗転
-        if (isServer)
+        // 暗転 実際に暗転処理をコールするのはサーバーのみ
+        float progress = 0;
+        while (progress < 1f)
         {
-            float progress = 0;
-            while (progress < 1f)
+            if (isServer)
             {
                 var newColor = new Color(0f, 0f, 0f, progress);
                 PlayerTest.list.ForEach(p => p.RpcSetCameraMaskColor(newColor));
-
-                progress += Time.deltaTime / sceneChangeFadeDuration;
-                Debug.Log(progress);
-                yield return null;
             }
+            progress += Time.deltaTime / sceneChangeFadeDuration;
+            yield return null;            
         }
 
 		// 必要なオブジェクトの所属シーンを引っ越し
@@ -334,19 +332,17 @@ public class EventManager : NetworkBehaviour
 			SceneManager.SetActiveScene(scene);
 		}
 
-        // 暗転解除
-        if (isServer)
+        // 暗転解除 実際に暗転処理をコールするのはサーバーのみ
+        progress = 0;
+        while (progress < 1f)
         {
-            float progress = 0;
-            while (progress < 1f)
+            if (isServer)
             {
                 var newColor = new Color(0f, 0f, 0f, 1f - progress);
                 PlayerTest.list.ForEach(p => p.RpcSetCameraMaskColor(newColor));
-
-                progress += Time.deltaTime / sceneChangeFadeDuration;
-                Debug.Log(progress);
-                yield return null;
             }
+            progress += Time.deltaTime / sceneChangeFadeDuration;
+            yield return null;
         }
     }
 
