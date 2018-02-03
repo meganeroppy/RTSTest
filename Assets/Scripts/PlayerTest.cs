@@ -120,12 +120,6 @@ public class PlayerTest : NetworkBehaviour
     private MeshRenderer mask;
 
     /// <summary>
-    /// カメラマスクの不透明度
-    /// </summary>
-    [SyncVar]
-    private float cameraMaskAlpha = 0;
-
-    /// <summary>
     /// 観測者の数 ただしプレイヤー風観測者は除外する
     /// </summary>
     public static int PureObserverCount {
@@ -628,12 +622,6 @@ public class PlayerTest : NetworkBehaviour
         isObserver = value;
     }
 
-    [Client]
-    private void UpdateCameraMask()
-    {
-        mask.material.color = new Color(0, 0, 0, cameraMaskAlpha);
-    }
-
     /// <summary>
     /// 参加型フラグを設定する
     /// </summary>
@@ -842,12 +830,6 @@ public class PlayerTest : NetworkBehaviour
     /// カメラマスクの色を変更する
     /// シーン切り替え時用
     /// </summary>
-    [Server]
-    public void SetCameraMaskColor(Color color)
-    {
-        mask.material.color = color;
-    }
-
     [ClientRpc]
     public void RpcSetCameraMaskColor(Color color)
     {
