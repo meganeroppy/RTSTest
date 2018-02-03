@@ -114,6 +114,12 @@ public class PlayerTest : NetworkBehaviour
     public static List<PlayerTest> list;
 
     /// <summary>
+    /// シーン切り替えにつかうマスク
+    /// </summary>
+    [SerializeField]
+    private MeshRenderer mask;
+
+    /// <summary>
     /// 観測者の数 ただしプレイヤー風観測者は除外する
     /// </summary>
     public static int PureObserverCount {
@@ -821,5 +827,13 @@ public class PlayerTest : NetworkBehaviour
         holdPosRight.localPosition = holdPosLeft.localPosition = Vector3.up * ( on ? 1f : 0 );
     }
 
-    
+    /// <summary>
+    /// カメラマスクの色をサーバーから変更する
+    /// シーン切り替え時用
+    /// </summary>
+    [ClientRpc]
+    public void RpcSetCameraMaskColor(Color color)
+    {
+        mask.material.color = color;
+    }
 }
