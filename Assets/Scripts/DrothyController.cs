@@ -82,55 +82,80 @@ public class DrothyController : NetworkBehaviour
 	// Update is called once per frame
 	void Update () 
 	{
-		var vDiff = (prevPosition - modelRoot.localPosition);
-//		Debug.Log( vDiff );
-
-		var diff = vDiff.magnitude;
-
-//			Debug.Log( diff.ToString() );
-
-		walking = diff >= threasholdMoveSpeed;
-
-		if( walking != anim.GetBool("Walking") )
+		// 一定の速度以上で移動していたら歩きアニメにする
 		{
-			anim.SetBool("Walking", walking);
-		}
-		
-		prevPosition = modelRoot.localPosition;
+			var vDiff = (prevPosition - modelRoot.localPosition);
+	//		Debug.Log( vDiff );
 
-		if( falling )
-		{			
-			if( enableLoop && Mathf.Abs( transform.position.y ) > loopThresholdHeight )
+			var diff = vDiff.magnitude;
+	//		Debug.Log( diff.ToString() );
+
+			walking = diff >= threasholdMoveSpeed;
+
+			if( walking != anim.GetBool("Walking") )
 			{
-				transform.position = new Vector3( transform.position.x, originHeight, transform.position.z);
+				anim.SetBool("Walking", walking);
+			}
+			
+			prevPosition = modelRoot.localPosition;
+		}
+
+		// 落下している感じを出そうと頑張っているけど未だできていない
+		{
+			if( falling )
+			{			
+				if( enableLoop && Mathf.Abs( transform.position.y ) > loopThresholdHeight )
+				{
+					transform.position = new Vector3( transform.position.x, originHeight, transform.position.z);
+				}
+
+				var speedDif = fallingSpeedMax - fallingSpeedMin;
+				if( speedDif == 0 ) speedDif = 1;
+
+				var speed = fallingSpeedMin + Mathf.PingPong(Time.time * interval, speedDif);
+				transform.position += Vector3.down * speed * Time.deltaTime;
+	        }
+		}
+
+		// 位置と回転の更新
+		{
+			// サーバー側のみオーナーの位置を参照してメンバ変数ownerPosition、ownerRotationに代入する
+			if( isServer )
+			{
+	        	UpdateOwnerPositionAndRotation();
 			}
 
-			var speedDif = fallingSpeedMax - fallingSpeedMin;
-			if( speedDif == 0 ) speedDif = 1;
+			// サーバーとクライアント双方で位置を更新 ownerPositionとownerRotationはSyncVarなのでサーバーの値がクライアントにも同期される
+	        transform.SetPositionAndRotation(ownerPosition, ownerRotation);
+		}
 
-			var speed = fallingSpeedMin + Mathf.PingPong(Time.time * interval, speedDif);
-			transform.position += Vector3.down * speed * Time.deltaTime;
-        }
-
-        UpdateOwnerPositionAndRotation();
-
-        transform.SetPositionAndRotation(ownerPosition, ownerRotation);
-
+		// ドレスの色変更 サーバーとクライアント両方
 		SetDressColor();
 
-        UpdateDeleteFlag();
+		// 削除フラグ関連
+		{
+			// サーバー側でフラグの更新を行う
+			if( isServer )
+			{
+	        	UpdateDeleteFlag();
+			}
 
-        if (deleteFlag)
-        {
-            Destroy(gameObject);
-        }
+			// フラグによる処理をサーバーとクライアント両方で行う
+	        if (deleteFlag)
+	        {
+	            Destroy(gameObject);
+	        }
+		}
 
-        // まばたき
-        UpdateBlinking();
+		// まばたきと口パク
+		{
+	        // まばたき
+	        UpdateBlinking();
 
-        // 口ぱく
-        UpdateTalk();
-    }
+	        // 口ぱく
+	        UpdateTalk();
+	    }
+	}
 
     /// <summary>
     /// サーバーのみ
