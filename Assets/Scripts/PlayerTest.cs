@@ -325,7 +325,8 @@ public class PlayerTest : NetworkBehaviour
 
 		if( isClient )
 		{
-			if( myDrothy == null )
+			// 自身のドロシーがnull かつ 非参加型ナビゲータでないときに実行
+			if( myDrothy == null && ( !IsObserver || ( IsObserver && ObserverType == RtsTestNetworkManager.ObserverType.Participatory ) ) )
 			{
 				Debug.Log( netId.ToString() + "のドロシーがnull参照なのでフラグを立てた" );
 
