@@ -156,9 +156,7 @@ public class PlayerTest : NetworkBehaviour
         Right,
         Left,
     }
-
-
-
+		
     /// <summary>
     /// つかんでいるアイテムと頭との距離がこの値以下になったら食べる
     /// </summary>
@@ -491,25 +489,10 @@ public class PlayerTest : NetworkBehaviour
 					animLeftHand.SetTrigger(animName);
 				}
 			}
-
 		}
-
 
         // アイテムを食べる
         {
-            /*    
-                if (Input.GetKeyDown(KeyCode.Y) ||
-                    OVRInput.GetDown(OVRInput.RawButton.RHandTrigger) // 右中指トリガー
-                )
-                {
-                    CmdEatItem(HandIndex.Right);
-                }
-                if (Input.GetKeyDown(KeyCode.U) || OVRInput.GetDown(OVRInput.RawButton.LHandTrigger))// 左中指トリガー
-                {
-                    CmdEatItem(HandIndex.Left);
-                }
-                */
-
             // コントローラ操作による食事操作シミュレート
             if (RtsTestNetworkManager.instance.MyInputMode == RtsTestNetworkManager.InputMode.ForceByKeyboard)
             {
@@ -522,13 +505,12 @@ public class PlayerTest : NetworkBehaviour
                     SimulateEatWithTouch(false);
                 }
             }
-
         }
 
         // 観測者になる
 
         // 現状いらなそう 必要になったら実装する
-        if (Input.GetKeyDown(KeyCode.O) ||
+		if (Input.GetKeyDown(KeyCode.N) ||
             OVRInput.GetDown(OVRInput.RawButton.RThumbstick) // 右スティック押し込み
         )
         {
@@ -551,7 +533,7 @@ public class PlayerTest : NetworkBehaviour
     [Server]
     private void UpdateHoldItem()
     {
-        // アイテムの位置を該当する手の位置に更新
+        // アイテムの位置を該当する手の位置と回転に更新
         if (holdItemRight != null)
         {
 //            Debug.LogWarning("右手位置に更新");
