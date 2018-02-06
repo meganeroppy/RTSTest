@@ -173,6 +173,7 @@ public class EventManager : NetworkBehaviour
 			StopCoroutine( waitAndExecCoroutine );
 			waitAndExecCoroutine = null;
 		}
+		StopAllCoroutines();
 
 		ProceedSequence();
 	}
