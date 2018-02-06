@@ -62,12 +62,6 @@ public class PlayerTest : NetworkBehaviour
     private Transform holdPosLeft;
 
     /// <summary>
-    /// 現在のドロシーのスケール
-    /// </summary>
-    [SyncVar]
-    private float drothyScale = 1f;
-
-    /// <summary>
     /// （仮）プリセットのプレイヤーカラー
     /// </summary>
     Color[] playerColor = new Color[] { Color.gray, Color.red, Color.green, Color.blue, Color.yellow };
@@ -256,6 +250,7 @@ public class PlayerTest : NetworkBehaviour
                 }
             }
 
+			// トラッキングによる制御の有効性を設定する
             if (RtsTestNetworkManager.instance.MyObserverType == RtsTestNetworkManager.ObserverType.Participatory)
             {
                 // 参加型の時は有効にする ただし強制キーボード操作の時は無効にする
@@ -314,16 +309,7 @@ public class PlayerTest : NetworkBehaviour
         {
             UpdateHoldItem();
         }
-
-        if (isClient)
-        {
-            // サーバーの値が同期されるdrothyScaleの値でドロシーのスケールを更新
-            if (myDrothy != null)
-            {
-                myDrothy.transform.localScale = Vector3.one * drothyScale;
-            }
-        }
-
+			
         // アイテム効果タイマーの更新
         if (isServer)
         {
