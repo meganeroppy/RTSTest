@@ -101,6 +101,20 @@ public class EventManager : NetworkBehaviour
     [SerializeField]
     private AudioClip itemEffectToLarge;
 
+	/// <summary>
+	/// 公園シーンでの地面崩壊イベント開始から次シーンに遷移するまでの秒数
+	/// </summary>
+	private float collapseFloorEventWait = 17f;
+
+	/// <summary>
+	/// 落下シーンで次シーンに遷移するまでの秒数
+	/// </summary>
+	private float fallingEventWait = 20f;
+
+	/// <summary>
+	/// ティールーム系シーンでアイテムが出現するまでの秒数
+	/// </summary>
+	private float itemPopEventWait = 10f;
 
     private void Awake()
     {
@@ -146,12 +160,28 @@ public class EventManager : NetworkBehaviour
         }
     }
 
+	/// <summary>
+	/// 強制的にシーケンスを進める
+	/// ナビゲータが強制的に進行させたい時に使う
+	/// </summary>
+	[Server]
+	public void ForceProceedSequence()
+	{
+		// コルーチンが動いていたら停止
+		if( waitAndExecCoroutine != null )
+		{
+			StopCoroutine( waitAndExecCoroutine );
+			waitAndExecCoroutine = null;
+		}
+
+		ProceedSequence();
+	}
 
     /// <summary>
     /// シーケンスを進める
     /// </summary>
 	[Server]
-    public void ProceedSequence()
+	private void ProceedSequence()
     {
 	//	Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
@@ -229,6 +259,21 @@ public class EventManager : NetworkBehaviour
 			var newSceneName = currentSequence.ToString();
 
 			GotoNewScene( newSceneName );
+
+			// 特定のシーケンスに遷移する時は時間経過によりさらに次のシーケンスに進める
+			switch( currentSequence )
+			{
+			case Sequence.Falling:
+				WaitAndProceedSequence( fallingEventWait );
+				break;
+			case Sequence.TeaRoom:
+			case Sequence.TeaRoomLarge:
+			case Sequence.TeaRoomSmall:
+				WaitAndProceedSequence( itemPopEventWait );
+				break;
+			default:
+				break;
+			}
         }
     }
 
@@ -259,7 +304,7 @@ public class EventManager : NetworkBehaviour
 		// ホストの場合は多重に呼ばれてしまうためなにもしない
 		if( isServer && isClient )
 		{
-			return;			
+			return;
 		}
 
 		StartCoroutine( ExecGotoNewScene( newSceneName ) );
@@ -358,6 +403,8 @@ public class EventManager : NetworkBehaviour
 
 		manager.PlayEvent();
 
+		WaitAndProceedSequence(collapseFloorEventWait);
+
 		// クライアントでも同様のイベントを発生させる
 		RpcExecCollapseFloorEvent();
 	}
@@ -380,6 +427,31 @@ public class EventManager : NetworkBehaviour
 		if (manager == null) return;
 
 		manager.PlayEvent();
+
+		WaitAndProceedSequence(collapseFloorEventWait);
+	}
+
+	/// <summary>
+	/// 待機してから進めるコルーチン
+	/// </summary>
+	IEnumerator waitAndExecCoroutine = null;
+
+	private void WaitAndProceedSequence( float wait )
+	{
+		waitAndExecCoroutine = WaitForNextSequence(wait);
+		StartCoroutine( waitAndExecCoroutine );
+	}
+
+	/// <summary>
+	/// 次のシーケンスまで待機してコルーチンを削除
+	/// </summary>
+	private IEnumerator WaitForNextSequence(float wait)
+	{
+		yield return new WaitForSeconds(wait);
+
+		ProceedSequence();
+
+		waitAndExecCoroutine = null;
 	}
 
     /// <summary>

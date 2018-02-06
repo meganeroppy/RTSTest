@@ -184,7 +184,7 @@ public class ObserverController : NetworkBehaviour {
     {
         var em = EventManager.instance;
         if (em == null) return;
-        em.ProceedSequence();
+		em.ForceProceedSequence();
     }
 
 	/// <summary>
