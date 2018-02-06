@@ -10,7 +10,7 @@ using UnityEngine.Networking;
 public class DrothyItem : NetworkBehaviour
 {
     [SyncVar]
-    private bool enable = true;
+    private bool eatable = true;
 
     /// <summary>
     /// 見た目
@@ -21,7 +21,7 @@ public class DrothyItem : NetworkBehaviour
     /// <summary>
     /// 再出現タイマー
     /// </summary>
-    private float respawnTimer = 0;
+    private float resetTimer = 0;
 
     /// <summary>
     /// 再出現までの時間
@@ -34,6 +34,11 @@ public class DrothyItem : NetworkBehaviour
     /// 食べられてから一定時間たつとここに再配置される
     /// </summary>
     private Vector3 originPosition;
+
+	/// <summary>
+	/// 最初に生まれた時の回転
+	/// </summary>
+	private Quaternion originRotation;
 
     [SerializeField]
     private float effectTime = 2f;
@@ -66,21 +71,29 @@ public class DrothyItem : NetworkBehaviour
     private bool holdable = true;
     public bool Holdable { get { return holdable; } }
 
+	/// <summary>
+	/// 一度掴まれてから離されたか？
+	/// 再出減したらfalseになる
+	/// </summary>
+	private bool released = false;
+
     [ServerCallback]
     private void Start()
     {
         originPosition = transform.position;
+		originRotation = transform.rotation;
 
         // SE再生
         RpcPlaySpawnSound();
 
         holdable = true;
+		released = false;
     }
 
     private void Update()
     {
         // ビジュアルの有効をセット enableはSyncVar
-        visual.SetActive(enable);
+        visual.SetActive(eatable);
 
         // サーバー側のみタイマーを更新する
         if (isServer)
@@ -89,13 +102,23 @@ public class DrothyItem : NetworkBehaviour
 
     /// <summary>
     /// つかまれる
+	/// falseの時は離される
     /// </summary>
     [Server]
-    public void SetHeld()
+	public void SetHeld( bool val )
     {
-        holdable = false;
+        holdable = !val;
+		released = !val;
 
-        RpcPlayHeldSound();
+		if( val )
+		{
+        	RpcPlayHeldSound();
+		}
+		else
+		{
+			// 一度つかんでからはなしたアイテムは一定時間で初期位置にセット
+			resetTimer = respawnWait;
+		}
     }
 
     /// <summary>
@@ -106,9 +129,9 @@ public class DrothyItem : NetworkBehaviour
     {
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
-        enable = false;
+		eatable = false;
 
-        respawnTimer = respawnWait;
+        resetTimer = respawnWait;
 
         RpcPlayEatenSound();
     }
@@ -116,25 +139,27 @@ public class DrothyItem : NetworkBehaviour
     [Server]
     private void UpdateTimer()
     {
-        if (enable) return;
+		if (eatable && !released) return;
 
-        respawnTimer -= Time.deltaTime;
-        if (respawnTimer <= 0)
+		resetTimer -= Time.deltaTime;
+        if (resetTimer <= 0)
         {
-            Respawn();
+            Reset();
         }
     }
 
     /// <summary>
-    /// 再出現
+	/// 初期位置にセット
     /// </summary>
     [Server]
-    private void Respawn()
+    private void Reset()
     {
         transform.position = originPosition;
+		transform.rotation = originRotation;
 
-        enable = true;
+        eatable = true;
         holdable = true;
+		released = false;
 
         // SE再生
         RpcPlaySpawnSound();
@@ -188,4 +213,3 @@ public class DrothyItem : NetworkBehaviour
         audioSource.PlayOneShot(heldSound);
     }
 }
-

@@ -445,15 +445,16 @@ public class PlayerTest : NetworkBehaviour
 				if ( (grabRight && !grabbingRight) )
 				{
 					grabbingRight = true;
-					Debug.Log ("右手でつかむ");
+					Debug.Log ("右手をにぎる");
 					CmdSetHoldItem (HandIndex.Right);
 				}  
 				else if (!grabRight) 
 				{
 					grabbingRight = false;
+					Debug.Log ("右手をひらく");
 
 					// アイテムをつかんでいたら離す
-
+					CmdReleaseHoldItem(HandIndex.Right);
 				}
 
 				// アニメーション更新
@@ -471,15 +472,16 @@ public class PlayerTest : NetworkBehaviour
 				if ( (grabLeft && !grabbingLeft) )
 				{
 					grabbingLeft = true;
-					Debug.Log ("左手でつかむ");
+					Debug.Log ("左手をにぎる");
 					CmdSetHoldItem (HandIndex.Left);
 				}
 				else if (!grabLeft)
 				{				
 					grabbingLeft = false;
-				
-					// アイテムをつかんでいたら離す
+					Debug.Log ("左手をひらく");
 
+					// アイテムをつかんでいたら離す
+					CmdReleaseHoldItem(HandIndex.Left);
 				}
 
 				// アニメーション更新
@@ -784,10 +786,38 @@ public class PlayerTest : NetworkBehaviour
         //        nIdentity.AssignClientAuthority(connectionToClient);
 
         // つかむ
-        targetItem.SetHeld();
+		targetItem.SetHeld(true);
 
         Debug.Log((hIndex == HandIndex.Right ? "右手" : "左手") + "でアイテムをつかんだ");
     }
+
+	/// <summary>
+	/// アイテムを持っていたら離す
+	/// </summary>
+	[Command]
+	private void CmdReleaseHoldItem( HandIndex hIndex )
+	{
+		Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
+
+		if( (hIndex == HandIndex.Right && holdItemRight == null) || (hIndex == HandIndex.Left && holdItemLeft == null) )
+		{
+			Debug.Log((hIndex == HandIndex.Right ? "右手" : "左手") + "にはアイテムを持っていない");
+			return;
+		}
+
+		if( hIndex == HandIndex.Right )
+		{
+			Debug.Log("右手のアイテムを離した");
+			holdItemRight.SetHeld(false);
+			holdItemRight = null;
+		}
+		else
+		{
+			Debug.Log("左手のアイテムを離した");
+			holdItemLeft.SetHeld(false);
+			holdItemLeft = null;
+		}
+	}
 
     /// <summary>
     /// アイテムを消費する
