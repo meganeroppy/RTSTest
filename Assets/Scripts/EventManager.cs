@@ -25,7 +25,8 @@ public class EventManager : NetworkBehaviour
     /// <summary>
     /// 出現しているアイテムのリスト
     /// </summary>
-    public static List<DrothyItem> itemList;
+	private List<DrothyItem> itemList;
+	public List<DrothyItem> ItemList { get { return itemList; } }
 
     /// <summary>
     /// シーン切り替え時の
@@ -530,6 +531,14 @@ public class EventManager : NetworkBehaviour
 	[Server]
     private void CreateItems( ItemType type )
     {
+		Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
+
+		// すでに配置されたアイテムがあればリストを削除
+		RemoveItems();
+
+		// リストを新しく作る
+		itemList = new List<DrothyItem>();
+
         if (TeaRoomSceneManager.instance == null) 
 		{
 			Debug.LogError("TeaRoomSceneManager.instanceがない");
@@ -557,8 +566,6 @@ public class EventManager : NetworkBehaviour
             var item = Instantiate(prefab);
             item.transform.position = trans.position;
 
-            if (itemList == null) itemList = new List<DrothyItem>();
-
             itemList.Add(item);
 
             NetworkServer.Spawn(item.gameObject);
@@ -573,23 +580,30 @@ public class EventManager : NetworkBehaviour
             {
                 Debug.Log(setCount.ToString() + "こ作った まだつくる");
             }
-
         }
 
+		Debug.Log( "アイテムの数 -> " + itemList.Count.ToString() );
     }
 
     /// <summary>
     /// 配置済みアイテムを削除
     /// </summary>
-    [Command]
-    private void CmdRemoveItems()
+	[Server]
+    private void RemoveItems()
     {
-        for( int i = itemList.Count-1; i <= 0; --i )
+		if( itemList == null ) return;
+
+        for( int i = itemList.Count-1; i >= 0; --i )
         {
             var item = itemList[i];
             itemList.RemoveAt(i);
-            NetworkServer.Destroy(item.gameObject);
+			if( item != null )
+			{
+            	NetworkServer.Destroy(item.gameObject);
+			}
         }
+
+		itemList = null;
     }
 
     /// <summary>

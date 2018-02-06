@@ -81,7 +81,7 @@ public class PlayerTest : NetworkBehaviour
     /// <summary>
     /// つかめる距離にあるアイテム
     /// </summary>
-    private DrothyItem holdTarget = null;
+    //private DrothyItem holdTarget = null;
 
     /// <summary>
     /// 右手でつかんでいるアイテム
@@ -161,7 +161,13 @@ public class PlayerTest : NetworkBehaviour
     /// つかんでいるアイテムと頭との距離がこの値以下になったら食べる
     /// </summary>
     [SerializeField]
-    private float eatThreshold = 0.1f;
+	private float eatRange = 0.3f;
+
+	/// <summary>
+	/// 置かれているアイテムと手の距離がこれ以下ならつかみ操作で掴める
+	/// </summary>
+	[SerializeField]
+	private float holdRange = 0.8f;
 
 	/// <summary>
 	/// 右手のアニメータ
@@ -359,10 +365,10 @@ public class PlayerTest : NetworkBehaviour
 
         // つかみ候補アイテムから一定距離はなれたら候補から外す
         // サーバーのみ
-        if (isServer && holdTarget && Vector3.Distance(transform.position, holdTarget.transform.position) > 5f)
-        {
-            holdTarget = null;
-        }
+   //     if (isServer && holdTarget && Vector3.Distance(transform.position, holdTarget.transform.position) > 5f)
+   //     {
+   //         holdTarget = null;
+    //    }
     }
 
     /// <summary>
@@ -541,7 +547,7 @@ public class PlayerTest : NetworkBehaviour
 			holdItemRight.transform.rotation = holdPosRight.rotation;
 
             // 頭との距離が閾値以下になったらアイテムを食べる
-            if( Vector3.Distance( holdItemRight.transform.position, headObject.transform.position) < eatThreshold )
+            if( Vector3.Distance( holdItemRight.transform.position, headObject.transform.position) < eatRange )
             {
                 EatItem( HandIndex.Right );
             }
@@ -554,7 +560,7 @@ public class PlayerTest : NetworkBehaviour
 			holdItemLeft.transform.rotation = holdPosLeft.rotation;
 
 			// 頭との距離が閾値以下になったらアイテムを食べる
-            if (Vector3.Distance(holdItemLeft.transform.position, headObject.transform.position) < eatThreshold)
+            if (Vector3.Distance(holdItemLeft.transform.position, headObject.transform.position) < eatRange)
             {
                 EatItem(HandIndex.Left);
             }
@@ -680,6 +686,7 @@ public class PlayerTest : NetworkBehaviour
     /// <summary>
     /// サーバーでのみ衝突を判定する
     /// </summary>
+	/*
     [ServerCallback]
     private void OnTriggerEnter(Collider other)
     {
@@ -695,10 +702,12 @@ public class PlayerTest : NetworkBehaviour
             }
         }
     }
+	*/
 
     /// <summary>
     /// つかみ候補のアイテムのセット
     /// </summary>
+	/*
     [Server]
     private void SetHoldTarget(NetworkInstanceId id)
     {
@@ -712,6 +721,7 @@ public class PlayerTest : NetworkBehaviour
             holdTarget = item;
         }
     }
+	*/
 
     /// <summary>
     /// アイテムをつかむ
@@ -722,15 +732,49 @@ public class PlayerTest : NetworkBehaviour
     {
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
+		// 対象となる手を取得
+		var targetHand = hIndex == HandIndex.Right ? holdPosRight : holdPosLeft;
+
+		// 範囲内に掴めるアイテムがあるか調べる
+		// 複数存在した場合はもっとも近くにあるものを取得する
+		DrothyItem selectedItem = null;
+		var items = EventManager.instance.ItemList;
+		if( items == null )
+		{
+			Debug.Log("アイテムリストなし");
+			return;
+		}
+
+		float nearest = float.MaxValue;
+		for( int i=0 ; i< items.Count ; ++i )
+		{
+			float distance = Vector3.Distance( targetHand.position, items[i].transform.position );
+
+			// 掴める範囲外はコンティニュー
+			if( distance > holdRange ) 
+			{
+				Debug.Log(items[i].name + "はつかみ可能範囲外( 距離 : " + distance.ToString() + ")");
+				continue;
+			}
+
+			// 暫定最短距離以下か？
+			if( distance < nearest )
+			{
+				// 暫定最短距離を更新
+				nearest = distance;
+				selectedItem = items[i];
+			}
+		}
+
         // つかみ候補が無ければなにもしない
-        if (!holdTarget)
+		if ( selectedItem == null )
         {
             Debug.Log("つかみ候補なし");
             return;
         }
 
         // つかめる状態でない（他のプレイヤーがつかんでいるなど）ときはなにもしない
-        if( !holdTarget.Holdable )
+		if( !selectedItem.Holdable )
         {
             Debug.Log("つかめる状態でない");
             return;
@@ -743,32 +787,17 @@ public class PlayerTest : NetworkBehaviour
 			return;
         }
 
-        DrothyItem targetItem;
         if(hIndex == HandIndex.Right)
         {
-            holdItemRight = holdTarget.GetComponent<DrothyItem>();
-            targetItem = holdItemRight;
+			holdItemRight = selectedItem;
         }
         else
         {
-            holdItemLeft = holdTarget.GetComponent<DrothyItem>();
-            targetItem = holdItemLeft;
+			holdItemLeft = selectedItem;
         }
-
-        //        holdTarget = null;
-
-        // つかんでいるプレイヤーに権限を与える
-        // TODO: 不要または問題を起こしている可能性がある
-        //        var nIdentity = targetItem.GetComponent<NetworkIdentity>();
-        //        if (nIdentity == null)
-        //        {
-        //            Debug.Log("NetworkIdentityなし");
-        //            return;
-        //        }
-        //        nIdentity.AssignClientAuthority(connectionToClient);
-
+			
         // つかむ
-		targetItem.SetHeld(true);
+		selectedItem.SetHeld(true);
 
         Debug.Log((hIndex == HandIndex.Right ? "右手" : "左手") + "でアイテムをつかんだ");
     }
