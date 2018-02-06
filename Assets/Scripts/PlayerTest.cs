@@ -410,28 +410,50 @@ public class PlayerTest : NetworkBehaviour
         trackedObjects.SetEnable(enableTracking);
     }
 
-    [Client]
-    private void CheckInput()
-    {
-        // これを呼ばないとOVRInputのメソッドが動かないらしいので呼ぶ
-        OVRInput.Update();
+	bool grabbingRight = false;
+	bool grabbingLeft = false;
 
-        // アイテムをつかむ
-        {
-            // TODO: タッチでの操作は追追改善する
-            if (Input.GetKeyDown(KeyCode.H) ||
-                OVRInput.GetDown(OVRInput.RawButton.RIndexTrigger)// 右人差し指トリガー
-            )
-            {
-                CmdSetHoldItem(HandIndex.Right);
-            }
+	[Client]
+	private void CheckInput()
+	{
+		// これを呼ばないとOVRInputのメソッドが動かないらしいので呼ぶ
+		OVRInput.Update();
 
-            if (Input.GetKeyDown(KeyCode.J) || OVRInput.GetDown(OVRInput.RawButton.LIndexTrigger) // 左人差し指トリガー
-            )
-            {
-                CmdSetHoldItem(HandIndex.Left);
-            }
-        }
+		var grabRight = OVRInput.Get (OVRInput.RawAxis1D.RIndexTrigger) > 0;
+		var grabLeft = OVRInput.Get (OVRInput.RawAxis1D.LIndexTrigger) > 0;
+
+		// アイテムをつかむ
+		{
+			// TODO: タッチでの操作は追追改善する
+			if (Input.GetKeyDown (KeyCode.H) ||
+				OVRInput.GetDown (OVRInput.RawButton.RIndexTrigger) || // 右人差し指トリガー
+				(grabRight && !grabbingRight)
+			)
+			{
+				grabbingRight = true;
+				Debug.Log ("右手でつかむ");
+				CmdSetHoldItem (HandIndex.Right);
+			}  
+			else if (!grabRight) 
+			{
+				grabbingRight = false;
+			}
+
+			if (Input.GetKeyDown (KeyCode.J) ||
+				OVRInput.GetDown (OVRInput.RawButton.LIndexTrigger) || // 左人差し指トリガー
+				(grabLeft && !grabbingLeft)
+			)
+			{
+				grabbingLeft = true;
+				Debug.Log ("左手でつかむ");
+				CmdSetHoldItem (HandIndex.Left);
+			}
+			else if (!grabLeft)
+			{
+				grabbingLeft = false;
+			}
+		}
+
 
         // アイテムを食べる
         {
