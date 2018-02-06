@@ -198,9 +198,6 @@ public class PlayerTest : NetworkBehaviour
             // カメラ無効（一緒にオーディオリスナーも無効になる）
             var camera = GetComponentInChildren<Camera>();
             if (camera.gameObject) camera.gameObject.SetActive(false);
-
-            // 非参加型ナビゲータのときにいもむしビジュアルを有効にする
-			headObject.SetActive(isObserver && observerType == RtsTestNetworkManager.ObserverType.Default);
         }
 
         // ラベルの設定
@@ -381,9 +378,8 @@ public class PlayerTest : NetworkBehaviour
 
         observerController.enabled = isObserver;
 
-        // 観測者かつ自身ではないときにビジュアル（いもむし）を有効にする
-        // TODO: 参加型観測者の見た目をいもむしで無くす場合は要処理変更
-        headObject.SetActive(isObserver && !isLocalPlayer);
+		// 非参加型ナビゲータかつ自身でないときにいもむしビジュアルを有効にする
+		headObject.SetActive(isObserver && observerType == RtsTestNetworkManager.ObserverType.Default && !isLocalPlayer);
 
         // トラッキングによる移動の有効を設定 結構難解なので間違いがないか再三確認する
         bool enableTracking;
