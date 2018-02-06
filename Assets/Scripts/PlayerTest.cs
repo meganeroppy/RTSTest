@@ -516,6 +516,7 @@ public class PlayerTest : NetworkBehaviour
         {
 //            Debug.LogWarning("右手位置に更新");
             holdItemRight.transform.position = holdPosRight.position;
+			holdItemRight.transform.rotation = holdPosRight.rotation;
 
             // 頭との距離が閾値以下になったらアイテムを食べる
             if( Vector3.Distance( holdItemRight.transform.position, headObject.transform.position) < eatThreshold )
@@ -527,8 +528,10 @@ public class PlayerTest : NetworkBehaviour
         if (holdItemLeft != null)
         {
 //            Debug.LogWarning("左手位置に更新");
-            holdItemLeft.transform.position = holdPosLeft.position;
-            // 頭との距離が閾値以下になったらアイテムを食べる
+			holdItemLeft.transform.position = holdPosLeft.position;
+			holdItemLeft.transform.rotation = holdPosLeft.rotation;
+
+			// 頭との距離が閾値以下になったらアイテムを食べる
             if (Vector3.Distance(holdItemLeft.transform.position, headObject.transform.position) < eatThreshold)
             {
                 EatItem(HandIndex.Left);
