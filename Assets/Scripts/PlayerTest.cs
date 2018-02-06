@@ -79,11 +79,6 @@ public class PlayerTest : NetworkBehaviour
     private Text playerLabel;
 
     /// <summary>
-    /// つかめる距離にあるアイテム
-    /// </summary>
-    //private DrothyItem holdTarget = null;
-
-    /// <summary>
     /// 右手でつかんでいるアイテム
     /// </summary>
     private DrothyItem holdItemRight = null;
@@ -362,13 +357,6 @@ public class PlayerTest : NetworkBehaviour
         CheckInput();
 
         CheckTalking();
-
-        // つかみ候補アイテムから一定距離はなれたら候補から外す
-        // サーバーのみ
-   //     if (isServer && holdTarget && Vector3.Distance(transform.position, holdTarget.transform.position) > 5f)
-   //     {
-   //         holdTarget = null;
-    //    }
     }
 
     /// <summary>
@@ -682,46 +670,6 @@ public class PlayerTest : NetworkBehaviour
     {
         observerType = value;
     }
-
-    /// <summary>
-    /// サーバーでのみ衝突を判定する
-    /// </summary>
-	/*
-    [ServerCallback]
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.tag.Equals("Item"))
-        {
-            Debug.Log(System.Reflection.MethodBase.GetCurrentMethod() + other.name);
-
-            var item = other.GetComponent<DrothyItem>();
-            if (item != null)
-            {
-                holdTarget = item;
-                SetHoldTarget(item.netId);
-            }
-        }
-    }
-	*/
-
-    /// <summary>
-    /// つかみ候補のアイテムのセット
-    /// </summary>
-	/*
-    [Server]
-    private void SetHoldTarget(NetworkInstanceId id)
-    {
-        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
-
-        var obj = NetworkServer.FindLocalObject(id);
-        if (!obj) return;
-        var item = obj.GetComponent<DrothyItem>();
-        if (item != null)
-        {
-            holdTarget = item;
-        }
-    }
-	*/
 
     /// <summary>
     /// アイテムをつかむ
