@@ -176,6 +176,12 @@ public class PlayerTest : NetworkBehaviour
 	[SerializeField]
 	private Animator animLeftHand;
 
+	/// <summary>
+	/// ドロシーのNetId
+	/// </summary>
+	[SyncVar]
+	private NetworkInstanceId drothyNetId = NetworkInstanceId.Invalid;
+
     private void Awake()
     {
         trackedObjects = GetComponent<TrackedObjects>();
@@ -323,6 +329,14 @@ public class PlayerTest : NetworkBehaviour
         {
             UpdateItemEffectTimer();
         }
+
+		if( isClient )
+		{
+			if( myDrothy == null )
+			{
+				CmdRequestDrothyReference();
+			}
+		}
 
         /////////////////////////////////////////
         // ■ここから↓はローカルプレイヤーのみ■
@@ -596,6 +610,8 @@ public class PlayerTest : NetworkBehaviour
         NetworkServer.SpawnWithClientAuthority(myDrothy.gameObject, gameObject);
 
         RpcPassDrothyReference(myDrothy.netId);
+
+		drothyNetId = myDrothy.netId;
     }
 
     /// <summary>
@@ -652,6 +668,17 @@ public class PlayerTest : NetworkBehaviour
         }
         drothyObj.SetActive(drothyVisible);
     }
+
+	/// <summary>
+	/// ドロシーの参照を要求する
+	/// </summary>
+	[Command]
+	private void CmdRequestDrothyReference()
+	{
+		if( drothyNetId == NetworkInstanceId.Invalid ) return;
+
+		RpcPassDrothyReference( drothyNetId );
+	}
 
     /// <summary>
     /// 観測者フラグを設定する
