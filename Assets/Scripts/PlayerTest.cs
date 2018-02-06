@@ -199,14 +199,15 @@ public class PlayerTest : NetworkBehaviour
             Debug.Log("AddPlayer : プレイヤー数 -> " + list.Count.ToString());
         }
 
+		// ローカルプレイヤーでないとき
         if (!isLocalPlayer)
         {
             // カメラ無効（一緒にオーディオリスナーも無効になる）
             var camera = GetComponentInChildren<Camera>();
             if (camera.gameObject) camera.gameObject.SetActive(false);
 
-            // 観測者かつ自身ではないときにビジュアルを有効にする
-            headObject.SetActive(isObserver && !isLocalPlayer);
+            // 非参加型ナビゲータのときにいもむしビジュアルを有効にする
+			headObject.SetActive(isObserver && observerType == RtsTestNetworkManager.ObserverType.Default);
         }
 
         // ラベルの設定
