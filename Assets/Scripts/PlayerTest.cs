@@ -498,11 +498,11 @@ public class PlayerTest : NetworkBehaviour
             {
                 if (Input.GetKey(KeyCode.Y) || Input.GetKey(KeyCode.U))
                 {
-                    SimulateEatWithTouch(true);
+                    CmdSimulateEatWithTouch(true);
                 }               
                 else
                 {
-                    SimulateEatWithTouch(false);
+                    CmdSimulateEatWithTouch(false);
                 }
             }
         }
@@ -892,10 +892,10 @@ public class PlayerTest : NetworkBehaviour
 
     /// <summary>
     /// キーボード操作でTouchでアイテムを食べる操作を再現
-    /// 両手は( 0, 0, 0 ) 頭は( 0, 1, 0 )の位置なので徐々に両手の位置を上げる
+    /// 両手は( 0, 0, 0 ) 頭は( 0, 1, 0 )の位置なので両手の位置を上げる
     /// </summary>
-    [Client]
-    private void SimulateEatWithTouch( bool on )
+	[Command]
+    private void CmdSimulateEatWithTouch( bool on )
     {
         holdPosRight.localPosition = holdPosLeft.localPosition = Vector3.up * ( on ? 1f : 0 );
     }
