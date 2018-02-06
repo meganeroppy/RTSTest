@@ -606,6 +606,7 @@ public class PlayerTest : NetworkBehaviour
 
         RpcPassDrothyReference(myDrothy.netId);
 
+		// ドロシーのNetIdをサーバー側で保持する
 		drothyNetId = myDrothy.netId;
     }
 
@@ -645,24 +646,24 @@ public class PlayerTest : NetworkBehaviour
             // 管理者の時
             if (isLocalPlayer)
             {
-                // ローカルの時は表示しない
+				// ローカルの時(自分のとき)は表示しない
                 drothyVisible = false;
             }
             else
             {
-                // リモートかつ参加型の時は表示し、そうでなければ表示しない 
-                // 表示しない場合はいもむしが表示される
+                // リモートかつ参加型の時は表示する、そうでなければ表示しない 
                 drothyVisible = RtsTestNetworkManager.instance.MyObserverType == RtsTestNetworkManager.ObserverType.Participatory;
             }
         }
         else
         {
             // プレイヤーの時
+
             // ローカルでなければ表示する
             drothyVisible = !isLocalPlayer;
         }
-        drothyObj.SetActive(drothyVisible);
 
+        drothyObj.SetActive(drothyVisible);
     }
 
 	/// <summary>
