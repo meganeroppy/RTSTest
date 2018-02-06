@@ -604,6 +604,11 @@ public class PlayerTest : NetworkBehaviour
 		Debug.Log(System.Reflection.MethodBase.GetCurrentMethod() + "NetId = " + netId);
 
         var drothyObj = ClientScene.FindLocalObject(netId);
+		if( !drothyObj )
+		{
+			Debug.Log("ドロシーなし");
+			return;
+		}
 
         myDrothy = drothyObj.GetComponent<DrothyController>();
 
