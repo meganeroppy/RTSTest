@@ -716,9 +716,9 @@ public class PlayerTest : NetworkBehaviour
         if ( ( hIndex == HandIndex.Right && holdItemRight != null ) || (hIndex == HandIndex.Left && holdItemLeft != null))
         {
             Debug.Log((hIndex == HandIndex.Right ? "右手" : "左手") + "はすでにアイテムをつかんでいる");
+			return;
         }
 
-    
         DrothyItem targetItem;
         if(hIndex == HandIndex.Right)
         {
