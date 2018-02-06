@@ -168,12 +168,22 @@ public class EventManager : NetworkBehaviour
 	public void ForceProceedSequence()
 	{
 		// コルーチンが動いていたら停止
-		if( waitAndExecCoroutine != null )
+
+		// ここはなくても一緒かも？
 		{
-			StopCoroutine( waitAndExecCoroutine );
-			waitAndExecCoroutine = null;
+			if( waitAndExecCoroutine != null )
+			{
+				StopCoroutine( waitAndExecCoroutine );
+				waitAndExecCoroutine = null;
+			}
 		}
 		StopAllCoroutines();
+
+		// イベント効果音の再生を停止
+		RpcStopSound();
+
+		// 演出を中断するので演出中フラグを下げる
+		inExpression = false;
 
 		ProceedSequence();
 	}
@@ -497,11 +507,15 @@ public class EventManager : NetworkBehaviour
             else if (currentSequence == Sequence.Ending_Event)
             {
 
-                // 効果音
+				// 効果音
+				// TODO: もっとエンディングっぽい音にする
+				RpcPlaySmallenSound();
 
                 // ビジュアルエフェクト
 
                 yield return new WaitForSeconds(5);
+
+				RpcStopSound();
             }
 
         }
