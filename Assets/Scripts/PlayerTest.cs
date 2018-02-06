@@ -448,7 +448,7 @@ public class PlayerTest : NetworkBehaviour
 					Debug.Log ("右手をにぎる");
 					CmdSetHoldItem (HandIndex.Right);
 				}  
-				else if (!grabRight) 
+				else if (!grabRight && grabbingRight) 
 				{
 					grabbingRight = false;
 					Debug.Log ("右手をひらく");
@@ -475,7 +475,7 @@ public class PlayerTest : NetworkBehaviour
 					Debug.Log ("左手をにぎる");
 					CmdSetHoldItem (HandIndex.Left);
 				}
-				else if (!grabLeft)
+				else if (!grabLeft && grabbingLeft)
 				{				
 					grabbingLeft = false;
 					Debug.Log ("左手をひらく");
