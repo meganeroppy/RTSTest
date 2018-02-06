@@ -108,6 +108,13 @@ public class PlayerTest : NetworkBehaviour
     [SerializeField]
     private MeshRenderer mask;
 
+	/// <summary>
+	/// シーンにnull参照のドロシーが一体でも存在するか？
+	/// 非参加型ナビゲータの無効ドロシーは除外
+	/// クライアント側のみで使用すること
+	/// </summary>
+	private static bool unreferencedDrothyExist = false;
+
     /// <summary>
     /// 観測者の数 ただしプレイヤー風観測者は除外する
     /// </summary>
@@ -320,7 +327,17 @@ public class PlayerTest : NetworkBehaviour
 		{
 			if( myDrothy == null )
 			{
-				CmdRequestDrothyReference();
+				Debug.Log( netId.ToString() + "のドロシーがnull参照なのでフラグを立てた" );
+
+				// 参照なしドロシーが存在するフラグを立てる
+				unreferencedDrothyExist = true;
+
+				// 非ローカルからは呼べないのでローカルのプレイヤーから呼び出す
+				if( isLocalPlayer )
+				{
+					Debug.Log( "フラグがたっているのでローカルプレイヤー " + netId.ToString() + " からドロシーの参照を要求" );
+					CmdRequestDrothyReference();
+				}
 			}
 		}
 
@@ -606,7 +623,7 @@ public class PlayerTest : NetworkBehaviour
     [ClientRpc]
     private void RpcPassDrothyReference(NetworkInstanceId netId)
     {
-        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
+		Debug.Log(System.Reflection.MethodBase.GetCurrentMethod() + "NetId = " + netId);
 
         var drothyObj = ClientScene.FindLocalObject(netId);
 
@@ -653,17 +670,44 @@ public class PlayerTest : NetworkBehaviour
             drothyVisible = !isLocalPlayer;
         }
         drothyObj.SetActive(drothyVisible);
+
+		unreferencedDrothyExist = false;
     }
 
 	/// <summary>
 	/// ドロシーの参照を要求する
+	/// 生成済みの全てのプレイヤーに対して実行される
+	/// ただし非参加型ナビゲータは除外
 	/// </summary>
 	[Command]
 	private void CmdRequestDrothyReference()
 	{
-		if( drothyNetId == NetworkInstanceId.Invalid ) return;
+		Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
-		RpcPassDrothyReference( drothyNetId );
+		var players = GameObject.FindGameObjectsWithTag("Player");
+
+		Debug.Log("生成済みプレイヤー数 -> " + players.Length.ToString());
+
+		foreach( GameObject g in players )
+		{
+			var p = g.GetComponent<PlayerTest>();
+			if( p == null ) continue;
+
+			// 非参加型ナビゲータを除外
+			if( p.IsObserver && p.ObserverType == RtsTestNetworkManager.ObserverType.Default )
+			{
+				Debug.Log( "プレイヤー" + p.netId.ToString() + "は非参加型ナビゲータなので除外");
+				continue;
+			}
+			// ドロシーNetIdが未設定の時は除外
+			if( p.drothyNetId == NetworkInstanceId.Invalid ){
+				Debug.Log( "プレイヤー" + p.netId.ToString() + "はドロシーのNetIdが未設定なので除外");
+
+			continue;
+			}
+
+			p.RpcPassDrothyReference( p.drothyNetId );
+		}
 	}
 
     /// <summary>
