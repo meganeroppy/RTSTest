@@ -157,11 +157,25 @@ public class PlayerTest : NetworkBehaviour
         Left,
     }
 
+
+
     /// <summary>
     /// つかんでいるアイテムと頭との距離がこの値以下になったら食べる
     /// </summary>
     [SerializeField]
     private float eatThreshold = 0.1f;
+
+	/// <summary>
+	/// 右手のアニメータ
+	/// </summary>
+	[SerializeField]
+	private Animator animRightHand;
+
+	/// <summary>
+	/// 左手のアニメータ
+	/// </summary>
+	[SerializeField]
+	private Animator animLeftHand;
 
     private void Awake()
     {
@@ -419,39 +433,63 @@ public class PlayerTest : NetworkBehaviour
 		// これを呼ばないとOVRInputのメソッドが動かないらしいので呼ぶ
 		OVRInput.Update();
 
-		var grabRight = OVRInput.Get (OVRInput.RawAxis1D.RIndexTrigger) > 0;
-		var grabLeft = OVRInput.Get (OVRInput.RawAxis1D.LIndexTrigger) > 0;
+		var grabRight = OVRInput.Get (OVRInput.RawAxis1D.RIndexTrigger) > 0 || Input.GetKey(KeyCode.J);
+		var grabLeft = OVRInput.Get (OVRInput.RawAxis1D.LIndexTrigger) > 0 || Input.GetKey(KeyCode.H);
 
 		// アイテムをつかむ
 		{
-			// TODO: タッチでの操作は追追改善する
-			if (Input.GetKeyDown (KeyCode.H) ||
-				OVRInput.GetDown (OVRInput.RawButton.RIndexTrigger) || // 右人差し指トリガー
-				(grabRight && !grabbingRight)
-			)
+			// 右手
 			{
-				grabbingRight = true;
-				Debug.Log ("右手でつかむ");
-				CmdSetHoldItem (HandIndex.Right);
-			}  
-			else if (!grabRight) 
-			{
-				grabbingRight = false;
+				bool grabbingRightPrev = grabbingRight;
+
+				if ( (grabRight && !grabbingRight) )
+				{
+					grabbingRight = true;
+					Debug.Log ("右手でつかむ");
+					CmdSetHoldItem (HandIndex.Right);
+				}  
+				else if (!grabRight) 
+				{
+					grabbingRight = false;
+
+					// アイテムをつかんでいたら離す
+
+				}
+
+				// アニメーション更新
+				if( grabbingRightPrev != grabbingRight )
+				{
+					var animName = grabbingRight ? "GrabSmall" : "Natural";
+					animRightHand.SetTrigger(animName);
+				}
 			}
 
-			if (Input.GetKeyDown (KeyCode.J) ||
-				OVRInput.GetDown (OVRInput.RawButton.LIndexTrigger) || // 左人差し指トリガー
-				(grabLeft && !grabbingLeft)
-			)
+			// 左手
 			{
-				grabbingLeft = true;
-				Debug.Log ("左手でつかむ");
-				CmdSetHoldItem (HandIndex.Left);
+				bool grabbingLeftPrev = grabbingLeft;
+
+				if ( (grabLeft && !grabbingLeft) )
+				{
+					grabbingLeft = true;
+					Debug.Log ("左手でつかむ");
+					CmdSetHoldItem (HandIndex.Left);
+				}
+				else if (!grabLeft)
+				{				
+					grabbingLeft = false;
+				
+					// アイテムをつかんでいたら離す
+
+				}
+
+				// アニメーション更新
+				if( grabbingLeftPrev != grabbingLeft )
+				{
+					var animName = grabbingLeft ? "GrabSmall" : "Natural";
+					animLeftHand.SetTrigger(animName);
+				}
 			}
-			else if (!grabLeft)
-			{
-				grabbingLeft = false;
-			}
+
 		}
 
 
@@ -536,7 +574,6 @@ public class PlayerTest : NetworkBehaviour
             {
                 EatItem(HandIndex.Left);
             }
-
         }
     }
 
