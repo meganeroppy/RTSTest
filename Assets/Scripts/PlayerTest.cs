@@ -108,13 +108,6 @@ public class PlayerTest : NetworkBehaviour
     [SerializeField]
     private MeshRenderer mask;
 
-	/// <summary>
-	/// シーンにnull参照のドロシーが一体でも存在するか？
-	/// 非参加型ナビゲータの無効ドロシーは除外
-	/// クライアント側のみで使用すること
-	/// </summary>
-	private static bool unreferencedDrothyExist = false;
-
     /// <summary>
     /// 観測者の数 ただしプレイヤー風観測者は除外する
     /// </summary>
@@ -330,9 +323,6 @@ public class PlayerTest : NetworkBehaviour
 			if( myDrothy == null && ( !IsObserver || ( IsObserver && ObserverType == RtsTestNetworkManager.ObserverType.Participatory ) ) )
 			{
 				Debug.Log( netId.ToString() + "のドロシーがnull参照なのでフラグを立てた" );
-
-				// 参照なしドロシーが存在するフラグを立てる
-				unreferencedDrothyExist = true;
 
 				// 非ローカルからは呼べないのでローカルのプレイヤーから呼び出す
 				if( isLocalPlayer )
@@ -673,7 +663,6 @@ public class PlayerTest : NetworkBehaviour
         }
         drothyObj.SetActive(drothyVisible);
 
-		unreferencedDrothyExist = false;
     }
 
 	/// <summary>
