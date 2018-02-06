@@ -32,13 +32,6 @@ public class PlayerTest : NetworkBehaviour
     private RtsTestNetworkManager.ObserverType observerType = RtsTestNetworkManager.ObserverType.Default;
     public RtsTestNetworkManager.ObserverType ObserverType { get { return observerType; } }
 
-    /// <summary>
-    /// 削除予定
-    /// 観測者だと赤くなるだけのキューブ
-    /// </summary>
-    [SerializeField]
-    private MeshRenderer observerSign;
-
     [SerializeField]
     private IKControl drothyIKPrefab;
     private DrothyController myDrothy;
@@ -370,10 +363,6 @@ public class PlayerTest : NetworkBehaviour
     /// </summary>
     private void SetObserverEnable()
     {
-        // 削除候補
-        // 観測者サインの色を変える
-        observerSign.material.color = isObserver ? Color.red : Color.white;
-
         if (observerController == null) observerController = GetComponent<ObserverController>();
 
         observerController.enabled = isObserver;
