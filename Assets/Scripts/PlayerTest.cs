@@ -169,6 +169,11 @@ public class PlayerTest : NetworkBehaviour
 	[SyncVar]
 	private NetworkInstanceId drothyNetId = NetworkInstanceId.Invalid;
 
+	/// <summary>
+	/// null参照のドロシーがローカル環境に存在するか？
+	/// </summary>
+	private static bool unreferencedDrothyExist = false;
+
     private void Awake()
     {
         trackedObjects = GetComponent<TrackedObjects>();
@@ -312,14 +317,16 @@ public class PlayerTest : NetworkBehaviour
 			// 自身のドロシーがnull かつ 非参加型ナビゲータでないときに実行
 			if( myDrothy == null && ( !IsObserver || ( IsObserver && ObserverType == RtsTestNetworkManager.ObserverType.Participatory ) ) )
 			{
-				Debug.Log( netId.ToString() + "のドロシーがnull参照なのでフラグを立てた" );
+				Debug.Log( netId.ToString() + "のプレイヤーのドロシーがnull参照なのでフラグを立てた" );
 
-				// 非ローカルからは呼べないのでローカルのプレイヤーから呼び出す
-				if( isLocalPlayer )
-				{
-					Debug.Log( "フラグがたっているのでローカルプレイヤー " + netId.ToString() + " からドロシーの参照を要求" );
-					CmdRequestDrothyReference();
-				}
+				unreferencedDrothyExist = true;
+			}
+
+			// 非ローカルからは呼べないのでローカルのプレイヤーから呼び出す
+			if( isLocalPlayer && unreferencedDrothyExist )
+			{
+				Debug.Log( "フラグがたっているのでNetId = " + netId.ToString() + "のローカルプレイヤーからドロシーの参照を要求" );
+				CmdRequestDrothyReference();
 			}
 		}
 
@@ -599,16 +606,17 @@ public class PlayerTest : NetworkBehaviour
     /// クライアント側でもドロシーの参照を持たせる
     /// </summary>
     [ClientRpc]
-    private void RpcPassDrothyReference(NetworkInstanceId netId)
+	private void RpcPassDrothyReference(NetworkInstanceId drothyNetId)
     {
-		Debug.Log(System.Reflection.MethodBase.GetCurrentMethod() + "NetId = " + netId);
+		Debug.Log(System.Reflection.MethodBase.GetCurrentMethod() + "NetId = " + drothyNetId);
 
-        var drothyObj = ClientScene.FindLocalObject(netId);
+        var drothyObj = ClientScene.FindLocalObject(drothyNetId);
 		if( !drothyObj )
 		{
-			Debug.Log("ドロシーなし");
+			Debug.Log( "NetId = " + netId.ToString() + "のプレイヤーからみて" + drothyNetId.ToString() + "のドロシーはみつからなかった");
 			return;
 		}
+		Debug.Log( "ドロシー発見！NetId = " + netId.ToString() + "のプレイヤーのドロシーは" + drothyNetId.ToString() + "のドロシーだった");
 
         myDrothy = drothyObj.GetComponent<DrothyController>();
 
@@ -654,6 +662,8 @@ public class PlayerTest : NetworkBehaviour
         }
 
         drothyObj.SetActive(drothyVisible);
+
+		unreferencedDrothyExist = false;
     }
 
 	/// <summary>
@@ -678,12 +688,12 @@ public class PlayerTest : NetworkBehaviour
 			// 非参加型ナビゲータを除外
 			if( p.IsObserver && p.ObserverType == RtsTestNetworkManager.ObserverType.Default )
 			{
-				Debug.Log( "プレイヤー" + p.netId.ToString() + "は非参加型ナビゲータなので除外");
+				Debug.Log( "NetId = " + p.netId.ToString() + "のプレイヤーは非参加型ナビゲータなので除外");
 				continue;
 			}
 			// ドロシーNetIdが未設定の時は除外
 			if( p.drothyNetId == NetworkInstanceId.Invalid ){
-				Debug.Log( "プレイヤー" + p.netId.ToString() + "はドロシーのNetIdが未設定なので除外");
+				Debug.Log( "NetId = " + p.netId.ToString() + "のプレイヤーはドロシーのNetIdが未設定なので除外");
 
 			continue;
 			}
