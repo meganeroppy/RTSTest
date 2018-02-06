@@ -214,7 +214,7 @@ public class ObserverController : NetworkBehaviour {
 	{
 		var obj = right ? trackedObjects.RightHandObject : trackedObjects.LeftHandObject;
 		// 生成はサーバー側で行う
-		CmdFireNavigateShot(obj);
+		CmdFireNavigateShot(obj.position, obj.rotation);
 	}
 
     [Command]
@@ -228,11 +228,11 @@ public class ObserverController : NetworkBehaviour {
 	}
 
 	[Command]
-	private void CmdFireNavigateShot( Transform muzzleTrans )
+	private void CmdFireNavigateShot( Vector3 muzzlePos, Quaternion muzzleRot )
 	{
 		var obj = Instantiate(navigateShotPrefab);
-		obj.transform.position = muzzleTrans.position;
-		obj.transform.rotation = muzzleTrans.rotation;
+		obj.transform.position = muzzlePos;
+		obj.transform.rotation = muzzleRot;
 
 		NetworkServer.Spawn(obj);
 	}
