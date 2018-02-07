@@ -42,9 +42,10 @@ public class ObserverController : NetworkBehaviour {
         CheckInput();
 	}
 
+	[Client]
 	void UpdatePosition()
 	{
-		// 参加型観測者の時はなにもしない
+		// 参加型観測者の時はなにもしない 
 		if (RtsTestNetworkManager.instance.MyObserverType.Equals( RtsTestNetworkManager.ObserverType.Participatory )) return;
 
 		// 強制トラッカー依存操作の時はなにもしない
@@ -68,6 +69,7 @@ public class ObserverController : NetworkBehaviour {
             transform.position += transform.up * move_y * move_speed * Time.deltaTime;
 	}
 
+	[Client]
     void UpdateRotaition()
     {
 		// 参加型観測者の時はなにもしない
@@ -103,6 +105,7 @@ public class ObserverController : NetworkBehaviour {
 	/// <summary>
 	/// 入力管理
 	/// </summary>
+	[Client]
     private void CheckInput()
     {
         // これを呼ばないとOVRInputのメソッドが動かないらしいので呼ぶ

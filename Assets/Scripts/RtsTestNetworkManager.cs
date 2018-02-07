@@ -56,6 +56,10 @@ public class RtsTestNetworkManager : NetworkBehaviour
 	/// </summary>
 	[SerializeField]
 	private bool isObserver = false;
+	/// <summary>
+	/// ！ローカルでのみ使用すること！
+	/// リモートで使用するとえらいことになる
+	/// </summary>
 	public bool IsObserver
 	{
 		get { return isObserver; }
@@ -72,6 +76,11 @@ public class RtsTestNetworkManager : NetworkBehaviour
 
 	[SerializeField]
 	private ObserverType observerType = ObserverType.Default;
+
+	/// <summary>
+	/// ！ローカルでのみ使用すること！
+	/// リモートで使用するとえらいことになる
+	/// </summary>
 	public ObserverType MyObserverType{get{ return observerType;}}
 
 
@@ -88,6 +97,10 @@ public class RtsTestNetworkManager : NetworkBehaviour
 
 	[SerializeField]
 	private InputMode inputMode = InputMode.Default;
+	/// <summary>
+	/// ！ローカルでのみ使用すること！
+	/// リモートで使用するとえらいことになる
+	/// </summary>
 	public InputMode MyInputMode{ get{ return inputMode;} }
 
     /// <summary>
@@ -96,7 +109,11 @@ public class RtsTestNetworkManager : NetworkBehaviour
     /// </summary>
     [SerializeField]
     private bool simulateRtsMovement = false;
-    public bool SimulateRtsMovement
+	/// <summary>
+	/// ！ローカルでのみ使用すること！
+	/// リモートで使用するとえらいことになる
+	/// </summary>
+	public bool SimulateRtsMovement
     {
         get { return simulateRtsMovement; }
     }
@@ -106,6 +123,10 @@ public class RtsTestNetworkManager : NetworkBehaviour
 	/// </summary>
 	[SerializeField]
 	private bool useSimulateFoot = false;
+	/// <summary>
+	/// ！ローカルでのみ使用すること！
+	/// リモートで使用するとえらいことになる
+	/// </summary>
 	public bool UseSimulateFoot
 	{
 		get { return useSimulateFoot; }
@@ -118,6 +139,10 @@ public class RtsTestNetworkManager : NetworkBehaviour
 	/// </summary>
 	[SerializeField]
 	private bool forceDisplayDrothy = false;
+	/// <summary>
+	/// ！ローカルでのみ使用すること！
+	/// リモートで使用するとえらいことになる
+	/// </summary>
 	public bool ForceDisplayDrothy
 	{
 		get { return forceDisplayDrothy; }

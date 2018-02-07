@@ -386,8 +386,10 @@ public class PlayerTest : NetworkBehaviour
 			if (observerType == RtsTestNetworkManager.ObserverType.Participatory)
             {
                 // 参加型観測者の場合は有効 ただし強制キーボード操作の時は無効
+				// TODO: RtsTestNetworkManager.instance.MyInputModeつかってるけどやばくない？
                 enableTracking = RtsTestNetworkManager.instance.MyInputMode != RtsTestNetworkManager.InputMode.ForceByKeyboard;
             }
+			// TODO: RtsTestNetworkManager.instance.MyInputModeつかってるけどやばくない？
             else if (RtsTestNetworkManager.instance.MyInputMode == RtsTestNetworkManager.InputMode.ForceByTracking)
             {
                 // 強制トラッカー依存操作の時は有効
@@ -402,6 +404,7 @@ public class PlayerTest : NetworkBehaviour
         else
         {
             // プレイヤーの場合
+			// TODO: RtsTestNetworkManager.instance.MyInputModeつかってるけどやばくない？
             if (RtsTestNetworkManager.instance.MyInputMode == RtsTestNetworkManager.InputMode.ForceByKeyboard)
             {
                 // 強制キーボード操作の時は無効
@@ -576,6 +579,7 @@ public class PlayerTest : NetworkBehaviour
         }
 
         // 設定が有効になっている場合は脚の動きのシミュレートを行う
+		// TODO: RtsTestNetworkManager.instance.UseSimulateFootつかってるけどやばくない？
         if (RtsTestNetworkManager.instance.UseSimulateFoot)
         {
             drothyIK.SetSimulateFoot();
@@ -632,8 +636,9 @@ public class PlayerTest : NetworkBehaviour
             }
         }
 
-        // 自分のドロシーは無効にする
+        // ドロシーの表示設定
         bool drothyVisible;
+		// TODO: RtsTestNetworkManager.instance.ForceDisplayDrothyつかってるけどやばくない？
         if (RtsTestNetworkManager.instance.ForceDisplayDrothy)
         {
             // 強制ドロシー表示フラグがあったら確実に表示する
