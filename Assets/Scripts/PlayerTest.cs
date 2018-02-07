@@ -383,7 +383,7 @@ public class PlayerTest : NetworkBehaviour
         if (isObserver)
         {
             // 観測者の場合
-            if (RtsTestNetworkManager.instance.MyObserverType == RtsTestNetworkManager.ObserverType.Participatory)
+			if (observerType == RtsTestNetworkManager.ObserverType.Participatory)
             {
                 // 参加型観測者の場合は有効 ただし強制キーボード操作の時は無効
                 enableTracking = RtsTestNetworkManager.instance.MyInputMode != RtsTestNetworkManager.InputMode.ForceByKeyboard;
@@ -650,7 +650,7 @@ public class PlayerTest : NetworkBehaviour
             else
             {
                 // リモートかつ参加型の時は表示する、そうでなければ表示しない 
-                drothyVisible = RtsTestNetworkManager.instance.MyObserverType == RtsTestNetworkManager.ObserverType.Participatory;
+				drothyVisible = observerType == RtsTestNetworkManager.ObserverType.Participatory;
             }
         }
         else
