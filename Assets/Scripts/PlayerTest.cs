@@ -17,6 +17,9 @@ public class PlayerTest : NetworkBehaviour
     [SerializeField]
     private float rotSpeed = 10f;
 
+	[SyncVar]
+	private bool initialized = false;
+
     /// <summary>
     /// 管理者か？
     /// </summary>
