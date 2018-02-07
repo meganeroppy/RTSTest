@@ -38,6 +38,7 @@ public class PlayerTest : NetworkBehaviour
     [SerializeField]
     private IKControl drothyIKPrefab;
     private DrothyController myDrothy;
+	public DrothyController MyDrothy{ get{ return myDrothy;}}
 
     [SerializeField]
     private TextMesh textMesh;
@@ -86,6 +87,7 @@ public class PlayerTest : NetworkBehaviour
     /// </summary>
     [SerializeField]
     private GameObject headObject = null;
+	public GameObject HeadObject{ get { return headObject;} }
 
     /// <summary>
     /// 観測者クラス

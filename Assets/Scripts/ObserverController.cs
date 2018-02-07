@@ -22,17 +22,29 @@ public class ObserverController : NetworkBehaviour {
     GameObject navigateShotPrefab;
 
 	private TrackedObjects trackedObjects;
+	private PlayerTest playerTest;
+
+	[SyncVar]
+	private bool isVisible = false;
+	private bool isVisiblePrev = false;
+
+	private GameObject drothyVisual;
+	private GameObject CaterpillarVisual;
+
 
     // Use this for initialization
     void Start () 
 	{
 		cameraRotate = transform.localRotation;
 		trackedObjects = GetComponent<TrackedObjects>();
+		playerTest = GetComponent<PlayerTest>();
 	}
 
     // Update is called once per frame
     void Update()
     {
+		UpdateVisual();
+
         // ローカルの自分自身でなかったらなにもしない
         if (!isLocalPlayer) return;
 
@@ -40,6 +52,53 @@ public class ObserverController : NetworkBehaviour {
 		UpdatePosition();
         UpdateRotaition();
         CheckInput();
+	}
+
+	/// <summary>
+	/// 可視状態を更新
+	/// ただし自分に対してはなにもしない
+	/// </summary>
+	private void UpdateVisual()
+	{
+		if( isLocalPlayer ) return;
+
+		if( isVisible == isVisiblePrev ) return;
+
+		// ドロシーの表示/非表示
+		if( playerTest.ObserverType == RtsTestNetworkManager.ObserverType.Participatory )
+		{
+			if( !drothyVisual ) 
+			{
+				var drothy = playerTest.MyDrothy;
+				if( drothy != null )
+				{
+					drothyVisual = drothy.gameObject;
+				}
+			}
+
+			if( drothyVisual )
+			{
+				drothyVisual.SetActive( isVisible );
+			}
+		}
+		else
+		// 芋虫の表示/非表示
+		{
+			if( !CaterpillarVisual ) 
+			{
+				var caterpillar = playerTest.HeadObject;
+				if( caterpillar != null )
+				{
+					CaterpillarVisual = caterpillar.gameObject;
+				}
+			}
+
+			if( CaterpillarVisual )
+			{
+				CaterpillarVisual.SetActive( isVisible );
+			}
+		}
+		isVisiblePrev = isVisible;
 	}
 
 	[Client]
@@ -180,6 +239,16 @@ public class ObserverController : NetworkBehaviour {
 				pullingLeftHandTrigger = false;
 			}				
 		}
+
+		// ビジュアルの表示/非表示
+		{
+			if( Input.GetKeyDown(KeyCode.V) || // キーボードのV				
+				(OVRInput.GetDown(OVRInput.RawButton.X) )// TouchXボタン
+			)
+			{
+				CmdSwitchVisibility();
+			}
+		}
     }
 
     [Command]
@@ -207,7 +276,7 @@ public class ObserverController : NetworkBehaviour {
 		// 生成はサーバー側で行う
 		CmdFireNavigateShotWithMouse(targetPos);
 	}
-
+		
 	/// <summary>
 	/// 道筋やヒントをプレイヤーに与えるためのショットを発射
 	/// Touch操作版
@@ -238,5 +307,17 @@ public class ObserverController : NetworkBehaviour {
 		obj.transform.rotation = muzzleRot;
 
 		NetworkServer.Spawn(obj);
+	}
+
+	/// <summary>
+	/// ビジュアルの表示/非表示切り替え
+	/// SyncVarなのでクライアントにも同期される
+	/// </summary>
+	[Command]
+	private void CmdSwitchVisibility()
+	{
+		Debug.Log( System.Reflection.MethodBase.GetCurrentMethod() );
+
+		isVisible = !isVisible;
 	}
 }
