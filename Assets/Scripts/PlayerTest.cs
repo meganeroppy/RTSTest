@@ -172,10 +172,14 @@ public class PlayerTest : NetworkBehaviour
 	[SyncVar]
 	private NetworkInstanceId drothyNetId = NetworkInstanceId.Invalid;
 
+	private int playerId = -1;
+
 	/// <summary>
 	/// null参照のドロシーがローカル環境に存在するか？
 	/// </summary>
 	private static bool unreferencedDrothyExist = false;
+
+	private bool waitingForResponse = false;
 
     private void Awake()
     {
@@ -326,10 +330,11 @@ public class PlayerTest : NetworkBehaviour
 			}
 
 			// 非ローカルからは呼べないのでローカルのプレイヤーから呼び出す
-			if( isLocalPlayer && unreferencedDrothyExist )
+			if( isLocalPlayer && unreferencedDrothyExist && !waitingForResponse)
 			{
 				Debug.Log( "フラグがたっているのでNetId = " + netId.ToString() + "のローカルプレイヤーからドロシーの参照を要求" );
 				CmdRequestDrothyReference();
+				waitingForResponse = true;
 			}
 		}
 
@@ -564,50 +569,98 @@ public class PlayerTest : NetworkBehaviour
 
     /// <summary>
     /// ドロシーを生成する
+	/// プレイヤーが一人部屋に入るたびに全てのドロシーを生成しなおす
+	/// 他に良い方法がありそうだが現状サーバーに生成済みおオブジェクトを後から入ってきたクライアントで生成する方法がわからない
     /// </summary>
     [Command]
     private void CmdCreateDrothy(int playerId)
     {
-        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
+		this.playerId = playerId;
 
-        // プレハブから生成
-        var drothyIK = Instantiate<IKControl>(drothyIKPrefab);
+		CreateAllDrothy();
+    }
 
-        // IKのターゲットをトラッキングオブジェクトから取得
-        {
-            drothyIK.rightHandObj = trackedObjects.RightHandObject;
-            drothyIK.leftHandObj = trackedObjects.LeftHandObject;
-            drothyIK.bodyObj = trackedObjects.BodyObject;
-            drothyIK.lookObj = trackedObjects.LookTarget;
-        }
+	/// <summary>
+	/// 部屋にいる全プレイヤーに対し必要なドロシーを作り直す
+	/// </summary>
+	/// <summary>
+	/// 必要な全てのドロシーを作り直す
+	/// </summary>
+	[Server]
+	private void CreateAllDrothy()
+	{
+		Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
-        // 設定が有効になっている場合は脚の動きのシミュレートを行う
+		var players = GameObject.FindGameObjectsWithTag("Player");
+
+		Debug.Log("生成済みプレイヤー数 -> " + players.Length.ToString());
+
+		foreach( GameObject g in players )
+		{
+			var p = g.GetComponent<PlayerTest>();
+			if( p == null ) continue;
+
+			// 非参加型ナビゲータを除外
+			if( p.IsObserver && p.ObserverType == RtsTestNetworkManager.ObserverType.Default )
+			{
+				Debug.Log( "NetId = " + p.netId.ToString() + "のプレイヤーは非参加型ナビゲータなので除外");
+				continue;
+			}
+
+			p.CreateDrothy();
+		}
+	}
+
+	[Server]
+	private void CreateDrothy()
+	{
+		Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
+
+		// すでにドロシーがいたら破棄
+		if( myDrothy != null )
+		{
+			NetworkServer.Destroy( myDrothy.gameObject );
+			myDrothy = null;
+		}
+
+		// プレハブから生成
+		var drothyIK = Instantiate<IKControl>(drothyIKPrefab);
+
+		// IKのターゲットをトラッキングオブジェクトから取得
+		{
+			drothyIK.rightHandObj = trackedObjects.RightHandObject;
+			drothyIK.leftHandObj = trackedObjects.LeftHandObject;
+			drothyIK.bodyObj = trackedObjects.BodyObject;
+			drothyIK.lookObj = trackedObjects.LookTarget;
+		}
+
+		// 設定が有効になっている場合は脚の動きのシミュレートを行う
 		// TODO: RtsTestNetworkManager.instance.UseSimulateFootつかってるけどやばくない？
-        if (RtsTestNetworkManager.instance.UseSimulateFoot)
-        {
-            drothyIK.SetSimulateFoot();
-        }
+		if (RtsTestNetworkManager.instance.UseSimulateFoot)
+		{
+			drothyIK.SetSimulateFoot();
+		}
+		var id = playerId == -1 ? 0 : playerId;
+		// プレイヤーIDによってカラバリを変更する
+		drothyIK.GetComponent<DrothyController>().ColorIdx = id;
 
-        // プレイヤーIDによってカラバリを変更する
-        drothyIK.GetComponent<DrothyController>().ColorIdx = playerId;
+		myDrothy = drothyIK.GetComponent<DrothyController>();
+		if (myDrothy == null)
+		{
+			return;
+		}
 
-        myDrothy = drothyIK.GetComponent<DrothyController>();
-        if (myDrothy == null)
-        {
-            return;
-        }
+		myDrothy.SetOwner(trackedObjects.BodyObject);
 
-        myDrothy.SetOwner(trackedObjects.BodyObject);
+		// どちらが正しいかはまだ不明
+		NetworkServer.Spawn(myDrothy.gameObject);
+		//NetworkServer.SpawnWithClientAuthority(myDrothy.gameObject, gameObject);
 
-        // どちらが正しいかはまだ不明
-        //      NetworkServer.Spawn(drothy.gameObject);
-        NetworkServer.SpawnWithClientAuthority(myDrothy.gameObject, gameObject);
-
-        RpcPassDrothyReference(myDrothy.netId);
+		RpcPassDrothyReference(myDrothy.netId);
 
 		// ドロシーのNetIdをサーバー側で保持する
 		drothyNetId = myDrothy.netId;
-    }
+	}
 
     /// <summary>
     /// クライアント側でもドロシーの参照を持たせる
@@ -672,6 +725,8 @@ public class PlayerTest : NetworkBehaviour
         drothyObj.SetActive(drothyVisible);
 
 		unreferencedDrothyExist = false;
+
+		waitingForResponse = false;
     }
 
 	/// <summary>
@@ -702,13 +757,13 @@ public class PlayerTest : NetworkBehaviour
 			// ドロシーNetIdが未設定の時は除外
 			if( p.drothyNetId == NetworkInstanceId.Invalid ){
 				Debug.Log( "NetId = " + p.netId.ToString() + "のプレイヤーはドロシーのNetIdが未設定なので除外");
-
-			continue;
+				continue;
 			}
 
 			p.RpcPassDrothyReference( p.drothyNetId );
 		}
 	}
+
 
     /// <summary>
     /// 観測者フラグを設定する
