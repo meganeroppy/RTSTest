@@ -48,6 +48,10 @@ public class DrothyController : NetworkBehaviour
     [SyncVar]
     private float talking = 0;
 
+	[SerializeField]
+	private GameObject visual;
+	public GameObject Visual{ get {return visual;}}
+
     private bool initialized = false;
 
     /// <summary>

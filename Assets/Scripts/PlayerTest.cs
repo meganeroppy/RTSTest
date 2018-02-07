@@ -645,10 +645,6 @@ public class PlayerTest : NetworkBehaviour
 		drothyIK.GetComponent<DrothyController>().ColorIdx = id;
 
 		myDrothy = drothyIK.GetComponent<DrothyController>();
-		if (myDrothy == null)
-		{
-			return;
-		}
 
 		myDrothy.SetOwner(trackedObjects.BodyObject);
 
@@ -722,7 +718,7 @@ public class PlayerTest : NetworkBehaviour
             drothyVisible = !isLocalPlayer;
         }
 
-        drothyObj.SetActive(drothyVisible);
+		drothyObj.GetComponent<DrothyController>().Visual.SetActive(drothyVisible);
 
 		unreferencedDrothyExist = false;
 
