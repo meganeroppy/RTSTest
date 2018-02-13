@@ -6,7 +6,7 @@ using UnityEngine.Networking;
 
 /// <summary>
 /// イベントの進行を管理
-/// 観測者からの命令で制御し、イベント関連のプレイヤーステートの監視なども行う
+/// ナビゲーターからの命令で制御し、イベント関連のプレイヤーステートの監視なども行う
 /// 基本的にサーバーで動かし、クライアント側にも命令を送る必要があるときだけRPCを使用する
 /// </summary>
 public class EventManager : NetworkBehaviour
@@ -146,7 +146,7 @@ public class EventManager : NetworkBehaviour
         foreach( PlayerTest p in PlayerTest.list )
         {
             // 参加型でないオブザーバーはスキップ ただしオブザーバーのみの時は例外
-            if (p.IsObserver && p.ObserverType != RtsTestNetworkManager.ObserverType.Participatory && PlayerTest.list.Count >= 2) continue;
+            if (p.IsNavigator && p.NavigatorType != RtsTestNetworkManager.NavigatorType.Participatory && PlayerTest.list.Count >= 2) continue;
 
             bool inEffect = p.ItemEffectTimer > 0;
 
@@ -556,8 +556,8 @@ public class EventManager : NetworkBehaviour
         var prefab = type == ItemType.Mushroom ? mushroomPrefab : cakePrefab;
 
         // プレイヤー数を取得
-        int playerNum = PlayerTest.list.Count - PlayerTest.PureObserverCount;
-        Debug.Log(PlayerTest.list.Count.ToString() + " - " + PlayerTest.PureObserverCount.ToString() + " = " + playerNum.ToString());
+        int playerNum = PlayerTest.list.Count - PlayerTest.PureNavigatorCount;
+        Debug.Log(PlayerTest.list.Count.ToString() + " - " + PlayerTest.PureNavigatorCount.ToString() + " = " + playerNum.ToString());
 
 		int setCount = 0;
         // 候補の数繰り返す

@@ -5,10 +5,10 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Networking;
 
 /// <summary>
-/// 観測者クラス
+/// ナビゲータークラス
 /// イベントマネージャにコマンドを送ることでシナリオを進行させる役割もある
 /// </summary>
-public class ObserverController : NetworkBehaviour {
+public class NavigatorController : NetworkBehaviour {
 
 	[SerializeField]
 	private float move_speed = 2f;
@@ -65,7 +65,7 @@ public class ObserverController : NetworkBehaviour {
 		if( isVisible == isVisiblePrev ) return;
 
 		// ドロシーの表示/非表示
-		if( playerTest.ObserverType == RtsTestNetworkManager.ObserverType.Participatory )
+		if( playerTest.NavigatorType == RtsTestNetworkManager.NavigatorType.Participatory )
 		{
 			if( !drothyVisual ) 
 			{
@@ -104,8 +104,8 @@ public class ObserverController : NetworkBehaviour {
 	[Client]
 	void UpdatePosition()
 	{
-		// 参加型観測者の時はなにもしない 
-		if (RtsTestNetworkManager.instance.MyObserverType.Equals( RtsTestNetworkManager.ObserverType.Participatory )) return;
+		// 参加型ナビゲーターの時はなにもしない 
+		if (RtsTestNetworkManager.instance.MyNavigatorType.Equals( RtsTestNetworkManager.NavigatorType.Participatory )) return;
 
 		// 強制トラッカー依存操作の時はなにもしない
 		if (RtsTestNetworkManager.instance.MyInputMode.Equals( RtsTestNetworkManager.InputMode.ForceByTracking )) return;
@@ -131,8 +131,8 @@ public class ObserverController : NetworkBehaviour {
 	[Client]
     void UpdateRotaition()
     {
-		// 参加型観測者の時はなにもしない
-		if (RtsTestNetworkManager.instance.MyObserverType.Equals( RtsTestNetworkManager.ObserverType.Participatory )) return;
+		// 参加型ナビゲーターの時はなにもしない
+		if (RtsTestNetworkManager.instance.MyNavigatorType.Equals( RtsTestNetworkManager.NavigatorType.Participatory )) return;
 
 		// 強制トラッカー依存操作の時はなにもしない
 		if (RtsTestNetworkManager.instance.MyInputMode.Equals( RtsTestNetworkManager.InputMode.ForceByTracking )) return;

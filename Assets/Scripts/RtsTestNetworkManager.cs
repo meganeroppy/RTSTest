@@ -51,37 +51,37 @@ public class RtsTestNetworkManager : NetworkBehaviour
 	private string localServerAddress;
 
 	/// <summary>
-	/// 観測者フラグ
+	/// ナビゲーターフラグ
 	/// 後々動的に設定できるようにする
 	/// </summary>
 	[SerializeField]
-	private bool isObserver = false;
+	private bool isNavigator = false;
 	/// <summary>
 	/// ！ローカルでのみ使用すること！
 	/// リモートで使用するとえらいことになる
 	/// </summary>
-	public bool IsObserver
+	public bool IsNavigator
 	{
-		get { return isObserver; }
+		get { return isNavigator; }
 	}
 
 	/// <summary>
-	/// 観測者タイプ
+	/// ナビゲータータイプ
 	/// </summary>
-	public enum ObserverType
+	public enum NavigatorType
 	{
-		Default,	// 通常の観測者 キーボードで操作する
-		Participatory, // 参加型観測者 他のプレイヤーと同様にプレイスペース内に入りトラッキングにより操作する InputTypeの強制キーボード操作が有効でもこちらが優先される
+		Default,	// 通常のナビゲーター キーボードで操作する
+		Participatory, // 参加型ナビゲーター 他のプレイヤーと同様にプレイスペース内に入りトラッキングにより操作する InputTypeの強制キーボード操作が有効でもこちらが優先される
 	}
 
 	[SerializeField]
-	private ObserverType observerType = ObserverType.Default;
+	private NavigatorType navigatorType = NavigatorType.Default;
 
 	/// <summary>
 	/// ！ローカルでのみ使用すること！
 	/// リモートで使用するとえらいことになる
 	/// </summary>
-	public ObserverType MyObserverType{get{ return observerType;}}
+	public NavigatorType MyNavigatorType{get{ return navigatorType;}}
 
 
 	/// <summary>
@@ -91,8 +91,8 @@ public class RtsTestNetworkManager : NetworkBehaviour
 	public enum InputMode
 	{
 		ForceByKeyboard, // 強制キーボード操作 プレイヤーであってもキーボードで操作する
-		ForceByTracking, // 強制トラッカー依存操作 観測者であってもトラッカー経由での操作となる ObserverTypeの参加型観測者が有効の時は無意味になる
-		Default, // 基本操作 プレイヤーはトラッカー依存操作 & 観測者はキーボード操作 ただし参加型観測者の場合は観測者もトラッカー依存操作
+		ForceByTracking, // 強制トラッカー依存操作 ナビゲーターであってもトラッカー経由での操作となる NavigatorTypeの参加型ナビゲーターが有効の時は無意味になる
+		Default, // 基本操作 プレイヤーはトラッカー依存操作 & ナビゲーターはキーボード操作 ただし参加型ナビゲーターの場合はナビゲーターもトラッカー依存操作
 	}
 
 	[SerializeField]

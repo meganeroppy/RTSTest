@@ -21,19 +21,19 @@ public class PlayerTest : NetworkBehaviour
 	private bool initialized = false;
 
     /// <summary>
-    /// 管理者か？
+    /// ナビゲーターか？
     /// </summary>
 	[SyncVar]
-    private bool isObserver = false;
-    private bool isObserverPrev = false;
-    public bool IsObserver { get { return isObserver; } }
+    private bool isNavigator = false;
+    private bool isNavigatorPrev = false;
+    public bool IsNavigator { get { return isNavigator; } }
 
     /// <summary>
-    /// 参加型管理者か？
+    /// 参加型ナビゲーターか？
     /// </summary>
     [SyncVar]
-    private RtsTestNetworkManager.ObserverType observerType = RtsTestNetworkManager.ObserverType.Default;
-    public RtsTestNetworkManager.ObserverType ObserverType { get { return observerType; } }
+    private RtsTestNetworkManager.NavigatorType navigatorType = RtsTestNetworkManager.NavigatorType.Default;
+    public RtsTestNetworkManager.NavigatorType NavigatorType { get { return navigatorType; } }
 
     [SerializeField]
     private IKControl drothyIKPrefab;
@@ -90,9 +90,9 @@ public class PlayerTest : NetworkBehaviour
 	public GameObject HeadObject{ get { return headObject;} }
 
     /// <summary>
-    /// 観測者クラス
+    /// ナビゲータークラス
     /// </summary>
-    private ObserverController observerController;
+    private NavigatorController navigatorController;
 
     /// <summary>
     /// プレイヤーのリスト
@@ -107,9 +107,9 @@ public class PlayerTest : NetworkBehaviour
     private MeshRenderer mask;
 
     /// <summary>
-    /// 観測者の数 ただしプレイヤー風観測者は除外する
+    /// ナビゲーターの数 ただしプレイヤー風ナビゲーターは除外する
     /// </summary>
-    public static int PureObserverCount {
+    public static int PureNavigatorCount {
         get
         {
             if (list == null) return 0;
@@ -117,7 +117,7 @@ public class PlayerTest : NetworkBehaviour
             int count = 0;
             foreach (PlayerTest p in list)
             {
-                if (p.IsObserver && p.ObserverType != RtsTestNetworkManager.ObserverType.Participatory) count++;
+                if (p.IsNavigator && p.NavigatorType != RtsTestNetworkManager.NavigatorType.Participatory) count++;
             }
 
             return count;
@@ -231,15 +231,15 @@ public class PlayerTest : NetworkBehaviour
         // サーバー上でドロシーを生成
         CmdCreateDrothy(RtsTestNetworkManager.instance.PlayerId);
 
-        // サーバー上で観測者フラグをセットする syncVarなのでのちにクライアントにも反映される
-        CmdSetIsObserver(RtsTestNetworkManager.instance.IsObserver);
+        // サーバー上でナビゲーターフラグをセットする syncVarなのでのちにクライアントにも反映される
+        CmdSetIsNavigator(RtsTestNetworkManager.instance.IsNavigator);
 
         // サーバー上で参加型フラグをセットする syncVarなのでのちにクライアントにも反映される
-        CmdSetIsParticipatory(RtsTestNetworkManager.instance.MyObserverType);
+        CmdSetIsParticipatory(RtsTestNetworkManager.instance.MyNavigatorType);
 
-        if (RtsTestNetworkManager.instance.IsObserver)
+        if (RtsTestNetworkManager.instance.IsNavigator)
         {
-            // 観測者の場合
+            // ナビゲーターの場合
 
             var obj = GameObject.Find("BaseSceneManager");
             if (obj)
@@ -252,7 +252,7 @@ public class PlayerTest : NetworkBehaviour
             }
 
 			// トラッキングによる制御の有効性を設定する
-            if (RtsTestNetworkManager.instance.MyObserverType == RtsTestNetworkManager.ObserverType.Participatory)
+            if (RtsTestNetworkManager.instance.MyNavigatorType == RtsTestNetworkManager.NavigatorType.Participatory)
             {
                 // 参加型の時は有効にする ただし強制キーボード操作の時は無効にする
                 trackedObjects.SetEnable(RtsTestNetworkManager.instance.MyInputMode != RtsTestNetworkManager.InputMode.ForceByKeyboard);
@@ -292,13 +292,13 @@ public class PlayerTest : NetworkBehaviour
         // ラベルを更新
         textMesh.text = netId.Value.ToString();
 
-        // 観測者フラグに変更があった場合のみ処理する
+        // ナビゲーターフラグに変更があった場合のみ処理する
         {
-            if (isObserver != isObserverPrev)
+            if (isNavigator != isNavigatorPrev)
             {
-                SetObserverEnable();
+                SetNavigatorEnable();
             }
-            isObserverPrev = isObserver;
+            isNavigatorPrev = isNavigator;
         }
 
         // 自分の時だけ「YOU]アイコン表示
@@ -320,7 +320,7 @@ public class PlayerTest : NetworkBehaviour
 		if( isClient )
 		{
 			// 自身のドロシーがnull かつ 非参加型ナビゲータでないときに実行
-			if( myDrothy == null && ( !IsObserver || ( IsObserver && ObserverType == RtsTestNetworkManager.ObserverType.Participatory ) ) )
+			if( myDrothy == null && ( !IsNavigator || ( IsNavigator && NavigatorType == RtsTestNetworkManager.NavigatorType.Participatory ) ) )
 			{
 				Debug.Log( netId.ToString() + "のプレイヤーのドロシーがnull参照なのでフラグを立てた" );
 
@@ -371,26 +371,26 @@ public class PlayerTest : NetworkBehaviour
     }
 
     /// <summary>
-    /// 観測者設定の有効を切り替え
+    /// ナビゲーター設定の有効を切り替え
     /// </summary>
-    private void SetObserverEnable()
+    private void SetNavigatorEnable()
     {
-        if (observerController == null) observerController = GetComponent<ObserverController>();
+        if (navigatorController == null) navigatorController = GetComponent<NavigatorController>();
 
-        observerController.enabled = isObserver;
+        navigatorController.enabled = isNavigator;
 
 		// 非参加型ナビゲータかつ自身でないときにいもむしビジュアルを有効にする
-		headObject.SetActive(isObserver && observerType == RtsTestNetworkManager.ObserverType.Default && !isLocalPlayer);
+		headObject.SetActive(isNavigator && navigatorType == RtsTestNetworkManager.NavigatorType.Default && !isLocalPlayer);
 
         // トラッキングによる移動の有効を設定 結構難解なので間違いがないか再三確認する
         bool enableTracking;
 
-        if (isObserver)
+        if (isNavigator)
         {
-            // 観測者の場合
-			if (observerType == RtsTestNetworkManager.ObserverType.Participatory)
+            // ナビゲーターの場合
+			if (navigatorType == RtsTestNetworkManager.NavigatorType.Participatory)
             {
-                // 参加型観測者の場合は有効 ただし強制キーボード操作の時は無効
+                // 参加型ナビゲーターの場合は有効 ただし強制キーボード操作の時は無効
 				// TODO: RtsTestNetworkManager.instance.MyInputModeつかってるけどやばくない？
                 enableTracking = RtsTestNetworkManager.instance.MyInputMode != RtsTestNetworkManager.InputMode.ForceByKeyboard;
             }
@@ -510,23 +510,23 @@ public class PlayerTest : NetworkBehaviour
             }
         }
 
-        // 観測者になる
+        // ナビゲーターになる
 
         // 現状いらなそう 必要になったら実装する
 		if (Input.GetKeyDown(KeyCode.N) ||
             OVRInput.GetDown(OVRInput.RawButton.RThumbstick) // 右スティック押し込み
         )
         {
-            Debug.LogWarning("観測者とプレイヤー切り替え機能は未実装");
+            Debug.LogWarning("ナビゲーターとプレイヤー切り替え機能は未実装");
         }
 
-        // 観測者モード切り替え
+        // ナビゲーターモード切り替え
         // 現状いらなそう 必要になったら実装する
         if (Input.GetKeyDown(KeyCode.M) ||
             OVRInput.GetDown(OVRInput.RawButton.LThumbstick) // 左スティック押し込み
         )
         {
-            Debug.LogWarning("観測者モード切り替え機能は未実装");
+            Debug.LogWarning("ナビゲーターモード切り替え機能は未実装");
         }
     }
 
@@ -649,9 +649,9 @@ public class PlayerTest : NetworkBehaviour
             // 強制ドロシー表示フラグがあったら確実に表示する
             drothyVisible = true;
         }
-        else if (isObserver)
+        else if (isNavigator)
         {
-            // 管理者の時
+            // ナビゲーターの時
             if (isLocalPlayer)
             {
 				// ローカルの時(自分のとき)は表示しない
@@ -660,7 +660,7 @@ public class PlayerTest : NetworkBehaviour
             else
             {
                 // リモートかつ参加型の時は表示する、そうでなければ表示しない 
-				drothyVisible = observerType == RtsTestNetworkManager.ObserverType.Participatory;
+				drothyVisible = navigatorType == RtsTestNetworkManager.NavigatorType.Participatory;
             }
         }
         else
@@ -696,7 +696,7 @@ public class PlayerTest : NetworkBehaviour
 			if( p == null ) continue;
 
 			// 非参加型ナビゲータを除外
-			if( p.IsObserver && p.ObserverType == RtsTestNetworkManager.ObserverType.Default )
+			if( p.IsNavigator && p.NavigatorType == RtsTestNetworkManager.NavigatorType.Default )
 			{
 				Debug.Log( "NetId = " + p.netId.ToString() + "のプレイヤーは非参加型ナビゲータなので除外");
 				continue;
@@ -713,21 +713,21 @@ public class PlayerTest : NetworkBehaviour
 	}
 
     /// <summary>
-    /// 観測者フラグを設定する
+    /// ナビゲーターフラグを設定する
     /// </summary>
     [Command]
-    private void CmdSetIsObserver(bool value)
+    private void CmdSetIsNavigator(bool value)
     {
-        isObserver = value;
+        isNavigator = value;
     }
 
     /// <summary>
     /// 参加型フラグを設定する
     /// </summary>
     [Command]
-    private void CmdSetIsParticipatory(RtsTestNetworkManager.ObserverType value)
+    private void CmdSetIsParticipatory(RtsTestNetworkManager.NavigatorType value)
     {
-        observerType = value;
+        navigatorType = value;
     }
 
     /// <summary>

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 /// <summary>
-/// 観測者がプレイヤーをナビするときに使うショット
+/// ナビゲーターがプレイヤーをナビするときに使うショット
 /// </summary>
 public class NavigateShot : NetworkBehaviour {
 
