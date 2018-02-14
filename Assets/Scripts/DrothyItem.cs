@@ -64,6 +64,12 @@ public class DrothyItem : NetworkBehaviour
     [SerializeField]
     private AudioClip heldSound;
 
+	/// <summary>
+	/// エフェクト
+	/// </summary>
+	[SerializeField]
+	private GameObject effect;
+
     /// <summary>
     /// すでにほかの人がつかんでいるアイテムを奪ったりできないようにフラグを作る
     /// </summary>
@@ -134,6 +140,11 @@ public class DrothyItem : NetworkBehaviour
         resetTimer = respawnWait;
 
         RpcPlayEatenSound();
+
+		// エフェクト
+		var ef = Instantiate(effect);
+		ef.transform.position = transform.position; 
+		NetworkServer.Spawn(ef);
     }
 
     [Server]
