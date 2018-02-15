@@ -45,6 +45,12 @@ public class EventManager : NetworkBehaviour
     private float sceneChangeFadeDuration = 1f;
 
     /// <summary>
+    /// ケーキをセットできる距離閾値
+    /// </summary>
+    [SerializeField]
+    private float cakeSetDistance = 0.3f;
+
+    /// <summary>
     /// シナリオの流れ
     /// </summary>
     public enum Sequence
@@ -102,13 +108,13 @@ public class EventManager : NetworkBehaviour
     /// ドロシーが縮小化するときの効果音
     /// </summary>
     [SerializeField]
-    private AudioClip itemEffectToSmall;
+    private AudioClip itemEffectToSmall = null;
 
     /// <summary>
     /// ドロシーが巨大化するときの効果音
     /// </summary>
     [SerializeField]
-    private AudioClip itemEffectToLarge;
+    private AudioClip itemEffectToLarge = null;
 
 	/// <summary>
 	/// 公園シーンでの地面崩壊イベント開始から次シーンに遷移するまでの秒数
@@ -134,8 +140,35 @@ public class EventManager : NetworkBehaviour
     [ServerCallback]
     private void Update()
     {
+        CheckCakeStatus();
         CheckPlayerEffect();
         CheckTargetsStatus();
+    }
+
+    /// <summary>
+    /// 出現しているターゲットの状態をチェックする
+    /// </summary>
+    [Server]
+    private void CheckCakeStatus()
+    {
+        // ふさわしいシーケンスでなければなにもしない
+        if (currentSequence != Sequence.PopCakes1_Event) return;
+
+        // ターゲットリストがなければなにもしない
+        if (itemList == null) return;
+
+        // すべてのターゲットが死亡していたら次のシーンに移行
+        bool allCakesAreOnDish = true;
+        foreach (DrothyItem cake in itemList)
+        {
+            if (!cake.IsOnDish) allCakesAreOnDish = false;
+        }
+
+        if (allCakesAreOnDish)
+        {
+            // すべてのターゲットが死亡状態なのでシーケンスを進める
+            ProceedSequence();
+        }
     }
 
     /// <summary>
@@ -145,7 +178,7 @@ public class EventManager : NetworkBehaviour
     private void CheckPlayerEffect()
     {
         // ふさわしいシーケンスでなければなにもしない
-        if (currentSequence != Sequence.PopCakes1_Event && currentSequence != Sequence.PopCakes2_Event && currentSequence != Sequence.PopMushrooms_Event) return;
+        if (currentSequence != Sequence.PopCakes2_Event && currentSequence != Sequence.PopMushrooms_Event) return;
 
         // プレイヤーリストがなければなにもしない
         if (PlayerTest.list == null) return;
@@ -214,6 +247,7 @@ public class EventManager : NetworkBehaviour
 				waitAndExecCoroutine = null;
 			}
 		}
+
 		StopAllCoroutines();
 
 		// イベント効果音の再生を停止
@@ -601,6 +635,7 @@ public class EventManager : NetworkBehaviour
 		{	
             var item = Instantiate(prefab);
             item.transform.position = trans.position;
+            item.transform.localScale = Vector3.one * (type == ItemType.LargenCake ? 3 : 1);
 
             itemList.Add(item);
 
@@ -674,6 +709,35 @@ public class EventManager : NetworkBehaviour
         }
 
         Debug.Log("ターゲットの数 -> " + targetList.Count.ToString());
+    }
+
+    /// <summary>
+    /// 皿にケーキをセット
+    /// </summary>
+    [Server]
+    public void TrySetCake( DrothyItem item )
+    {
+        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
+
+        if (TeaRoomSceneManager.instance.CakeSetPositionParent == null) return;
+
+        var distance = Vector3.Distance(item.transform.position, TeaRoomSceneManager.instance.CakeSetPositionParent.position);
+
+        Debug.Log("distance" + distance.ToString());
+
+        if ( distance < cakeSetDistance )
+        {
+            Debug.Log("手離されたケーキはセット範囲内");
+
+            item.IsOnDish = true;
+            int itemIndex = itemList.IndexOf(item);
+            var targetTrans = TeaRoomSceneManager.instance.CakeSetPositions[itemIndex];
+            if( targetTrans != null )
+            {
+                item.transform.position = targetTrans.position;
+                item.transform.rotation = targetTrans.rotation;
+            }
+        }
     }
 
     /// <summary>

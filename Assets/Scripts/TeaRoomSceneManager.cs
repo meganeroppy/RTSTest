@@ -14,6 +14,15 @@ public class TeaRoomSceneManager : MonoBehaviour
     public static TeaRoomSceneManager instance;
 
     /// <summary>
+    /// ケーキを置く場所の親要素
+    /// </summary>
+    [SerializeField]
+    private Transform cakeSetPositionParent = null;
+    public Transform CakeSetPositionParent { get{ return cakeSetPositionParent;} }
+    private Transform[] cakeSetPositions;
+    public Transform[] CakeSetPositions { get { return cakeSetPositions; } }
+
+    /// <summary>
     /// 巨大化ケーキの出現位置候補
     /// </summary>
     [SerializeField]
@@ -58,6 +67,13 @@ public class TeaRoomSceneManager : MonoBehaviour
         {
             mushroomPositions[i] = mushroomPositionsParent.GetChild(i);
         }
+
+        cakeSetPositions = new Transform[cakeSetPositionParent.childCount];
+        for (int i = 0; i < cakeSetPositionParent.childCount; ++i)
+        {
+            cakeSetPositions[i] = cakeSetPositionParent.GetChild(i);
+        }
+
     }
 
     /// <summary>

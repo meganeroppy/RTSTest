@@ -83,6 +83,11 @@ public class DrothyItem : NetworkBehaviour
 	/// </summary>
 	private bool released = false;
 
+    /// <summary>
+    /// 皿に乗っているか？
+    /// </summary>
+    public bool IsOnDish { get; set; }
+
     [ServerCallback]
     private void Start()
     {
@@ -122,6 +127,12 @@ public class DrothyItem : NetworkBehaviour
 		}
 		else
 		{
+            // ケーキ皿に置く判定
+            if( EventManager.instance != null)
+            {
+                EventManager.instance.TrySetCake( this );
+            }
+
 			// 一度つかんでからはなしたアイテムは一定時間で初期位置にセット
 			resetTimer = respawnWait;
 		}
@@ -171,6 +182,7 @@ public class DrothyItem : NetworkBehaviour
         eatable = true;
         holdable = true;
 		released = false;
+        IsOnDish = false;
 
         // SE再生
         RpcPlaySpawnSound();
