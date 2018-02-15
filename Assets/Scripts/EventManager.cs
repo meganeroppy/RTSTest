@@ -20,6 +20,9 @@ public class EventManager : NetworkBehaviour
     private DrothyItem cakePrefab = null;
 
     [SerializeField]
+    private DrothyItem cakeLargePrefab = null;
+
+    [SerializeField]
     private DrothyItem mushroomPrefab = null;
 
     [SerializeField]
@@ -129,7 +132,7 @@ public class EventManager : NetworkBehaviour
 	/// <summary>
 	/// ティールーム系シーンでアイテムが出現するまでの秒数
 	/// </summary>
-	private float itemPopEventWait = 10f;
+	private float itemPopEventWait = 3f;
 
     private void Awake()
     {
@@ -623,7 +626,7 @@ public class EventManager : NetworkBehaviour
 
         Debug.Log(transforms.Length.ToString() + "この候補場所があるよ");
 
-        var prefab = type == ItemType.Mushroom ? mushroomPrefab : cakePrefab;
+        var prefab = type == ItemType.LargenCake ? cakeLargePrefab : cakePrefab;
 
         // プレイヤー数を取得
         int playerNum = PlayerTest.list.Count - PlayerTest.PureNavigatorCount;
@@ -634,8 +637,7 @@ public class EventManager : NetworkBehaviour
 		foreach( Transform trans in transforms )
 		{	
             var item = Instantiate(prefab);
-            item.transform.position = trans.position;
-            item.transform.localScale = Vector3.one * (type == ItemType.LargenCake ? 3 : 1);
+            item.transform.SetPositionAndRotation(trans.position, trans.rotation);
 
             itemList.Add(item);
 
