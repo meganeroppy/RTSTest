@@ -59,6 +59,24 @@ public class PlayerTest : NetworkBehaviour
     private Transform holdPosLeft;
 
     /// <summary>
+    /// 弾が発射される場所右手
+    /// </summary>
+    [SerializeField]
+    private Transform muzzleRight;
+
+    /// <summary>
+    /// 弾が発射される場所右手
+    /// </summary>
+    [SerializeField]
+    private Transform muzzleLeft;
+
+    /// <summary>
+    /// 銃のビジュアル
+    /// </summary>
+    [SerializeField]
+    private GameObject[] gunsVisual;
+
+    /// <summary>
     /// （仮）プリセットのプレイヤーカラー
     /// </summary>
     Color[] playerColor = new Color[] { Color.gray, Color.red, Color.green, Color.blue, Color.yellow };
@@ -178,6 +196,11 @@ public class PlayerTest : NetworkBehaviour
 	/// null参照のドロシーがローカル環境に存在するか？
 	/// </summary>
 	private static bool unreferencedDrothyExist = false;
+
+    /// <summary>
+    /// シーケンス切り替わった時だけ処理を行いたいので現在のシーケンスをプレイヤー側でも保持する
+    /// </summary>
+    private EventManager.Sequence playerCurrentSequence;
 
     private void Awake()
     {
@@ -368,6 +391,14 @@ public class PlayerTest : NetworkBehaviour
         CheckInput();
 
         CheckTalking();
+
+        // シーケンスが変わった時だけビジュアルの更新を行う
+        if (playerCurrentSequence != EventManager.instance.CurrentSequence)
+        {
+            UpdateHandVisual();
+        }
+
+        playerCurrentSequence = EventManager.instance.CurrentSequence;
     }
 
     /// <summary>
@@ -527,6 +558,28 @@ public class PlayerTest : NetworkBehaviour
         )
         {
             Debug.LogWarning("ナビゲーターモード切り替え機能は未実装");
+        }
+    }
+
+    /// <summary>
+    /// 手のビジュアルを更新する
+    /// 最後のシーンだけ銃を表示、それ以外のシーンの時は手を表示する
+    /// </summary>
+    private void UpdateHandVisual()
+    {
+        var inFinalScene =
+            EventManager.instance.CurrentSequence == EventManager.Sequence.TeaRoomSmall ||
+            EventManager.instance.CurrentSequence == EventManager.Sequence.PopMushrooms_Event ||
+            EventManager.instance.CurrentSequence == EventManager.Sequence.Ending_Event;
+
+        // 手
+        animRightHand.gameObject.SetActive(!inFinalScene);
+        animLeftHand.gameObject.SetActive(!inFinalScene);
+
+        // 銃
+        foreach( GameObject g in gunsVisual )
+        {
+            g.SetActive(inFinalScene);
         }
     }
 
