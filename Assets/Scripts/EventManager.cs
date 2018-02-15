@@ -17,16 +17,24 @@ public class EventManager : NetworkBehaviour
     public static EventManager instance;
 
     [SerializeField]
-    private DrothyItem cakePrefab;
+    private DrothyItem cakePrefab = null;
 
     [SerializeField]
-    private DrothyItem mushroomPrefab;
+    private DrothyItem mushroomPrefab = null;
+
+    [SerializeField]
+    private ShootTarget targetPrefab = null;
 
     /// <summary>
     /// 出現しているアイテムのリスト
     /// </summary>
 	private List<DrothyItem> itemList;
 	public List<DrothyItem> ItemList { get { return itemList; } }
+
+    /// <summary>
+    /// 出現しているターゲットのリスト
+    /// </summary>
+    private List<ShootTarget> targetList;
 
     /// <summary>
     /// シーン切り替え時の
@@ -127,6 +135,7 @@ public class EventManager : NetworkBehaviour
     private void Update()
     {
         CheckPlayerEffect();
+        CheckTargetsStatus();
     }
 
     /// <summary>
@@ -161,11 +170,38 @@ public class EventManager : NetworkBehaviour
         }
     }
 
-	/// <summary>
-	/// 強制的にシーケンスを進める
-	/// ナビゲータが強制的に進行させたい時に使う
-	/// </summary>
-	[Server]
+    /// <summary>
+    /// 出現しているターゲットの状態をチェックする
+    /// </summary>
+    [Server]
+    private void CheckTargetsStatus()
+    {
+        // ふさわしいシーケンスでなければなにもしない
+        if ( currentSequence != Sequence.PopMushrooms_Event) return;
+
+        // ターゲットリストがなければなにもしない
+        if (targetList == null) return;
+
+        // すべてのターゲットが死亡していたら次のシーンに移行
+        bool anyTargetActive = false;
+        foreach (ShootTarget s in targetList)
+        {
+            if (s.Activated) anyTargetActive = true;
+        }
+
+        if (!anyTargetActive)
+        {
+            // すべてのターゲットが死亡状態なのでシーケンスを進める
+            ProceedSequence();
+        }
+    }
+
+
+    /// <summary>
+    /// 強制的にシーケンスを進める
+    /// ナビゲータが強制的に進行させたい時に使う
+    /// </summary>
+    [Server]
 	public void ForceProceedSequence()
 	{
 		// コルーチンが動いていたら停止
@@ -243,8 +279,8 @@ public class EventManager : NetworkBehaviour
 
             case Sequence.PopMushrooms_Event:
 
-			// きのこ出現 サーバー側のみでOK
-                CreateItems(ItemType.Mushroom);
+                // ターゲット出現 サーバー側のみでOK
+                CreateTargets();
 
                 break;
 
@@ -586,6 +622,61 @@ public class EventManager : NetworkBehaviour
     }
 
     /// <summary>
+    /// ターゲット配置クライアントにも同期されるのでコールはサーバーのみ
+    /// </summary>
+    [Server]
+    private void CreateTargets()
+    {
+        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
+
+        // すでに配置されたアイテムがあればリストを削除
+        RemoveTargets();
+
+        // リストを新しく作る
+        targetList = new List<ShootTarget>();
+
+        if (TeaRoomSceneManager.instance == null)
+        {
+            Debug.LogError("TeaRoomSceneManager.instanceがない");
+            return;
+        }
+
+        // 出現候補を取得
+        var transforms = TeaRoomSceneManager.instance.MushroomTrans;
+
+        Debug.Log(transforms.Length.ToString() + "この候補場所があるよ");
+
+        // プレイヤー数を取得
+        int playerNum = PlayerTest.list.Count - PlayerTest.PureNavigatorCount;
+        Debug.Log(PlayerTest.list.Count.ToString() + " - " + PlayerTest.PureNavigatorCount.ToString() + " = " + playerNum.ToString());
+
+        int setCount = 0;
+        // 候補の数繰り返す
+        foreach (Transform trans in transforms)
+        {
+            var target = Instantiate(targetPrefab);
+            target.transform.position = trans.position;
+
+            targetList.Add(target);
+
+            NetworkServer.Spawn(target.gameObject);
+
+            // 生成数がプレイヤーと一緒になったら終了
+            if (++setCount >= playerNum)
+            {
+                Debug.Log(setCount.ToString() + "こ作った おしまい");
+                break;
+            }
+            else
+            {
+                Debug.Log(setCount.ToString() + "こ作った まだつくる");
+            }
+        }
+
+        Debug.Log("ターゲットの数 -> " + targetList.Count.ToString());
+    }
+
+    /// <summary>
     /// 配置済みアイテムを削除
     /// </summary>
 	[Server]
@@ -604,6 +695,27 @@ public class EventManager : NetworkBehaviour
         }
 
 		itemList = null;
+    }
+
+    /// <summary>
+    /// 配置済みターゲットを削除
+    /// </summary>
+    [Server]
+    private void RemoveTargets()
+    {
+        if (targetList == null) return;
+
+        for (int i = targetList.Count - 1; i >= 0; --i)
+        {
+            var target = targetList[i];
+            targetList.RemoveAt(i);
+            if (target != null)
+            {
+                NetworkServer.Destroy(target.gameObject);
+            }
+        }
+
+        targetList = null;
     }
 
     /// <summary>
