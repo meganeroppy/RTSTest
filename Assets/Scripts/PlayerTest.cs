@@ -755,12 +755,15 @@ public class PlayerTest : NetworkBehaviour
 		float nearest = float.MaxValue;
 		for( int i=0 ; i< items.Count ; ++i )
 		{
-			float distance = Vector3.Distance( targetHand.position, items[i].transform.position );
+            var item = items[i];
+            if (item == null) continue;
+
+			float distance = Vector3.Distance( targetHand.position, item.transform.position );
 
 			// 掴める範囲外はコンティニュー
 			if( distance > holdRange ) 
 			{
-				Debug.Log(items[i].name + "はつかみ可能範囲外( 距離 : " + distance.ToString() + ")");
+				Debug.Log(item.name + "はつかみ可能範囲外( 距離 : " + distance.ToString() + ")");
 				continue;
 			}
 
@@ -769,7 +772,7 @@ public class PlayerTest : NetworkBehaviour
 			{
 				// 暫定最短距離を更新
 				nearest = distance;
-				selectedItem = items[i];
+				selectedItem = item;
 			}
 		}
 
