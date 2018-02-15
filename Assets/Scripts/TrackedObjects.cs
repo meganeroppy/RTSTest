@@ -13,14 +13,14 @@ public class TrackedObjects : NetworkBehaviour
     /// シリアライズされたトラッキング位置と回転がそのまま適用されるオブジェクト、HMDをトラッキングしたもの
     /// </summary>
 	[SerializeField]
-	private CopyTransform copyTransformHead;
+	private CopyTransform copyTransformHead = null;
 
     /// <summary>
     /// copyTransformHeadの子要素
     /// ドロシーモデルの頭が見つめる目標になる
     /// </summary>
 	[SerializeField]
-	private Transform lookTarget;
+	private Transform lookTarget = null;
     public Transform LookTarget
     {
         get { return lookTarget; }
@@ -30,14 +30,14 @@ public class TrackedObjects : NetworkBehaviour
     /// シリアライズされたトラッキング位置と回転がそのまま適用されるオブジェクト、Touchの右手をトラッキングしたもの
     /// </summary>
     [SerializeField]
-	private CopyTransform copyTransformRightHand;
+	private CopyTransform copyTransformRightHand = null;
 
     /// <summary>
     /// ドロシーの右手のIK対象として位置角度を調整したもの。
     /// copyTransformRightHandの子要素
     /// </summary>
 	[SerializeField]
-	private Transform rightHandObject;
+	private Transform rightHandObject = null;
     public Transform RightHandObject
     {
         get { return rightHandObject; }
@@ -47,14 +47,14 @@ public class TrackedObjects : NetworkBehaviour
     /// シリアライズされたトラッキング位置と回転がそのまま適用されるオブジェクト、Touchの左手をトラッキングしたもの
     /// </summary>
     [SerializeField]
-	private CopyTransform copyTransformLeftHand;
+	private CopyTransform copyTransformLeftHand = null;
 
     /// <summary>
     /// ドロシーの右手のIK対象として位置角度を調整したもの。
     /// copyTransformLeftHandの子要素
     /// </summary>
 	[SerializeField]
-	private Transform leftHandObject;
+	private Transform leftHandObject = null;
     public Transform LeftHandObject
     {
         get { return leftHandObject; }
@@ -64,14 +64,14 @@ public class TrackedObjects : NetworkBehaviour
     /// シリアライズされたトラッキング位置と回転がそのまま適用されるオブジェクト、バックパックPCをトラッキングしたもの
     /// </summary>
     [SerializeField]
-	private CopyTransform copyTransformBody;
+	private CopyTransform copyTransformBody = null;
 
     /// <summary>
     /// ドロシーの体のIK対象として位置角度を調整したもの。
     /// copyTransformBodyの子要素
     /// </summary>
     [SerializeField]
-	private Transform bodyObject;
+	private Transform bodyObject = null;
     public Transform BodyObject
     {
         get { return bodyObject; }
