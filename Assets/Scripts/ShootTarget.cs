@@ -39,10 +39,8 @@ public class ShootTarget : NetworkBehaviour
 	
 	// Update is called once per frame
     [ServerCallback]
-	void Update () {
-
-        if (Input.GetKeyDown(KeyCode.H)) CmdHit();
-
+	void Update ()
+    {
         if (activated) return;
 
         timer += Time.deltaTime;
@@ -52,18 +50,11 @@ public class ShootTarget : NetworkBehaviour
         }
 	}
 
-    /// <summary>
-    /// 攻撃がヒット
-    /// </summary>
-    [Command]
-    public void CmdHit()
-    {
-        Hit();
-    }
-
     [Server]
-    private void Hit()
+    public void Hit()
     {
+        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
+
         if (!activated) return;
 
         currentHealth--;

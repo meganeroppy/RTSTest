@@ -9,7 +9,7 @@ using UnityEngine.Networking;
 public class NavigateShot : NetworkBehaviour {
 
 	[SerializeField]
-	private GameObject effect;
+	private GameObject effect = null;
 
 	[SerializeField]
 	private float speed = 3f;
@@ -44,9 +44,21 @@ public class NavigateShot : NetworkBehaviour {
 	}
 
     [ServerCallback]
-	void OnCollisionEnter( Collision col )
+	void OnTriggerEnter( Collider col )
 	{
+        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod() + " : " + col.name);
+
 		if( dead ) return;
+
+        // ターゲットだったらヒット
+        if( col.tag == "Item" )
+        {
+            var enemy = col.GetComponent<ShootTarget>();
+            if( enemy != null )
+            {
+                enemy.Hit();
+            }
+        }
 
 		dead = true;
 

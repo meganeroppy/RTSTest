@@ -125,6 +125,14 @@ public class PlayerTest : NetworkBehaviour
     private MeshRenderer mask;
 
     /// <summary>
+    /// アキバシーンで発射するもの
+    /// 何か発射したいのでとりあえずナビゲートショットを撃たせる
+    /// 工数に余裕がでてきたら処理変えるかも
+    /// </summary>
+    [SerializeField]
+    private NavigateShot shot;
+
+    /// <summary>
     /// ナビゲーターの数 ただしプレイヤー風ナビゲーターは除外する
     /// </summary>
     public static int PureNavigatorCount {
@@ -478,7 +486,7 @@ public class PlayerTest : NetworkBehaviour
 				{
 					grabbingRight = true;
 					Debug.Log ("右手をにぎる");
-					CmdSetHoldItem (HandIndex.Right);
+					CmdPullTrigger (HandIndex.Right);
 				}  
 				else if (!grabRight && grabbingRight) 
 				{
@@ -505,7 +513,7 @@ public class PlayerTest : NetworkBehaviour
 				{
 					grabbingLeft = true;
 					Debug.Log ("左手をにぎる");
-					CmdSetHoldItem (HandIndex.Left);
+					CmdPullTrigger (HandIndex.Left);
 				}
 				else if (!grabLeft && grabbingLeft)
 				{				
@@ -784,16 +792,29 @@ public class PlayerTest : NetworkBehaviour
     }
 
     /// <summary>
-    /// アイテムをつかむ
+    /// トリガーが引かれたときの処理
+    /// 最終シーンにいるときは弾を発射
+    /// そうでないときは手を握る（アイテムをつかむ）
     /// サーバー処理
     /// </summary>
     [Command]
-    private void CmdSetHoldItem( HandIndex hIndex )
+    private void CmdPullTrigger(HandIndex hIndex)
     {
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
-		// 対象となる手を取得
-		var targetHand = hIndex == HandIndex.Right ? holdPosRight : holdPosLeft;
+        // 最終シーンの時は銃撃
+        if (
+            EventManager.instance.CurrentSequence == EventManager.Sequence.TeaRoomSmall ||
+            EventManager.instance.CurrentSequence == EventManager.Sequence.PopMushrooms_Event ||
+            EventManager.instance.CurrentSequence == EventManager.Sequence.Ending_Event
+        )
+        {
+            FireNavigateShot( hIndex );
+            return;
+        }
+        
+        // 対象となる手を取得
+        var targetHand = hIndex == HandIndex.Right ? holdPosRight : holdPosLeft;
 
 		// 範囲内に掴めるアイテムがあるか調べる
 		// 複数存在した場合はもっとも近くにあるものを取得する
@@ -1000,5 +1021,21 @@ public class PlayerTest : NetworkBehaviour
     public void RpcSetCameraMaskColor(Color color)
     {
         mask.material.color = color;
+    }
+
+    /// <summary>
+    /// ナビゲートショットを発射
+    /// </summary>
+    /// <param name="hIndex"></param>
+    [Server]
+    private void FireNavigateShot( HandIndex hIndex )
+    {
+        var obj = Instantiate(shot);
+
+        var trans = hIndex == HandIndex.Right ? muzzleRight : muzzleLeft;
+        obj.transform.position = trans.position;
+        obj.transform.rotation = trans.rotation;
+
+        NetworkServer.Spawn(obj.gameObject);
     }
 }
