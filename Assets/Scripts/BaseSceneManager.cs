@@ -10,7 +10,6 @@ public class BaseSceneManager : MonoBehaviour
 {
     public static BaseSceneManager instance;
 
-    public string firstSceneName;
 
     [SerializeField]
     private Camera[] presetCameras;
@@ -77,11 +76,11 @@ public class BaseSceneManager : MonoBehaviour
     }
     private IEnumerator LoadFirstScene()
     {
-        var operation = SceneManager.LoadSceneAsync(firstSceneName, LoadSceneMode.Additive);
+        var operation = SceneManager.LoadSceneAsync(RtsTestNetworkManager.instance.firstSceneName, LoadSceneMode.Additive);
 
         while (!operation.isDone) yield return null;
 
-        var scene = SceneManager.GetSceneByName(firstSceneName);
+        var scene = SceneManager.GetSceneByName(RtsTestNetworkManager.instance.firstSceneName);
 
         SceneManager.SetActiveScene( scene );
 

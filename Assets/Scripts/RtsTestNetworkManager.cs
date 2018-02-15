@@ -83,7 +83,6 @@ public class RtsTestNetworkManager : NetworkBehaviour
 	/// </summary>
 	public NavigatorType MyNavigatorType{get{ return navigatorType;}}
 
-
 	/// <summary>
 	/// 入力モード
 	/// 実稼働時にはデフォルトの使用を前提とする
@@ -152,6 +151,11 @@ public class RtsTestNetworkManager : NetworkBehaviour
 	/// 自身の役割を実行済みか？
 	/// </summary>
 	private bool executedOwnRole = false;
+
+    /// <summary>
+    /// 最初に遷移するシーン
+    /// </summary>
+    public string firstSceneName;
 
     private void Awake()
     {
