@@ -186,6 +186,8 @@ public class DrothyController : NetworkBehaviour
 	/// </summary>
 	public void SetDressColor()
 	{
+        if (skinMesh == null) return;
+
 		var newTex = dressTexture[ colorIdx % dressTexture.Length];
 		if( skinMesh.materials[ dressMatIdx ].mainTexture != newTex )
 		{
