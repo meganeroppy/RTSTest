@@ -27,6 +27,14 @@ public class BaseSceneManager : MonoBehaviour
     public TrackerSettings CopyTransformLeftHand { get { return copyTransformLeftHand; } }
 
     [SerializeField]
+    private TrackerSettings copyTransformRightFoot;
+    public TrackerSettings CopyTransformRightFoot { get { return copyTransformRightFoot; } }
+
+    [SerializeField]
+    private TrackerSettings copyTransformLeftFoot;
+    public TrackerSettings CopyTransformLeftFoot { get { return copyTransformLeftFoot; } }
+
+    [SerializeField]
     private TrackerSettings copyTransformBody;
     public TrackerSettings CopyTransformBody { get { return copyTransformBody; } }
 
@@ -69,6 +77,12 @@ public class BaseSceneManager : MonoBehaviour
 
             if (copyTransformLeftHand.ObjectName.EndsWith("LH"))
                 copyTransformLeftHand.ObjectName += playerId.ToString();
+
+            if (copyTransformRightFoot.ObjectName.EndsWith("RF"))
+                copyTransformRightFoot.ObjectName += playerId.ToString();
+
+            if (copyTransformLeftFoot.ObjectName.EndsWith("LF"))
+                copyTransformLeftFoot.ObjectName += playerId.ToString();
 
             if (copyTransformBody.ObjectName.EndsWith("Body"))
                 copyTransformBody.ObjectName += playerId.ToString();

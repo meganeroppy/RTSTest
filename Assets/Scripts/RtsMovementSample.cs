@@ -20,6 +20,10 @@ public class RtsMovementSample : MonoBehaviour
     [SerializeField]
     private Transform lh;
     [SerializeField]
+    private Transform rf;
+    [SerializeField]
+    private Transform lf;
+    [SerializeField]
     private Transform head;
     [SerializeField]
     private Transform body;
@@ -33,6 +37,10 @@ public class RtsMovementSample : MonoBehaviour
     private Vector3 rhOriginPos = Vector3.right * 1f;
     [SerializeField]
     private Vector3 lhOriginPos = Vector3.right * -1f;
+    [SerializeField]
+    private Vector3 rfOriginPos = Vector3.right * 1f;
+    [SerializeField]
+    private Vector3 lfOriginPos = Vector3.right * -1f;
     [SerializeField]
     private Vector3 headOriginPos = Vector3.up * 1.5f;
     [SerializeField]
@@ -56,6 +64,20 @@ public class RtsMovementSample : MonoBehaviour
         {
             component.StopFlag();
             component.transform.localPosition = lhOriginPos;
+            component.transform.localRotation = Quaternion.identity;
+        }
+        component = rf.GetComponent<TrackerSettings>();
+        if (component != null)
+        {
+            component.StopFlag();
+            component.transform.localPosition = rfOriginPos;
+            component.transform.localRotation = Quaternion.identity;
+        }
+        component = lf.GetComponent<TrackerSettings>();
+        if (component != null)
+        {
+            component.StopFlag();
+            component.transform.localPosition = lfOriginPos;
             component.transform.localRotation = Quaternion.identity;
         }
         component = head.GetComponent<TrackerSettings>();

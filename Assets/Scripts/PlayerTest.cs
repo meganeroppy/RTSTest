@@ -640,6 +640,8 @@ public class PlayerTest : NetworkBehaviour
         {
             drothyIK.rightHandObj = trackedObjects.RightHandObject;
             drothyIK.leftHandObj = trackedObjects.LeftHandObject;
+            drothyIK.rightFootObj = trackedObjects.RightFootObject;
+            drothyIK.leftFootObj = trackedObjects.LeftFootObject;
             drothyIK.bodyObj = trackedObjects.BodyObject;
             drothyIK.lookObj = trackedObjects.LookTarget;
         }
@@ -697,6 +699,8 @@ public class PlayerTest : NetworkBehaviour
             {
                 drothyIK.rightHandObj = trackedObjects.RightHandObject;
                 drothyIK.leftHandObj = trackedObjects.LeftHandObject;
+                drothyIK.rightFootObj = trackedObjects.RightFootObject;
+                drothyIK.leftFootObj = trackedObjects.LeftFootObject;
                 drothyIK.bodyObj = trackedObjects.BodyObject;
                 drothyIK.lookObj = trackedObjects.LookTarget;
             }

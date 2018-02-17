@@ -60,6 +60,40 @@ public class TrackedObjects : NetworkBehaviour
         get { return leftHandObject; }
     }
 
+
+
+    /// <summary>
+    /// シリアライズされたトラッキング位置と回転がそのまま適用されるオブジェクト、サンダル左をトラッキングしたもの
+    /// </summary>
+    [SerializeField]
+    private CopyTransform copyTransformLeftFoot = null;
+
+    /// <summary>
+    /// ドロシーの左足のIK対象として位置角度を調整したもの
+    /// </summary>
+	[SerializeField]
+    private Transform leftFootObject = null;
+    public Transform LeftFootObject
+    {
+        get { return leftFootObject; }
+    }
+
+    /// <summary>
+    /// シリアライズされたトラッキング位置と回転がそのまま適用されるオブジェクト、サンダル右をトラッキングしたもの
+    /// </summary>
+    [SerializeField]
+    private CopyTransform copyTransformRightFoot = null;
+
+    /// <summary>
+    /// ドロシーの右足のIK対象として位置角度を調整したもの
+    /// </summary>
+	[SerializeField]
+    private Transform rightFootObject = null;
+    public Transform RightFootObject
+    {
+        get { return rightFootObject; }
+    }
+
     /// <summary>
     /// シリアライズされたトラッキング位置と回転がそのまま適用されるオブジェクト、バックパックPCをトラッキングしたもの
     /// </summary>
@@ -128,6 +162,12 @@ public class TrackedObjects : NetworkBehaviour
 
             copyTransformLeftHand.copySource = b.CopyTransformLeftHand.gameObject;
             copyTransformLeftHand.offsetObject = b.OffsetObject;
+
+            copyTransformRightFoot.copySource = b.CopyTransformRightFoot.gameObject;
+            copyTransformRightFoot.offsetObject = b.OffsetObject;
+
+            copyTransformLeftFoot.copySource = b.CopyTransformLeftFoot.gameObject;
+            copyTransformLeftFoot.offsetObject = b.OffsetObject;
 
             copyTransformBody.copySource = b.CopyTransformBody.gameObject;
             copyTransformBody.offsetObject = b.OffsetObject;
