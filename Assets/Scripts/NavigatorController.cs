@@ -64,24 +64,6 @@ public class NavigatorController : NetworkBehaviour {
 
 		if( isVisible == isVisiblePrev ) return;
 
-		// ドロシーの表示/非表示
-		if( playerTest.NavigatorType == RtsTestNetworkManager.NavigatorType.Participatory )
-		{
-			if( !drothyVisual ) 
-			{
-				var drothy = playerTest.MyAvatar;
-				if( drothy != null )
-				{
-					drothyVisual = drothy.gameObject;
-				}
-			}
-
-			if( drothyVisual )
-			{
-				drothyVisual.SetActive( isVisible );
-			}
-		}
-		else
 		// 芋虫の表示/非表示
 		{
 			if( !CaterpillarVisual ) 

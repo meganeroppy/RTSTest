@@ -432,7 +432,12 @@ public class PlayerTest : NetworkBehaviour
         if (isNavigator)
         {
             // ナビゲーターの場合
-			if (navigatorType == RtsTestNetworkManager.NavigatorType.Participatory)
+
+            // 手を非表示にする
+            animRightHand.gameObject.SetActive(false);
+            animLeftHand.gameObject.SetActive(false);
+
+            if (navigatorType == RtsTestNetworkManager.NavigatorType.Participatory)
             {
                 // 参加型ナビゲーターの場合は有効 ただし強制キーボード操作の時は無効
 				// TODO: RtsTestNetworkManager.instance.MyInputModeつかってるけどやばくない？
@@ -579,6 +584,9 @@ public class PlayerTest : NetworkBehaviour
     /// </summary>
     private void UpdateHandVisual()
     {
+        // ナビゲータはなにもしない
+        if (isNavigator) return;
+
         var inFinalScene =
             EventManager.instance.CurrentSequence == EventManager.Sequence.TeaRoomSmall ||
             EventManager.instance.CurrentSequence == EventManager.Sequence.PopMushrooms_Event ||
