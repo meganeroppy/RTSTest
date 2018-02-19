@@ -136,9 +136,10 @@ public class PlayerTest : NetworkBehaviour
     private NavigateShot shot;
 
     /// <summary>
-    /// ナビゲーターの数 ただしプレイヤー風ナビゲーターは除外する
+    /// ナビゲーターの数
     /// </summary>
-    public static int PureNavigatorCount {
+    public static int NavigatorCount
+    {
         get
         {
             if (list == null) return 0;
@@ -146,7 +147,7 @@ public class PlayerTest : NetworkBehaviour
             int count = 0;
             foreach (PlayerTest p in list)
             {
-                if (p.IsNavigator && p.NavigatorType != RtsTestNetworkManager.NavigatorType.Participatory) count++;
+                if (p.IsNavigator) count++;
             }
 
             return count;

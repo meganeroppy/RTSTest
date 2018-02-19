@@ -628,9 +628,9 @@ public class EventManager : NetworkBehaviour
 
         var prefab = type == ItemType.LargenCake ? cakeLargePrefab : cakePrefab;
 
-        // プレイヤー数を取得
-        int playerNum = PlayerTest.list.Count - PlayerTest.PureNavigatorCount;
-        Debug.Log(PlayerTest.list.Count.ToString() + " - " + PlayerTest.PureNavigatorCount.ToString() + " = " + playerNum.ToString());
+        // プレイヤー数を取得 ナビゲータは含まない
+        int playerNum = PlayerTest.list.Count - PlayerTest.NavigatorCount;
+        Debug.Log(PlayerTest.list.Count.ToString() + " - " + PlayerTest.NavigatorCount.ToString() + " = " + playerNum.ToString());
 
 		int setCount = 0;
         // 候補の数繰り返す
@@ -684,8 +684,8 @@ public class EventManager : NetworkBehaviour
         Debug.Log(transforms.Length.ToString() + "この候補場所があるよ");
 
         // プレイヤー数を取得
-        int playerNum = PlayerTest.list.Count - PlayerTest.PureNavigatorCount;
-        Debug.Log(PlayerTest.list.Count.ToString() + " - " + PlayerTest.PureNavigatorCount.ToString() + " = " + playerNum.ToString());
+        int playerNum = PlayerTest.list.Count - PlayerTest.NavigatorCount;
+        Debug.Log(PlayerTest.list.Count.ToString() + " - " + PlayerTest.NavigatorCount.ToString() + " = " + playerNum.ToString());
 
         int setCount = 0;
         // 候補の数繰り返す
