@@ -37,8 +37,11 @@ public class PlayerTest : NetworkBehaviour
 
     [SerializeField]
     private IKControl drothyIKPrefab;
-    private DrothyController myDrothy;
-	public DrothyController MyDrothy{ get{ return myDrothy;}}
+    [SerializeField]
+    private IKControl unityChanIKPrefab;
+
+    private AvatarController myAvatar;
+	public AvatarController MyAvatar{ get{ return myAvatar;}}
 
     [SerializeField]
     private TextMesh textMesh;
@@ -90,12 +93,12 @@ public class PlayerTest : NetworkBehaviour
     /// <summary>
     /// 右手でつかんでいるアイテム
     /// </summary>
-    private DrothyItem holdItemRight = null;
+    private AvatarItem holdItemRight = null;
 
     /// <summary>
     /// 左手でつかんでいるアイテム
     /// </summary>
-    private DrothyItem holdItemLeft = null;
+    private AvatarItem holdItemLeft = null;
 
     /// <summary>
     /// 頭オブジェクト
@@ -195,13 +198,13 @@ public class PlayerTest : NetworkBehaviour
 	private Animator animLeftHand;
 
 	/// <summary>
-	/// ドロシーのNetId
+	/// アバターのNetId
 	/// </summary>
 	[SyncVar]
-	private NetworkInstanceId drothyNetId = NetworkInstanceId.Invalid;
+	private NetworkInstanceId avatarNetId = NetworkInstanceId.Invalid;
 
 	/// <summary>
-	/// null参照のドロシーがローカル環境に存在するか？
+	/// null参照のアバターがローカル環境に存在するか？
 	/// </summary>
 	private static bool unreferencedDrothyExist = false;
 
@@ -259,7 +262,7 @@ public class PlayerTest : NetworkBehaviour
         // プレイヤー名を変更する
         gameObject.name = "[YOU] " + gameObject.name;
 
-        // サーバー上でドロシーを生成
+        // サーバー上でアバターを生成
         CmdCreateDrothy(RtsTestNetworkManager.instance.PlayerId);
 
         // サーバー上でナビゲーターフラグをセットする syncVarなのでのちにクライアントにも反映される
@@ -350,10 +353,10 @@ public class PlayerTest : NetworkBehaviour
 
 		if( isClient )
 		{
-			// 自身のドロシーがnull かつ 非参加型ナビゲータでないときに実行
-			if( myDrothy == null && ( !IsNavigator || ( IsNavigator && NavigatorType == RtsTestNetworkManager.NavigatorType.Participatory ) ) )
+			// 自身のアバターがnull かつ 非参加型ナビゲータでないときに実行
+			if( myAvatar == null && ( !IsNavigator || ( IsNavigator && NavigatorType == RtsTestNetworkManager.NavigatorType.Participatory ) ) )
 			{
-				Debug.Log( netId.ToString() + "のプレイヤーのドロシーがnull参照なのでフラグを立てた" );
+				Debug.Log( netId.ToString() + "のプレイヤーのアバターがnull参照なのでフラグを立てた" );
 
 				unreferencedDrothyExist = true;
 			}
@@ -361,7 +364,7 @@ public class PlayerTest : NetworkBehaviour
 			// 非ローカルからは呼べないのでローカルのプレイヤーから呼び出す
 			if( isLocalPlayer && unreferencedDrothyExist )
 			{
-				Debug.Log( "フラグがたっているのでNetId = " + netId.ToString() + "のローカルプレイヤーからドロシーの参照を要求" );
+				Debug.Log( "フラグがたっているのでNetId = " + netId.ToString() + "のローカルプレイヤーからアバターの参照を要求" );
 				CmdRequestDrothyReference();
 			}
 		}
@@ -626,7 +629,7 @@ public class PlayerTest : NetworkBehaviour
     }
 
     /// <summary>
-    /// ドロシーを生成する
+    /// アバターを生成する
     /// </summary>
     [Command]
     private void CmdCreateDrothy(int playerId)
@@ -634,85 +637,86 @@ public class PlayerTest : NetworkBehaviour
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
         // プレハブから生成
-        var drothyIK = Instantiate<IKControl>(drothyIKPrefab);
+        var avatar = RtsTestNetworkManager.instance.AvatarType == RtsTestNetworkManager.AvatarTypeEnum.UnityChan ? unityChanIKPrefab : drothyIKPrefab;
+        var avatarIK = Instantiate<IKControl>(avatar);
 
         // IKのターゲットをトラッキングオブジェクトから取得
         {
-            drothyIK.rightHandObj = trackedObjects.RightHandObject;
-            drothyIK.leftHandObj = trackedObjects.LeftHandObject;
-            drothyIK.rightFootObj = trackedObjects.RightFootObject;
-            drothyIK.leftFootObj = trackedObjects.LeftFootObject;
-            drothyIK.bodyObj = trackedObjects.BodyObject;
-            drothyIK.lookObj = trackedObjects.LookTarget;
+            avatarIK.rightHandObj = trackedObjects.RightHandObject;
+            avatarIK.leftHandObj = trackedObjects.LeftHandObject;
+            avatarIK.rightFootObj = trackedObjects.RightFootObject;
+            avatarIK.leftFootObj = trackedObjects.LeftFootObject;
+            avatarIK.bodyObj = trackedObjects.BodyObject;
+            avatarIK.lookObj = trackedObjects.LookTarget;
         }
 
         // 設定が有効になっている場合は脚の動きのシミュレートを行う
 		// TODO: RtsTestNetworkManager.instance.UseSimulateFootつかってるけどやばくない？
         if (RtsTestNetworkManager.instance.UseSimulateFoot)
         {
-            drothyIK.SetSimulateFoot();
+            avatarIK.SetSimulateFoot();
         }
 
         // プレイヤーIDによってカラバリを変更する
-        drothyIK.GetComponent<DrothyController>().ColorIdx = playerId;
+        avatarIK.GetComponent<AvatarController>().ColorIdx = playerId;
 
-        myDrothy = drothyIK.GetComponent<DrothyController>();
-        if (myDrothy == null)
+        myAvatar = avatarIK.GetComponent<AvatarController>();
+        if (myAvatar == null)
         {
             return;
         }
 
-        myDrothy.SetOwner(trackedObjects.BodyObject);
+        myAvatar.SetOwner(trackedObjects.BodyObject);
 
         // どちらが正しいかはまだ不明
-        //      NetworkServer.Spawn(drothy.gameObject);
-        NetworkServer.SpawnWithClientAuthority(myDrothy.gameObject, gameObject);
+        //      NetworkServer.Spawn(avatar.gameObject);
+        NetworkServer.SpawnWithClientAuthority(myAvatar.gameObject, gameObject);
 
-        RpcPassDrothyReference(myDrothy.netId);
+        RpcPassDrothyReference(myAvatar.netId);
 
-		// ドロシーのNetIdをサーバー側で保持する
-		drothyNetId = myDrothy.netId;
+		// アバターのNetIdをサーバー側で保持する
+		avatarNetId = myAvatar.netId;
     }
 
     /// <summary>
-    /// クライアント側でもドロシーの参照を持たせる
+    /// クライアント側でもアバターの参照を持たせる
     /// </summary>
     [ClientRpc]
-	private void RpcPassDrothyReference(NetworkInstanceId drothyNetId)
+	private void RpcPassDrothyReference(NetworkInstanceId avatarNetId)
     {
-		Debug.Log(System.Reflection.MethodBase.GetCurrentMethod() + "NetId = " + drothyNetId);
+		Debug.Log(System.Reflection.MethodBase.GetCurrentMethod() + "NetId = " + avatarNetId);
 
-        var drothyObj = ClientScene.FindLocalObject(drothyNetId);
-		if( !drothyObj )
+        var avatarObj = ClientScene.FindLocalObject(avatarNetId);
+		if( !avatarObj )
 		{
-			Debug.Log( "NetId = " + netId.ToString() + "のプレイヤーからみて" + drothyNetId.ToString() + "のドロシーはみつからなかった");
+			Debug.Log( "NetId = " + netId.ToString() + "のプレイヤーからみて" + avatarNetId.ToString() + "のアバターはみつからなかった");
 			return;
 		}
-		Debug.Log( "ドロシー発見！NetId = " + netId.ToString() + "のプレイヤーのドロシーは" + drothyNetId.ToString() + "のドロシーだった");
+		Debug.Log( "アバター発見！NetId = " + netId.ToString() + "のプレイヤーのアバターは" + avatarNetId.ToString() + "のアバターだった");
 
-        myDrothy = drothyObj.GetComponent<DrothyController>();
+        myAvatar = avatarObj.GetComponent<AvatarController>();
 
         // まだクライアント側はIKターゲットが未指定なのでセットする
         {
-            var drothyIK = myDrothy.GetComponent<IKControl>();
-            if (drothyIK != null)
+            var avatarIK = myAvatar.GetComponent<IKControl>();
+            if (avatarIK != null)
             {
-                drothyIK.rightHandObj = trackedObjects.RightHandObject;
-                drothyIK.leftHandObj = trackedObjects.LeftHandObject;
-                drothyIK.rightFootObj = trackedObjects.RightFootObject;
-                drothyIK.leftFootObj = trackedObjects.LeftFootObject;
-                drothyIK.bodyObj = trackedObjects.BodyObject;
-                drothyIK.lookObj = trackedObjects.LookTarget;
+                avatarIK.rightHandObj = trackedObjects.RightHandObject;
+                avatarIK.leftHandObj = trackedObjects.LeftHandObject;
+                avatarIK.rightFootObj = trackedObjects.RightFootObject;
+                avatarIK.leftFootObj = trackedObjects.LeftFootObject;
+                avatarIK.bodyObj = trackedObjects.BodyObject;
+                avatarIK.lookObj = trackedObjects.LookTarget;
             }
         }
 
-        // ドロシーの表示設定
-        bool drothyVisible;
+        // アバターの表示設定
+        bool avatarVisible;
 		// TODO: RtsTestNetworkManager.instance.ForceDisplayDrothyつかってるけどやばくない？
-        if (RtsTestNetworkManager.instance.ForceDisplayDrothy)
+        if (RtsTestNetworkManager.instance.ForceDisplayAvatar)
         {
-            // 強制ドロシー表示フラグがあったら確実に表示する
-            drothyVisible = true;
+            // 強制アバター表示フラグがあったら確実に表示する
+            avatarVisible = true;
         }
         else if (isNavigator)
         {
@@ -720,12 +724,12 @@ public class PlayerTest : NetworkBehaviour
             if (isLocalPlayer)
             {
 				// ローカルの時(自分のとき)は表示しない
-                drothyVisible = false;
+                avatarVisible = false;
             }
             else
             {
                 // リモートかつ参加型の時は表示する、そうでなければ表示しない 
-				drothyVisible = navigatorType == RtsTestNetworkManager.NavigatorType.Participatory;
+				avatarVisible = navigatorType == RtsTestNetworkManager.NavigatorType.Participatory;
             }
         }
         else
@@ -733,16 +737,16 @@ public class PlayerTest : NetworkBehaviour
             // プレイヤーの時
 
             // ローカルでなければ表示する
-            drothyVisible = !isLocalPlayer;
+            avatarVisible = !isLocalPlayer;
         }
 
-        drothyObj.SetActive(drothyVisible);
+        avatarObj.SetActive(avatarVisible);
 
 		unreferencedDrothyExist = false;
     }
 
 	/// <summary>
-	/// ドロシーの参照を要求する
+	/// アバターの参照を要求する
 	/// 生成済みの全てのプレイヤーに対して実行される
 	/// ただし非参加型ナビゲータは除外
 	/// </summary>
@@ -766,14 +770,14 @@ public class PlayerTest : NetworkBehaviour
 				Debug.Log( "NetId = " + p.netId.ToString() + "のプレイヤーは非参加型ナビゲータなので除外");
 				continue;
 			}
-			// ドロシーNetIdが未設定の時は除外
-			if( p.drothyNetId == NetworkInstanceId.Invalid ){
-				Debug.Log( "NetId = " + p.netId.ToString() + "のプレイヤーはドロシーのNetIdが未設定なので除外");
+			// アバターNetIdが未設定の時は除外
+			if( p.avatarNetId == NetworkInstanceId.Invalid ){
+				Debug.Log( "NetId = " + p.netId.ToString() + "のプレイヤーはアバターのNetIdが未設定なので除外");
 
 			continue;
 			}
 
-			p.RpcPassDrothyReference( p.drothyNetId );
+			p.RpcPassDrothyReference( p.avatarNetId );
 		}
 	}
 
@@ -822,7 +826,7 @@ public class PlayerTest : NetworkBehaviour
 
 		// 範囲内に掴めるアイテムがあるか調べる
 		// 複数存在した場合はもっとも近くにあるものを取得する
-		DrothyItem selectedItem = null;
+		AvatarItem selectedItem = null;
 		var items = EventManager.instance.ItemList;
 		if( items == null )
 		{
@@ -991,7 +995,7 @@ public class PlayerTest : NetworkBehaviour
 
     /// <summary>
     /// ＊要テスト＊
-    /// プレイヤーが発言している時はドロシーを口パクさせる
+    /// プレイヤーが発言している時はアバターを口パクさせる
     /// </summary>
     [Client]
     void CheckTalking()
@@ -999,11 +1003,11 @@ public class PlayerTest : NetworkBehaviour
         if (broadcastTrigger == null)
             broadcastTrigger = GetComponent<Dissonance.VoiceBroadcastTrigger>();
 
-        if (broadcastTrigger == null || myDrothy == null) return;
+        if (broadcastTrigger == null || myAvatar == null) return;
 
         if (broadcastTrigger.IsTransmitting)
         {
-            myDrothy.CmdTalk();
+            myAvatar.CmdTalk();
         }
     }
 

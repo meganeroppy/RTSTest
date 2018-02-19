@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DrothyTest : MonoBehaviour
+public class AvatarTest : MonoBehaviour
 {
 	public  float speed = 5f;
 	public List<Animator> anim;

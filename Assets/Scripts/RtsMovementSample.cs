@@ -33,18 +33,12 @@ public class RtsMovementSample : MonoBehaviour
     [SerializeField]
     private float rotSpeed = 1f;
 
-    [SerializeField]
     private Vector3 rhOriginPos = Vector3.right * 1f;
-    [SerializeField]
     private Vector3 lhOriginPos = Vector3.right * -1f;
-    [SerializeField]
-    private Vector3 rfOriginPos = Vector3.right * 1f;
-    [SerializeField]
-    private Vector3 lfOriginPos = Vector3.right * -1f;
-    [SerializeField]
+    private Vector3 rfOriginPos = Vector3.right * 0.2f;
+    private Vector3 lfOriginPos = Vector3.right * -0.2f;
     private Vector3 headOriginPos = Vector3.up * 1.5f;
-    [SerializeField]
-    private Vector3 bodyOriginPos = Vector3.up * 1f;
+    private Vector3 bodyOriginPos = new Vector3(0, 1.2f, -0.2f);
 
     private bool initialized = false;
 
@@ -57,28 +51,28 @@ public class RtsMovementSample : MonoBehaviour
         {
             component.StopFlag();
             component.transform.localPosition = rhOriginPos;
-            component.transform.localRotation = Quaternion.identity;
+            component.transform.localRotation = Quaternion.Euler(new Vector3(0, 90f, 0));
         }
         component = lh.GetComponent<TrackerSettings>();
         if (component != null)
         {
             component.StopFlag();
             component.transform.localPosition = lhOriginPos;
-            component.transform.localRotation = Quaternion.identity;
+            component.transform.localRotation = Quaternion.Euler(new Vector3(0, 90f, 0));
         }
         component = rf.GetComponent<TrackerSettings>();
         if (component != null)
         {
             component.StopFlag();
             component.transform.localPosition = rfOriginPos;
-            component.transform.localRotation = Quaternion.identity;
+            component.transform.localRotation = Quaternion.Euler(new Vector3(0, 90f, 0));
         }
         component = lf.GetComponent<TrackerSettings>();
         if (component != null)
         {
             component.StopFlag();
             component.transform.localPosition = lfOriginPos;
-            component.transform.localRotation = Quaternion.identity;
+            component.transform.localRotation = Quaternion.Euler(new Vector3(0, 90f, 0));
         }
         component = head.GetComponent<TrackerSettings>();
         if (component != null)
@@ -92,7 +86,7 @@ public class RtsMovementSample : MonoBehaviour
         {
             component.StopFlag();
             component.transform.localPosition = bodyOriginPos;
-            component.transform.localRotation = Quaternion.identity;
+            component.transform.localRotation = Quaternion.Euler(new Vector3(0, 90f, 0));
         }
 
         initialized = true;

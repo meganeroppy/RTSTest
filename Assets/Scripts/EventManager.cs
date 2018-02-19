@@ -17,13 +17,13 @@ public class EventManager : NetworkBehaviour
     public static EventManager instance;
 
     [SerializeField]
-    private DrothyItem cakePrefab = null;
+    private AvatarItem cakePrefab = null;
 
     [SerializeField]
-    private DrothyItem cakeLargePrefab = null;
+    private AvatarItem cakeLargePrefab = null;
 
     [SerializeField]
-    private DrothyItem mushroomPrefab = null;
+    private AvatarItem mushroomPrefab = null;
 
     [SerializeField]
     private ShootTarget targetPrefab = null;
@@ -31,8 +31,8 @@ public class EventManager : NetworkBehaviour
     /// <summary>
     /// 出現しているアイテムのリスト
     /// </summary>
-	private List<DrothyItem> itemList;
-	public List<DrothyItem> ItemList { get { return itemList; } }
+	private List<AvatarItem> itemList;
+	public List<AvatarItem> ItemList { get { return itemList; } }
 
     /// <summary>
     /// 出現しているターゲットのリスト
@@ -162,7 +162,7 @@ public class EventManager : NetworkBehaviour
 
         // すべてのターゲットが死亡していたら次のシーンに移行
         bool allCakesAreOnDish = true;
-        foreach (DrothyItem cake in itemList)
+        foreach (AvatarItem cake in itemList)
         {
             if (!cake.IsOnDish) allCakesAreOnDish = false;
         }
@@ -610,7 +610,7 @@ public class EventManager : NetworkBehaviour
 		RemoveItems();
 
 		// リストを新しく作る
-		itemList = new List<DrothyItem>();
+		itemList = new List<AvatarItem>();
 
         if (TeaRoomSceneManager.instance == null) 
 		{
@@ -717,7 +717,7 @@ public class EventManager : NetworkBehaviour
     /// 皿にケーキをセット
     /// </summary>
     [Server]
-    public void TrySetCake( DrothyItem item )
+    public void TrySetCake( AvatarItem item )
     {
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 

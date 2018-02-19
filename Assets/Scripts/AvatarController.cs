@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class DrothyController : NetworkBehaviour 
+public class AvatarController : NetworkBehaviour 
 {
 	private Animator anim;
 	private bool walking;
@@ -76,7 +76,7 @@ public class DrothyController : NetworkBehaviour
 		prevPosition = modelRoot.localPosition;
 		walking = false;
 
-        Debug.Log("DrothyController isLocal=" + isLocalPlayer.ToString());
+        Debug.Log("AvatarController isLocal=" + isLocalPlayer.ToString());
 	}
 
 	// Update is called once per frame

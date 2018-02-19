@@ -90,11 +90,11 @@ public class BaseSceneManager : MonoBehaviour
     }
     private IEnumerator LoadFirstScene()
     {
-        var operation = SceneManager.LoadSceneAsync(RtsTestNetworkManager.instance.firstSceneName, LoadSceneMode.Additive);
+        var operation = SceneManager.LoadSceneAsync(RtsTestNetworkManager.instance.FirsScene.ToString(), LoadSceneMode.Additive);
 
         while (!operation.isDone) yield return null;
 
-        var scene = SceneManager.GetSceneByName(RtsTestNetworkManager.instance.firstSceneName);
+        var scene = SceneManager.GetSceneByName(RtsTestNetworkManager.instance.FirsScene.ToString());
 
         SceneManager.SetActiveScene( scene );
 

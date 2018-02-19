@@ -132,19 +132,18 @@ public class RtsTestNetworkManager : NetworkBehaviour
 	}
 
 	/// <summary>
-	/// 自身であってもドロシーを表示するか？
-	/// 完全に開発用
-	/// 「ドロシー」でなく自身を表示にし、いもむしの表示にも対応させるとよいかも
+	/// 自身であっても自身のビジュアルを表示するか？
+	/// 開発用
 	/// </summary>
 	[SerializeField]
-	private bool forceDisplayDrothy = false;
+	private bool forceDisplayAvatar = false;
 	/// <summary>
 	/// ！ローカルでのみ使用すること！
 	/// リモートで使用するとえらいことになる
 	/// </summary>
-	public bool ForceDisplayDrothy
+	public bool ForceDisplayAvatar
 	{
-		get { return forceDisplayDrothy; }
+		get { return forceDisplayAvatar; }
 	}
 
 	/// <summary>
@@ -153,9 +152,32 @@ public class RtsTestNetworkManager : NetworkBehaviour
 	private bool executedOwnRole = false;
 
     /// <summary>
+    /// 初期シーンリスト
+    /// </summary>
+    public enum FirstSceneEnum
+    {
+        Garden,
+        Template,
+    }
+    /// <summary>
     /// 最初に遷移するシーン
     /// </summary>
-    public string firstSceneName;
+    [SerializeField]
+    private FirstSceneEnum firstScene = FirstSceneEnum.Template;
+    public FirstSceneEnum FirsScene { get { return firstScene; } }
+
+    /// <summary>
+    /// アバター種類
+    /// ドロシー or Unityちゃん
+    /// </summary>
+    public enum AvatarTypeEnum
+    {
+        Drothy,
+        UnityChan
+    }
+    [SerializeField]
+    private AvatarTypeEnum avatarType = AvatarTypeEnum.UnityChan;
+    public AvatarTypeEnum AvatarType { get { return avatarType; } }
 
     private void Awake()
     {

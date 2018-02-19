@@ -69,7 +69,7 @@ public class NavigatorController : NetworkBehaviour {
 		{
 			if( !drothyVisual ) 
 			{
-				var drothy = playerTest.MyDrothy;
+				var drothy = playerTest.MyAvatar;
 				if( drothy != null )
 				{
 					drothyVisual = drothy.gameObject;

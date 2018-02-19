@@ -5,9 +5,9 @@ using UnityEngine.Networking;
 
 /// <summary>
 /// アイテム
-/// 主にドロシーが食べる
+/// 主にアバターが食べる
 /// </summary>
-public class DrothyItem : NetworkBehaviour
+public class AvatarItem : NetworkBehaviour
 {
     [SyncVar]
     private bool eatable = true;
