@@ -19,17 +19,15 @@ public class NavigatorController : NetworkBehaviour {
     Quaternion cameraRotate;
 
     [SerializeField]
-    GameObject navigateShotPrefab;
+    GameObject navigateShotPrefab = null;
 
 	private TrackedObjects trackedObjects;
 	private PlayerTest playerTest;
 
-	[SyncVar]
 	private bool isVisible = false;
-	private bool isVisiblePrev = false;
 
-	private GameObject drothyVisual;
-	private GameObject CaterpillarVisual;
+    [SerializeField]
+	private GameObject caterpillarVisual;
 
 
     // Use this for initialization
@@ -43,8 +41,6 @@ public class NavigatorController : NetworkBehaviour {
     // Update is called once per frame
     void Update()
     {
-		UpdateVisual();
-
         // ローカルの自分自身でなかったらなにもしない
         if (!isLocalPlayer) return;
 
@@ -52,35 +48,6 @@ public class NavigatorController : NetworkBehaviour {
 		UpdatePosition();
         UpdateRotaition();
         CheckInput();
-	}
-
-	/// <summary>
-	/// 可視状態を更新
-	/// ただし自分に対してはなにもしない
-	/// </summary>
-	private void UpdateVisual()
-	{
-		if( isLocalPlayer ) return;
-
-		if( isVisible == isVisiblePrev ) return;
-
-		// 芋虫の表示/非表示
-		{
-			if( !CaterpillarVisual ) 
-			{
-				var caterpillar = playerTest.HeadObject;
-				if( caterpillar != null )
-				{
-					CaterpillarVisual = caterpillar.gameObject;
-				}
-			}
-
-			if( CaterpillarVisual )
-			{
-				CaterpillarVisual.SetActive( isVisible );
-			}
-		}
-		isVisiblePrev = isVisible;
 	}
 
 	[Client]
@@ -228,7 +195,8 @@ public class NavigatorController : NetworkBehaviour {
 				(OVRInput.GetDown(OVRInput.RawButton.X) )// TouchXボタン
 			)
 			{
-				CmdSwitchVisibility();
+				CmdSwitchVisibility(!isVisible);
+                isVisible = !isVisible;
 			}
 		}
     }
@@ -296,10 +264,26 @@ public class NavigatorController : NetworkBehaviour {
 	/// SyncVarなのでクライアントにも同期される
 	/// </summary>
 	[Command]
-	private void CmdSwitchVisibility()
+	private void CmdSwitchVisibility(bool val)
 	{
 		Debug.Log( System.Reflection.MethodBase.GetCurrentMethod() );
 
-		isVisible = !isVisible;
+        RpcSetVisibility(val);
 	}
+
+    [ClientRpc]
+    private void RpcSetVisibility(bool val)
+    {
+        if (isLocalPlayer) return;
+
+        // 芋虫の表示/非表示
+        {
+            if (!caterpillarVisual)
+            {
+                return;
+            }
+
+            caterpillarVisual.SetActive(val);
+        }
+    }
 }
