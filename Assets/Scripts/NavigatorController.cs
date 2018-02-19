@@ -21,7 +21,13 @@ public class NavigatorController : NetworkBehaviour {
     [SerializeField]
     GameObject navigateShotPrefab = null;
 
-	private TrackedObjects trackedObjects;
+    [SerializeField]
+    GameObject appearEffect = null;
+
+    [SerializeField]
+    GameObject disappearEffect = null;
+
+    private TrackedObjects trackedObjects;
 	private PlayerTest playerTest;
 
 	private bool isVisible = false;
@@ -268,6 +274,15 @@ public class NavigatorController : NetworkBehaviour {
 	{
 		Debug.Log( System.Reflection.MethodBase.GetCurrentMethod() );
 
+        // エフェクト 自分でも見える
+        {
+            var prefab = val ? appearEffect : disappearEffect;
+            var obj = Instantiate(prefab);
+            obj.transform.position = transform.position;
+
+            NetworkServer.Spawn(obj);
+        }
+
         RpcSetVisibility(val);
 	}
 
@@ -275,15 +290,9 @@ public class NavigatorController : NetworkBehaviour {
     private void RpcSetVisibility(bool val)
     {
         if (isLocalPlayer) return;
+        if (!caterpillarVisual) return;
 
         // 芋虫の表示/非表示
-        {
-            if (!caterpillarVisual)
-            {
-                return;
-            }
-
-            caterpillarVisual.SetActive(val);
-        }
+        caterpillarVisual.SetActive(val);
     }
 }
