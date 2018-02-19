@@ -43,12 +43,6 @@ public class PlayerTest : NetworkBehaviour
     private AvatarController myAvatar;
 	public AvatarController MyAvatar{ get{ return myAvatar;}}
 
-    [SerializeField]
-    private TextMesh textMesh = null;
-
-    [SerializeField]
-    private GameObject youIcon = null;
-
     /// <summary>
     /// 右手でアイテムをつかんでいる時の位置
     /// </summary>
@@ -245,11 +239,12 @@ public class PlayerTest : NetworkBehaviour
             var nIdentity = GetComponent<NetworkIdentity>();
             if (nIdentity != null)
             {
-                //    id = nIdentity.netId;
+                playerLabel.text = "PLAYER[ " + nIdentity.netId.ToString() + " ]";
             }
-
-            playerLabel.text = "PLAYER[ " + id.ToString() + " ]";
-            playerLabel.color = playerColor[id % playerColor.Length];
+            else
+            {
+                playerLabel.enabled = false;
+            }
         }
     }
 
@@ -324,9 +319,6 @@ public class PlayerTest : NetworkBehaviour
             playerLabel.transform.forward = Camera.main.transform.forward;
         }
 
-        // ラベルを更新
-        textMesh.text = netId.Value.ToString();
-
         // ナビゲーターフラグに変更があった場合のみ処理する
         {
             if (isNavigator != isNavigatorPrev)
@@ -335,9 +327,6 @@ public class PlayerTest : NetworkBehaviour
             }
             isNavigatorPrev = isNavigator;
         }
-
-        // 自分の時だけ「YOU]アイコン表示
-        youIcon.SetActive(isLocalPlayer);
 
         // アイテムをつかんでいる時はつかんでいる位置にマイフレーム設定
         // TODO: ローカルとサーバーどちらで行うべきかいまいち定かではないので適宜調整する
