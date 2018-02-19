@@ -190,8 +190,8 @@ public class EventManager : NetworkBehaviour
         bool allPlayersInEffect = true;
         foreach( PlayerTest p in PlayerTest.list )
         {
-            // 参加型でないオブザーバーはスキップ ただしオブザーバーのみの時は例外
-            if (p.IsNavigator && p.NavigatorType != RtsTestNetworkManager.NavigatorType.Participatory && PlayerTest.list.Count >= 2) continue;
+            // ナビゲーターはスキップ
+            if (p.IsNavigator && PlayerTest.list.Count >= 2) continue;
 
             bool inEffect = p.ItemEffectTimer > 0;
 

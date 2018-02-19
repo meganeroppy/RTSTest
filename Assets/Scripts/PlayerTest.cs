@@ -354,8 +354,8 @@ public class PlayerTest : NetworkBehaviour
 
 		if( isClient )
 		{
-			// 自身のアバターがnull かつ 非参加型ナビゲータでないときに実行
-			if( myAvatar == null && ( !IsNavigator || ( IsNavigator && NavigatorType == RtsTestNetworkManager.NavigatorType.Participatory ) ) )
+			// 自身のアバターがnull かつ ナビゲータでないときに実行
+			if( myAvatar == null && !IsNavigator )
 			{
 				Debug.Log( netId.ToString() + "のプレイヤーのアバターがnull参照なのでフラグを立てた" );
 
@@ -418,12 +418,13 @@ public class PlayerTest : NetworkBehaviour
     /// </summary>
     private void SetNavigatorEnable()
     {
+        // 参照が無ければ取得する
         if (navigatorController == null) navigatorController = GetComponent<NavigatorController>();
 
         navigatorController.enabled = isNavigator;
 
-		// 非参加型ナビゲータかつ自身でないときにいもむしビジュアルを有効にする
-		headObject.SetActive(isNavigator && navigatorType == RtsTestNetworkManager.NavigatorType.Default && !isLocalPlayer);
+		// ナビゲータかつ自身でないときにいもむしビジュアルを有効にする ただし強制アバター表示設定の時は自身でも表示する
+		headObject.SetActive(isNavigator && ( !isLocalPlayer || RtsTestNetworkManager.instance.ForceDisplayAvatar) );
 
         // トラッキングによる移動の有効を設定 結構難解なので間違いがないか再三確認する
         bool enableTracking;
@@ -747,7 +748,7 @@ public class PlayerTest : NetworkBehaviour
 	/// <summary>
 	/// アバターの参照を要求する
 	/// 生成済みの全てのプレイヤーに対して実行される
-	/// ただし非参加型ナビゲータは除外
+	/// ただしナビゲータは除外
 	/// </summary>
 	[Command]
 	private void CmdRequestDrothyReference()
@@ -763,10 +764,10 @@ public class PlayerTest : NetworkBehaviour
 			var p = g.GetComponent<PlayerTest>();
 			if( p == null ) continue;
 
-			// 非参加型ナビゲータを除外
-			if( p.IsNavigator && p.NavigatorType == RtsTestNetworkManager.NavigatorType.Default )
+			// ナビゲータを除外
+			if( p.IsNavigator )
 			{
-				Debug.Log( "NetId = " + p.netId.ToString() + "のプレイヤーは非参加型ナビゲータなので除外");
+				Debug.Log( "NetId = " + p.netId.ToString() + "のプレイヤーはナビゲータなので除外");
 				continue;
 			}
 			// アバターNetIdが未設定の時は除外
