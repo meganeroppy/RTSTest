@@ -36,9 +36,9 @@ public class PlayerTest : NetworkBehaviour
     public RtsTestNetworkManager.NavigatorType NavigatorType { get { return navigatorType; } }
 
     [SerializeField]
-    private IKControl drothyIKPrefab;
+    private IKControl drothyIKPrefa = null;
     [SerializeField]
-    private IKControl unityChanIKPrefab;
+    private IKControl unityChanIKPrefab = null;
 
     private AvatarController myAvatar;
 	public AvatarController MyAvatar{ get{ return myAvatar;}}
