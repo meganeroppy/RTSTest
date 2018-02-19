@@ -44,40 +44,40 @@ public class PlayerTest : NetworkBehaviour
 	public AvatarController MyAvatar{ get{ return myAvatar;}}
 
     [SerializeField]
-    private TextMesh textMesh;
+    private TextMesh textMesh = null;
 
     [SerializeField]
-    private GameObject youIcon;
-
-    /// <summary>
-    /// 右手でアイテムをつかんでいる時の位置
-    /// </summary>
-    [SerializeField]
-    private Transform holdPosRight;
+    private GameObject youIcon = null;
 
     /// <summary>
     /// 右手でアイテムをつかんでいる時の位置
     /// </summary>
     [SerializeField]
-    private Transform holdPosLeft;
+    private Transform holdPosRight = null;
+
+    /// <summary>
+    /// 右手でアイテムをつかんでいる時の位置
+    /// </summary>
+    [SerializeField]
+    private Transform holdPosLeft = null;
 
     /// <summary>
     /// 弾が発射される場所右手
     /// </summary>
     [SerializeField]
-    private Transform muzzleRight;
+    private Transform muzzleRight = null;
 
     /// <summary>
     /// 弾が発射される場所右手
     /// </summary>
     [SerializeField]
-    private Transform muzzleLeft;
+    private Transform muzzleLeft = null;
 
     /// <summary>
     /// 銃のビジュアル
     /// </summary>
     [SerializeField]
-    private GameObject[] gunsVisual;
+    private GameObject[] gunsVisual = null;
 
     /// <summary>
     /// （仮）プリセットのプレイヤーカラー
@@ -88,7 +88,7 @@ public class PlayerTest : NetworkBehaviour
     /// 情報表示ラベル
     /// </summary>
     [SerializeField]
-    private Text playerLabel;
+    private Text playerLabel = null;
 
     /// <summary>
     /// 右手でつかんでいるアイテム
@@ -125,7 +125,7 @@ public class PlayerTest : NetworkBehaviour
     /// シーン切り替えにつかうマスク
     /// </summary>
     [SerializeField]
-    private MeshRenderer mask;
+    private MeshRenderer mask = null;
 
     /// <summary>
     /// アキバシーンで発射するもの
@@ -133,7 +133,7 @@ public class PlayerTest : NetworkBehaviour
     /// 工数に余裕がでてきたら処理変えるかも
     /// </summary>
     [SerializeField]
-    private NavigateShot shot;
+    private NavigateShot shot = null;
 
     /// <summary>
     /// ナビゲーターの数
@@ -190,18 +190,18 @@ public class PlayerTest : NetworkBehaviour
 	/// 右手のアニメータ
 	/// </summary>
 	[SerializeField]
-	private Animator animRightHand;
+	private Animator animRightHand = null;
 
-	/// <summary>
-	/// 左手のアニメータ
-	/// </summary>
-	[SerializeField]
-	private Animator animLeftHand;
+    /// <summary>
+    /// 左手のアニメータ
+    /// </summary>
+    [SerializeField]
+	private Animator animLeftHand = null;
 
-	/// <summary>
-	/// アバターのNetId
-	/// </summary>
-	[SyncVar]
+    /// <summary>
+    /// アバターのNetId
+    /// </summary>
+    [SyncVar]
 	private NetworkInstanceId avatarNetId = NetworkInstanceId.Invalid;
 
 	/// <summary>
@@ -555,7 +555,6 @@ public class PlayerTest : NetworkBehaviour
         }
 
         // ナビゲーターになる
-
         // 現状いらなそう 必要になったら実装する
 		if (Input.GetKeyDown(KeyCode.N) ||
             OVRInput.GetDown(OVRInput.RawButton.RThumbstick) // 右スティック押し込み
