@@ -263,9 +263,6 @@ public class PlayerTest : NetworkBehaviour
         // プレイヤー名を変更する
         gameObject.name = "[YOU] " + gameObject.name;
 
-        // サーバー上でアバターを生成
-        CmdCreateDrothy(RtsTestNetworkManager.instance.PlayerId);
-
         // サーバー上でナビゲーターフラグをセットする syncVarなのでのちにクライアントにも反映される
         CmdSetIsNavigator(RtsTestNetworkManager.instance.IsNavigator);
 
@@ -307,6 +304,9 @@ public class PlayerTest : NetworkBehaviour
         {
             // 通常プレイヤーの場合 強制キーボード操作フラグがなければトラッキングによる制御
             trackedObjects.SetEnable(RtsTestNetworkManager.instance.MyInputMode != RtsTestNetworkManager.InputMode.ForceByKeyboard);
+
+            // サーバー上でアバターを生成
+            CmdCreateAvatar(RtsTestNetworkManager.instance.PlayerId, RtsTestNetworkManager.instance.UseSimulateFoot);
         }
     }
 
@@ -633,13 +633,13 @@ public class PlayerTest : NetworkBehaviour
     /// アバターを生成する
     /// </summary>
     [Command]
-    private void CmdCreateDrothy(int playerId)
+    private void CmdCreateAvatar(int playerId, bool useSimulateFoot)
     {
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
-        // プレハブから生成
+        // プレハブから生成　アバタータイプに応じて生成するモデルを指定する
         var avatar = RtsTestNetworkManager.instance.AvatarType == RtsTestNetworkManager.AvatarTypeEnum.UnityChan ? unityChanIKPrefab : drothyIKPrefab;
-        var avatarIK = Instantiate<IKControl>(avatar);
+        var avatarIK = Instantiate(avatar);
 
         // IKのターゲットをトラッキングオブジェクトから取得
         {
@@ -651,9 +651,7 @@ public class PlayerTest : NetworkBehaviour
             avatarIK.lookObj = trackedObjects.LookTarget;
         }
 
-        // 設定が有効になっている場合は脚の動きのシミュレートを行う
-		// TODO: RtsTestNetworkManager.instance.UseSimulateFootつかってるけどやばくない？
-        if (RtsTestNetworkManager.instance.UseSimulateFoot)
+        if (useSimulateFoot)
         {
             avatarIK.SetSimulateFoot();
         }
