@@ -2,19 +2,19 @@
 
 public class Chaperone : MonoBehaviour
 {
-    [SerializeField]
-    GameObject player_;
+    public static Chaperone instance;
+    public GameObject player{get; set;}
 
    // Use this for initialization
     void Start()
     {
-    //    GetComponent<Renderer>().material.SetVector("_PlayerPos", player_.transform.position);
+        instance = this;
     }
 
    // Update is called once per frame
     void Update()
     {
-        if( player_ )
-        GetComponent<Renderer>().material.SetVector("_PlayerPos", player_.transform.position);
+        if( player )
+        GetComponent<Renderer>().material.SetVector("_PlayerPos", player.transform.position);
    }
 }

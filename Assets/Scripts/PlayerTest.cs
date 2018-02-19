@@ -224,18 +224,25 @@ public class PlayerTest : NetworkBehaviour
             Debug.Log("AddPlayer : プレイヤー数 -> " + list.Count.ToString());
         }
 
-		// ローカルプレイヤーでないとき
-        if (!isLocalPlayer)
+		// ローカルプレイヤーかどうかで処理を変える
+        if (isLocalPlayer)
+        {
+            // シャペロン境界に自身を登録
+            if( Chaperone.instance != null )
+            {
+                Chaperone.instance.player = gameObject;
+            }
+        }
+        else
         {
             // カメラ無効（一緒にオーディオリスナーも無効になる）
             var camera = GetComponentInChildren<Camera>();
             if (camera.gameObject) camera.gameObject.SetActive(false);
         }
 
+
         // ラベルの設定
         {
-            int id = 0;
-
             var nIdentity = GetComponent<NetworkIdentity>();
             if (nIdentity != null)
             {

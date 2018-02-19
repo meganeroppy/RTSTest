@@ -8,9 +8,11 @@ Shader "Custom/Chaperone" {
 		_Dist("Distance", Float) = 5.0
     }
     SubShader{
-        Tags{ "RenderType" = "Opaque" }
+//        Tags{ "RenderType" = "Opaque" "Queue" = "Transparent" }
+        Tags{ "Queue" = "Transparent" }
+		Cull off
         CGPROGRAM
-        #pragma surface surf Lambert
+        #pragma surface surf Lambert alpha:fade
        struct Input {
             float2 uv_MainTex;
             float2 uv_BumpMap;
