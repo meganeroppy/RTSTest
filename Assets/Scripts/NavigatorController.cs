@@ -42,7 +42,10 @@ public class NavigatorController : NetworkBehaviour {
 		cameraRotate = transform.localRotation;
 		trackedObjects = GetComponent<TrackedObjects>();
 		playerTest = GetComponent<PlayerTest>();
-	}
+
+        // 最初は非表示
+        caterpillarVisual.SetActive(false);
+    }
 
     // Update is called once per frame
     void Update()
@@ -53,6 +56,8 @@ public class NavigatorController : NetworkBehaviour {
 		// 位置と回転を更新
 		UpdatePosition();
         UpdateRotaition();
+
+        // 入力チェック
         CheckInput();
 	}
 
