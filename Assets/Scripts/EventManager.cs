@@ -134,6 +134,11 @@ public class EventManager : NetworkBehaviour
 	/// </summary>
 	private float itemPopEventWait = 3f;
 
+    /// <summary>
+    /// シーン切り替え処理中
+    /// </summary>
+    private bool inTransition = false;
+
     private void Awake()
     {
         instance = this;
@@ -240,6 +245,13 @@ public class EventManager : NetworkBehaviour
     [Server]
 	public void ForceProceedSequence()
 	{
+        // トランジション中に実行するとおかしな挙動になるのでなにもしない
+        if( inTransition )
+        {
+            Debug.Log("トランジション中なので強制シナリオ進行は無効");
+            return;
+        }
+
 		// コルーチンが動いていたら停止
 
 		// ここはなくても一緒かも？
@@ -409,6 +421,8 @@ public class EventManager : NetworkBehaviour
 			yield break;
 		}
 
+        inTransition = true;
+
         // 暗転 実際に暗転処理をコールするのはサーバーのみ
         float progress = 0;
         while (progress < 1f)
@@ -474,6 +488,8 @@ public class EventManager : NetworkBehaviour
             progress += Time.deltaTime / sceneChangeFadeDuration;
             yield return null;
         }
+
+        inTransition = false;
     }
 
     /// <summary>
