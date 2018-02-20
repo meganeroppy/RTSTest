@@ -191,21 +191,9 @@ public class PlayerTest : NetworkBehaviour
 	private Animator animLeftHand = null;
 
     /// <summary>
-    /// アバターのNetId
-    /// </summary>
-    [SyncVar]
-	private NetworkInstanceId avatarNetId = NetworkInstanceId.Invalid;
-
-	/// <summary>
-	/// null参照のアバターがローカル環境に存在するか？
-	/// </summary>
-	private static bool unreferencedDrothyExist = false;
-
-    /// <summary>
     /// シーケンス切り替わった時だけ処理を行いたいので現在のシーケンスをプレイヤー側でも保持する
     /// </summary>
     private EventManager.Sequence playerCurrentSequence;
-
 
     // サーバー側で保持するために定義
     int myPlayerId;
@@ -214,6 +202,9 @@ public class PlayerTest : NetworkBehaviour
 
     private void Awake()
     {
+        // 生成されたときは初期化フラグをさげる
+        if (isLocalPlayer) initialized = false;
+
         trackedObjects = GetComponent<TrackedObjects>();
     }
 
@@ -313,6 +304,15 @@ public class PlayerTest : NetworkBehaviour
             // サーバー上でアバターを生成
             CmdCreateAvatar(RtsTestNetworkManager.instance.AvatarType, RtsTestNetworkManager.instance.PlayerId, RtsTestNetworkManager.instance.UseSimulateFoot);
         }
+
+        // 初期化完了フラグをセット
+        CmdSetInitialized();
+    }
+
+    [Command]
+    private void CmdSetInitialized()
+    {
+        initialized = true;
     }
 
     public override void OnStartClient()
@@ -354,23 +354,12 @@ public class PlayerTest : NetworkBehaviour
 		if( isClient )
 		{
 			// 自身のアバターがnull かつ ナビゲータでないときに実行
-			if( myAvatar == null && !IsNavigator )
+			if( initialized && myAvatar == null && !IsNavigator )
 			{
-            //    Debug.Log(netId.ToString() + "のプレイヤーのアバターがnull参照なのでフラグを立てた");
                 Debug.Log(netId.ToString() + "のプレイヤーのアバターがnull参照なのでフラグを立てた");
 
                 RequestAvatarFromAuthorizedPlayer(netId);
-                //    CmdRequestDrothyReference();
-
-                //    unreferencedDrothyExist = true;
             }
-
-            // 非ローカルからは呼べないのでローカルのプレイヤーから呼び出す
-        //    if ( isLocalPlayer && unreferencedDrothyExist )
-		//	{
-		//		Debug.Log( "フラグがたっているのでNetId = " + netId.ToString() + "のローカルプレイヤーからアバターの参照を要求" );
-		//		CmdRequestDrothyReference();
-		//	}
 		}
 
         /////////////////////////////////////////
@@ -470,6 +459,11 @@ public class PlayerTest : NetworkBehaviour
             Debug.LogError("NetID" + playerNetId.ToString() + "のプレイヤーがみつからない");
             return;
         }
+        else if ( selectedPlayer.isNavigator )
+        {
+            Debug.LogError("NetID" + playerNetId.ToString() + "のプレイヤーはナビゲーターなのでアバターを生成しない");
+            return;
+        }
 
         selectedPlayer.CreateAvatar();
     }
@@ -484,51 +478,58 @@ public class PlayerTest : NetworkBehaviour
 
         navigatorController.enabled = isNavigator;
 
-		// ナビゲータかつ自身でないときにいもむしビジュアルを有効にする ただし強制アバター表示設定の時は自身でも表示する
-		headObject.SetActive(isNavigator && ( !isLocalPlayer || RtsTestNetworkManager.instance.ForceDisplayAvatar) );
+        // ナビゲータかつ自身でないときにいもむしビジュアルを有効にする ただし強制アバター表示設定の時は自身でも表示する
+        headObject.SetActive(isNavigator && (!isLocalPlayer || RtsTestNetworkManager.instance.ForceDisplayAvatar));
+
+        // ナビゲータの時は手を非表示
+        animRightHand.gameObject.SetActive(!isNavigator);
+        animLeftHand.gameObject.SetActive(!isNavigator);
+
 
         // トラッキングによる移動の有効を設定 結構難解なので間違いがないか再三確認する
         bool enableTracking;
 
-        if (isNavigator)
+        // 自身でなければかならず無効
+        if (!isLocalPlayer)
         {
-            // ナビゲーターの場合
-
-            // 手を非表示にする
-            animRightHand.gameObject.SetActive(false);
-            animLeftHand.gameObject.SetActive(false);
-
-            if (navigatorType == RtsTestNetworkManager.NavigatorType.Participatory)
-            {
-                // 参加型ナビゲーターの場合は有効 ただし強制キーボード操作の時は無効
-				// TODO: RtsTestNetworkManager.instance.MyInputModeつかってるけどやばくない？
-                enableTracking = RtsTestNetworkManager.instance.MyInputMode != RtsTestNetworkManager.InputMode.ForceByKeyboard;
-            }
-			// TODO: RtsTestNetworkManager.instance.MyInputModeつかってるけどやばくない？
-            else if (RtsTestNetworkManager.instance.MyInputMode == RtsTestNetworkManager.InputMode.ForceByTracking)
-            {
-                // 強制トラッカー依存操作の時は有効
-                enableTracking = true;
-            }
-            else
-            {
-                // 上記のどちらでもなければ無効
-                enableTracking = false;
-            }
+            enableTracking = false;
         }
         else
-        {
-            // プレイヤーの場合
-			// TODO: RtsTestNetworkManager.instance.MyInputModeつかってるけどやばくない？
-            if (RtsTestNetworkManager.instance.MyInputMode == RtsTestNetworkManager.InputMode.ForceByKeyboard)
+        { 
+            if (isNavigator)
             {
-                // 強制キーボード操作の時は無効
-                enableTracking = false;
+                // ナビゲーターの場合
+
+                if (navigatorType == RtsTestNetworkManager.NavigatorType.Participatory)
+                {
+                    // 参加型ナビゲーターの場合は有効 ただし強制キーボード操作の時は無効
+                    enableTracking = RtsTestNetworkManager.instance.MyInputMode != RtsTestNetworkManager.InputMode.ForceByKeyboard;
+                }
+                else if (RtsTestNetworkManager.instance.MyInputMode == RtsTestNetworkManager.InputMode.ForceByTracking)
+                {
+                    // 強制トラッカー依存操作の時は有効
+                    enableTracking = true;
+                }
+                else
+                {
+                    // 上記のどちらでもなければ無効
+                    enableTracking = false;
+                }
             }
             else
             {
-                // そうでなければ有効
-                enableTracking = true;
+                // プレイヤーの場合
+
+                if (RtsTestNetworkManager.instance.MyInputMode == RtsTestNetworkManager.InputMode.ForceByKeyboard)
+                {
+                    // 強制キーボード操作の時は無効
+                    enableTracking = false;
+                }
+                else
+                {
+                    // そうでなければ有効
+                    enableTracking = true;
+                }
             }
         }
 
@@ -758,9 +759,6 @@ public class PlayerTest : NetworkBehaviour
         NetworkServer.SpawnWithClientAuthority(myAvatar.gameObject, gameObject);
 
         RpcPassAvatarReference(myAvatar.netId);
-
-        // アバターのNetIdをサーバー側で保持する
-        avatarNetId = myAvatar.netId;
     }
 
     /// <summary>
@@ -826,45 +824,7 @@ public class PlayerTest : NetworkBehaviour
         }
 
         avatarObj.SetActive(avatarVisible);
-
-		unreferencedDrothyExist = false;
     }
-
-	/// <summary>
-	/// アバターの参照を要求する
-	/// 生成済みの全てのプレイヤーに対して実行される
-	/// ただしナビゲータは除外
-	/// </summary>
-	[Command]
-	private void CmdRequestDrothyReference()
-	{
-		Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
-
-		var players = GameObject.FindGameObjectsWithTag("Player");
-
-		Debug.Log("生成済みプレイヤー数 -> " + players.Length.ToString());
-
-		foreach( GameObject g in players )
-		{
-			var p = g.GetComponent<PlayerTest>();
-			if( p == null ) continue;
-
-			// ナビゲータを除外
-			if( p.IsNavigator )
-			{
-				Debug.Log( "NetId = " + p.netId.ToString() + "のプレイヤーはナビゲータなので除外");
-				continue;
-			}
-			// アバターNetIdが未設定の時は除外
-			if( p.avatarNetId == NetworkInstanceId.Invalid ){
-				Debug.Log( "NetId = " + p.netId.ToString() + "のプレイヤーはアバターのNetIdが未設定なので除外");
-
-			continue;
-			}
-
-			p.RpcPassAvatarReference( p.avatarNetId );
-		}
-	}
 
     /// <summary>
     /// ナビゲーターフラグを設定する
