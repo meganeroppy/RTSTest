@@ -15,6 +15,9 @@ public class BaseSceneManager : MonoBehaviour
     private Camera[] presetCameras;
 
     [SerializeField]
+    private AudioListener audioListener;
+
+    [SerializeField]
     private TrackerSettings copyTransformHead;
     public TrackerSettings CopyTransformHead { get { return copyTransformHead; } }
 
@@ -110,5 +113,7 @@ public class BaseSceneManager : MonoBehaviour
             presetCameras[i].enabled = true;
 			presetCameras[i].targetDisplay = i+diff;
         }
+
+        audioListener.enabled = true;
     }
 }
