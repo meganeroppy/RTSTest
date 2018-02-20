@@ -41,7 +41,6 @@ public class PlayerTest : NetworkBehaviour
     private IKControl unityChanIKPrefab = null;
 
     private AvatarController myAvatar;
-	public AvatarController MyAvatar{ get{ return myAvatar;}}
 
     /// <summary>
     /// 右手でアイテムをつかんでいる時の位置
@@ -111,7 +110,6 @@ public class PlayerTest : NetworkBehaviour
 
     /// <summary>
     /// プレイヤーのリスト
-    /// サーバーでのみ使用可能
     /// </summary>
     public static List<PlayerTest> list;
 
@@ -208,6 +206,12 @@ public class PlayerTest : NetworkBehaviour
     /// </summary>
     private EventManager.Sequence playerCurrentSequence;
 
+
+    // サーバー側で保持するために定義
+    int myPlayerId;
+    RtsTestNetworkManager.AvatarTypeEnum myAvatarType = RtsTestNetworkManager.AvatarTypeEnum.UnityChan;
+    bool myUseSimulateFoot = false;
+
     private void Awake()
     {
         trackedObjects = GetComponent<TrackedObjects>();
@@ -216,7 +220,7 @@ public class PlayerTest : NetworkBehaviour
     // Use this for initialization
     void Start()
     {
-        if (isServer)
+        // 自身をリストに追加
         {
             if (list == null) list = new List<PlayerTest>();
             list.Add(this);
@@ -239,7 +243,6 @@ public class PlayerTest : NetworkBehaviour
             var camera = GetComponentInChildren<Camera>();
             if (camera.gameObject) camera.gameObject.SetActive(false);
         }
-
 
         // ラベルの設定
         {
@@ -308,7 +311,7 @@ public class PlayerTest : NetworkBehaviour
             trackedObjects.SetEnable(RtsTestNetworkManager.instance.MyInputMode != RtsTestNetworkManager.InputMode.ForceByKeyboard);
 
             // サーバー上でアバターを生成
-            CmdCreateAvatar(RtsTestNetworkManager.instance.PlayerId, RtsTestNetworkManager.instance.UseSimulateFoot);
+            CmdCreateAvatar(RtsTestNetworkManager.instance.AvatarType, RtsTestNetworkManager.instance.PlayerId, RtsTestNetworkManager.instance.UseSimulateFoot);
         }
     }
 
@@ -353,17 +356,21 @@ public class PlayerTest : NetworkBehaviour
 			// 自身のアバターがnull かつ ナビゲータでないときに実行
 			if( myAvatar == null && !IsNavigator )
 			{
-				Debug.Log( netId.ToString() + "のプレイヤーのアバターがnull参照なのでフラグを立てた" );
+            //    Debug.Log(netId.ToString() + "のプレイヤーのアバターがnull参照なのでフラグを立てた");
+                Debug.Log(netId.ToString() + "のプレイヤーのアバターがnull参照なのでフラグを立てた");
 
-				unreferencedDrothyExist = true;
-			}
+                RequestAvatarFromAuthorizedPlayer(netId);
+                //    CmdRequestDrothyReference();
 
-			// 非ローカルからは呼べないのでローカルのプレイヤーから呼び出す
-			if( isLocalPlayer && unreferencedDrothyExist )
-			{
-				Debug.Log( "フラグがたっているのでNetId = " + netId.ToString() + "のローカルプレイヤーからアバターの参照を要求" );
-				CmdRequestDrothyReference();
-			}
+                //    unreferencedDrothyExist = true;
+            }
+
+            // 非ローカルからは呼べないのでローカルのプレイヤーから呼び出す
+        //    if ( isLocalPlayer && unreferencedDrothyExist )
+		//	{
+		//		Debug.Log( "フラグがたっているのでNetId = " + netId.ToString() + "のローカルプレイヤーからアバターの参照を要求" );
+		//		CmdRequestDrothyReference();
+		//	}
 		}
 
         /////////////////////////////////////////
@@ -407,6 +414,64 @@ public class PlayerTest : NetworkBehaviour
         }
 
         playerCurrentSequence = EventManager.instance.CurrentSequence;
+    }
+
+    /// <summary>
+    /// 権限を持っているプレイヤーからアバターの生成をリクエストする
+    /// </summary>
+    [Client]
+    private void RequestAvatarFromAuthorizedPlayer( NetworkInstanceId playerNetIdWithNoAvatar )
+    {
+        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod() + playerNetIdWithNoAvatar.ToString() + "のプレイヤーのアバターを取得したい");
+
+        // 権限のあるプレイヤー（だいたい自分）を取得
+        PlayerTest authorizedPlayer = null;
+        foreach( PlayerTest p in list)
+        {
+            if( p.hasAuthority )
+            {
+                authorizedPlayer = p;
+                break;
+            }
+        }
+
+        if( authorizedPlayer == null)
+        {
+            Debug.LogError("権限のあるプレイヤーがみつからない");
+            return;
+        }
+
+        // コマンド送信
+        authorizedPlayer.CmdRequestCreateAvatar(playerNetIdWithNoAvatar);
+    }
+    
+    /// <summary>
+    /// 指定のNetIdのプレイヤーのアバターを再生成
+    /// </summary>
+    /// <param name="playerNetId">特定のクライアント上でアバターが生成されていないプレイヤーのNetId</param>
+    [Command]
+    private void CmdRequestCreateAvatar(NetworkInstanceId playerNetId)
+    {
+        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod() + playerNetId.ToString() + "のプレイヤーのアバターを再生成したい");
+
+        // 指定のプレイヤーを取得
+        PlayerTest selectedPlayer = null;
+        foreach (PlayerTest p in list)
+        {
+            if (p.netId == playerNetId )
+            {
+                selectedPlayer = p;
+                break;
+            }
+        }
+
+        if (selectedPlayer == null)
+        {
+            Debug.LogError("NetID" + playerNetId.ToString() + "のプレイヤーがみつからない");
+            return;
+        }
+
+        selectedPlayer.CreateAvatar();
     }
 
     /// <summary>
@@ -637,12 +702,33 @@ public class PlayerTest : NetworkBehaviour
     /// アバターを生成する
     /// </summary>
     [Command]
-    private void CmdCreateAvatar(int playerId, bool useSimulateFoot)
+    private void CmdCreateAvatar(RtsTestNetworkManager.AvatarTypeEnum avatarType, int playerId, bool useSimulateFoot)
     {
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
+        myAvatarType = avatarType;
+        myPlayerId = playerId;
+        myUseSimulateFoot = useSimulateFoot;
+
+        CreateAvatar();
+    }
+
+    /// <summary>
+    /// アバター作成
+    /// </summary>
+    [Server]
+    private void CreateAvatar()
+    {
+        Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
+
+        // すでに存在していたらサーバーから削除する
+        if( myAvatar != null )
+        {
+            NetworkServer.Destroy(myAvatar.gameObject);
+        }
+
         // プレハブから生成　アバタータイプに応じて生成するモデルを指定する
-        var avatar = RtsTestNetworkManager.instance.AvatarType == RtsTestNetworkManager.AvatarTypeEnum.UnityChan ? unityChanIKPrefab : drothyIKPrefab;
+        var avatar = myAvatarType == RtsTestNetworkManager.AvatarTypeEnum.UnityChan ? unityChanIKPrefab : drothyIKPrefab;
         var avatarIK = Instantiate(avatar);
 
         // IKのターゲットをトラッキングオブジェクトから取得
@@ -655,19 +741,15 @@ public class PlayerTest : NetworkBehaviour
             avatarIK.lookObj = trackedObjects.LookTarget;
         }
 
-        if (useSimulateFoot)
+        if (myUseSimulateFoot)
         {
             avatarIK.SetSimulateFoot();
         }
 
         // プレイヤーIDによってカラバリを変更する
-        avatarIK.GetComponent<AvatarController>().ColorIdx = playerId;
+        avatarIK.GetComponent<AvatarController>().ColorIdx = myPlayerId;
 
         myAvatar = avatarIK.GetComponent<AvatarController>();
-        if (myAvatar == null)
-        {
-            return;
-        }
 
         myAvatar.SetOwner(trackedObjects.BodyObject);
 
@@ -675,17 +757,17 @@ public class PlayerTest : NetworkBehaviour
         //      NetworkServer.Spawn(avatar.gameObject);
         NetworkServer.SpawnWithClientAuthority(myAvatar.gameObject, gameObject);
 
-        RpcPassDrothyReference(myAvatar.netId);
+        RpcPassAvatarReference(myAvatar.netId);
 
-		// アバターのNetIdをサーバー側で保持する
-		avatarNetId = myAvatar.netId;
+        // アバターのNetIdをサーバー側で保持する
+        avatarNetId = myAvatar.netId;
     }
 
     /// <summary>
     /// クライアント側でもアバターの参照を持たせる
     /// </summary>
     [ClientRpc]
-	private void RpcPassDrothyReference(NetworkInstanceId avatarNetId)
+	private void RpcPassAvatarReference(NetworkInstanceId avatarNetId)
     {
 		Debug.Log(System.Reflection.MethodBase.GetCurrentMethod() + "NetId = " + avatarNetId);
 
@@ -715,8 +797,8 @@ public class PlayerTest : NetworkBehaviour
 
         // アバターの表示設定
         bool avatarVisible;
-		// TODO: RtsTestNetworkManager.instance.ForceDisplayDrothyつかってるけどやばくない？
-        if (RtsTestNetworkManager.instance.ForceDisplayAvatar)
+		// RtsTestNetworkManager.instance.ForceDisplayAvatarをつかっているが、ローカルでのみ使用するので問題なし
+        if (RtsTestNetworkManager.instance.ForceDisplayAvatar && isLocalPlayer)
         {
             // 強制アバター表示フラグがあったら確実に表示する
             avatarVisible = true;
@@ -780,7 +862,7 @@ public class PlayerTest : NetworkBehaviour
 			continue;
 			}
 
-			p.RpcPassDrothyReference( p.avatarNetId );
+			p.RpcPassAvatarReference( p.avatarNetId );
 		}
 	}
 
