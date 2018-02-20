@@ -289,7 +289,12 @@ public class NavigatorController : NetworkBehaviour {
         }
 
         RpcSetVisibility(val);
-	}
+
+        if (!caterpillarVisual) return;
+
+        // 芋虫の表示/非表示
+        caterpillarVisual.SetActive(val);
+    }
 
     [ClientRpc]
     private void RpcSetVisibility(bool val)
