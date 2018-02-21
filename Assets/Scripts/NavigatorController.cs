@@ -59,6 +59,9 @@ public class NavigatorController : NetworkBehaviour {
 
         // 入力チェック
         CheckInput();
+
+        // タイマー更新
+        UpdateTimer();
 	}
 
 	[Client]
@@ -203,13 +206,32 @@ public class NavigatorController : NetworkBehaviour {
 		// ビジュアルの表示/非表示
 		{
 			if( Input.GetKeyDown(KeyCode.V) || // キーボードのV				
-				(OVRInput.GetDown(OVRInput.RawButton.X) )// TouchXボタン
+				(OVRInput.Get(OVRInput.RawButton.X) )// TouchXボタン
 			)
 			{
-				CmdSwitchVisibility(!isVisible);
-                isVisible = !isVisible;
+                SwitchVisibility();
 			}
 		}
+    }
+
+    private float visibleChangeWait = 0;
+    private const float visibleChangeInterval = 1f; 
+
+    [Client]
+    private void SwitchVisibility()
+    {
+        if (visibleChangeWait > 0) return;
+
+        CmdSwitchVisibility(!isVisible);
+        isVisible = !isVisible;
+
+        visibleChangeWait = visibleChangeInterval;
+    }
+
+    [Client]
+    private void UpdateTimer()
+    {
+        if (visibleChangeWait > 0) visibleChangeWait -= Time.deltaTime;
     }
 
     [Command]
