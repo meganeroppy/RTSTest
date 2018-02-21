@@ -275,7 +275,8 @@ public class PlayerTest : NetworkBehaviour
                 var manager = obj.GetComponent<BaseSceneManager>();
                 if (manager != null)
                 {
-                    manager.ActivatePresetCameras();
+                // プリセットカメラ対応は追々
+                //    manager.ActivatePresetCameras();
                 }
             }
 
