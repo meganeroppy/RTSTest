@@ -225,7 +225,7 @@ public class PlayerTest : NetworkBehaviour
             // シャペロン境界に自身を登録
             if( Chaperone.instance != null )
             {
-                Chaperone.instance.player = gameObject;
+                Chaperone.instance.player = headObject;
             }
         }
         else
