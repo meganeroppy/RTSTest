@@ -95,9 +95,7 @@ public class PlayerTest : NetworkBehaviour
 
     /// <summary>
     /// 頭オブジェクト
-    /// 自身にカメライメージがついている
-    /// 子要素にいもむしがある
-    /// アイテムを食べるときにも使用する
+    /// アイテムを食べるときに使用する
     /// </summary>
     [SerializeField]
     private GameObject headObject = null;
@@ -473,12 +471,11 @@ public class PlayerTest : NetworkBehaviour
         navigatorController.enabled = isNavigator;
 
         // ナビゲータかつ自身でないときにいもむしビジュアルを有効にする ただし強制アバター表示設定の時は自身でも表示する
-        headObject.SetActive(isNavigator && (!isLocalPlayer || RtsTestNetworkManager.instance.ForceDisplayAvatar));
+        //headObject.SetActive(isNavigator && (!isLocalPlayer || RtsTestNetworkManager.instance.ForceDisplayAvatar));
 
         // ナビゲータの時は手を非表示
         animRightHand.gameObject.SetActive(!isNavigator);
         animLeftHand.gameObject.SetActive(!isNavigator);
-
 
         // トラッキングによる移動の有効を設定 結構難解なので間違いがないか再三確認する
         bool enableTracking;
