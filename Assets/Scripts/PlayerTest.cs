@@ -719,13 +719,24 @@ public class PlayerTest : NetworkBehaviour
         Debug.Log(System.Reflection.MethodBase.GetCurrentMethod());
 
         // すでに存在していたらサーバーから削除する
-        if( myAvatar != null )
+        if (myAvatar != null)
         {
             NetworkServer.Destroy(myAvatar.gameObject);
         }
 
         // プレハブから生成　アバタータイプに応じて生成するモデルを指定する
-		string avatarName = myAvatarType.ToString();
+
+        string avatarName;
+        if (myAvatarType == RtsTestNetworkManager.AvatarTypeEnum.Kid)
+        {
+            int kidsIndex = myPlayerId % 5;
+            avatarName = myAvatarType.ToString() + kidsIndex.ToString();
+        }
+        else
+        {
+            avatarName = myAvatarType.ToString();
+        }
+
 		var avatar = RtsTestNetworkManager.instance.spawnPrefabs.Find( o => o.name == avatarName );
 		if( avatar == null )
 		{
@@ -762,6 +773,12 @@ public class PlayerTest : NetworkBehaviour
         NetworkServer.SpawnWithClientAuthority(myAvatar.gameObject, gameObject);
 
         RpcPassAvatarReference(myAvatar.netId);
+
+        var kidAvatar = avatar.GetComponent<KidAvatarController>();
+        if( kidAvatar != null )
+        {
+            kidAvatar.SetActiveKidServer(myPlayerId);
+        }
     }
 
     /// <summary>
