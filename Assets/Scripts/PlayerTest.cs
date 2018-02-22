@@ -32,7 +32,7 @@ public class PlayerTest : NetworkBehaviour
     /// 参加型ナビゲーターか？
     /// </summary>
     [SyncVar]
-    private RtsTestNetworkManager.NavigatorType navigatorType = RtsTestNetworkManager.NavigatorType.Default;
+    private RtsTestNetworkManager.NavigatorType navigatorType = RtsTestNetworkManager.NavigatorType.Remote;
     public RtsTestNetworkManager.NavigatorType NavigatorType { get { return navigatorType; } }
 
     [SerializeField]
@@ -278,9 +278,9 @@ public class PlayerTest : NetworkBehaviour
                 // 参加型の時は有効にする ただし強制キーボード操作の時は無効にする
                 trackedObjects.SetEnable(RtsTestNetworkManager.instance.MyInputMode != RtsTestNetworkManager.InputMode.ForceByKeyboard);
             }
-            else if (RtsTestNetworkManager.instance.MyInputMode == RtsTestNetworkManager.InputMode.ForceByTracking)
+            else if (RtsTestNetworkManager.instance.MyInputMode == RtsTestNetworkManager.InputMode.Defalut)
             {
-                // 強制トラッカー依存操作フラグがあったらコンポーネントを有効にする
+				// デフォルト(=強制トラッカー依存操作)フラグがあったらコンポーネントを有効にする
                 trackedObjects.SetEnable(true);
             }
             else
@@ -496,9 +496,9 @@ public class PlayerTest : NetworkBehaviour
                     // 参加型ナビゲーターの場合は有効 ただし強制キーボード操作の時は無効
                     enableTracking = RtsTestNetworkManager.instance.MyInputMode != RtsTestNetworkManager.InputMode.ForceByKeyboard;
                 }
-                else if (RtsTestNetworkManager.instance.MyInputMode == RtsTestNetworkManager.InputMode.ForceByTracking)
+                else if (RtsTestNetworkManager.instance.MyInputMode == RtsTestNetworkManager.InputMode.Defalut)
                 {
-                    // 強制トラッカー依存操作の時は有効
+					// デフォルト(=強制トラッカー依存操作)の時は有効
                     enableTracking = true;
                 }
                 else

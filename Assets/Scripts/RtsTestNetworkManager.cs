@@ -67,15 +67,16 @@ public class RtsTestNetworkManager : NetworkBehaviour
 
 	/// <summary>
 	/// ナビゲータータイプ
+	/// 基本は参加型
 	/// </summary>
 	public enum NavigatorType
 	{
-		Default,	// 通常のナビゲーター キーボードで操作する
-		Participatory, // 参加型ナビゲーター 他のプレイヤーと同様にプレイスペース内に入りトラッキングにより操作する InputTypeの強制キーボード操作が有効でもこちらが優先される
+		Participatory, // 参加型 他のプレイヤーと同様にプレイスペース内に入りトラッキングにより操作する InputTypeの強制キーボード操作が有効でもこちらが優先される
+		Remote,	// キーボードで遠隔操作
 	}
 
 	[SerializeField]
-	private NavigatorType navigatorType = NavigatorType.Default;
+	private NavigatorType navigatorType = NavigatorType.Remote;
 
 	/// <summary>
 	/// ！ローカルでのみ使用すること！
@@ -85,17 +86,17 @@ public class RtsTestNetworkManager : NetworkBehaviour
 
 	/// <summary>
 	/// 入力モード
-	/// 実稼働時にはデフォルトの使用を前提とする
+	/// 実稼働時にはデフォルト1の使用を前提とする
 	/// </summary>
 	public enum InputMode
 	{
-		ForceByKeyboard, // 強制キーボード操作 プレイヤーであってもキーボードで操作する
-		ForceByTracking, // 強制トラッカー依存操作 ナビゲーターであってもトラッカー経由での操作となる NavigatorTypeの参加型ナビゲーターが有効の時は無意味になる
-		Default, // 基本操作 プレイヤーはトラッカー依存操作 & ナビゲーターはキーボード操作 ただし参加型ナビゲーターの場合はナビゲーターもトラッカー依存操作
+		Defalut, // プレイヤー・ナビゲーター共にトラッカー依存で操作する
+		RemoteNavigator, // プレイヤーはトラッカー依存操作 & ナビゲーターはキーボード操作
+		ForceByKeyboard, // 強制キーボード操作 プレイヤーであってもキーボードで操作する デバッグ用
 	}
 
 	[SerializeField]
-	private InputMode inputMode = InputMode.Default;
+	private InputMode inputMode = InputMode.RemoteNavigator;
 	/// <summary>
 	/// ！ローカルでのみ使用すること！
 	/// リモートで使用するとえらいことになる

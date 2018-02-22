@@ -68,8 +68,8 @@ public class NavigatorController : NetworkBehaviour {
 		// 参加型ナビゲーターの時はなにもしない 
 		if (RtsTestNetworkManager.instance.MyNavigatorType.Equals( RtsTestNetworkManager.NavigatorType.Participatory )) return;
 
-		// 強制トラッカー依存操作の時はなにもしない
-		if (RtsTestNetworkManager.instance.MyInputMode.Equals( RtsTestNetworkManager.InputMode.ForceByTracking )) return;
+		// デフォルト(=強制トラッカー依存操作)の時はなにもしない
+		if (RtsTestNetworkManager.instance.MyInputMode.Equals( RtsTestNetworkManager.InputMode.Defalut )) return;
 
         var move_x = Input.GetAxis("Horizontal");
         var move_z = Input.GetAxis("Vertical");
@@ -99,8 +99,8 @@ public class NavigatorController : NetworkBehaviour {
 			return;
 		}
 
-		// 強制トラッカー依存操作の時はなにもしない
-		if (RtsTestNetworkManager.instance.MyInputMode.Equals( RtsTestNetworkManager.InputMode.ForceByTracking )) return;
+		// デフォルト(=強制トラッカー依存操作)の時はなにもしない
+		if (RtsTestNetworkManager.instance.MyInputMode.Equals( RtsTestNetworkManager.InputMode.Defalut )) return;
 
         var xRotate = Input.GetAxis("Mouse Y") * rot_speed;
         var yRotate = Input.GetAxis("Mouse X") * rot_speed;
