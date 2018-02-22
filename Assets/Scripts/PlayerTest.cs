@@ -571,10 +571,13 @@ public class PlayerTest : NetworkBehaviour
 				}
 
 				// アニメーション更新
-				if( grabbingRightPrev != grabbingRight )
+				if( animRightHand.gameObject.activeInHierarchy )
 				{
-					var animName = grabbingRight ? "GrabSmall" : "Natural";
-					animRightHand.SetTrigger(animName);
+					if( grabbingRightPrev != grabbingRight )
+					{
+						var animName = grabbingRight ? "GrabSmall" : "Natural";
+						animRightHand.SetTrigger(animName);
+					}
 				}
 			}
 
@@ -598,10 +601,13 @@ public class PlayerTest : NetworkBehaviour
 				}
 
 				// アニメーション更新
-				if( grabbingLeftPrev != grabbingLeft )
+				if( animLeftHand.gameObject.activeInHierarchy )
 				{
-					var animName = grabbingLeft ? "GrabSmall" : "Natural";
-					animLeftHand.SetTrigger(animName);
+					if( grabbingLeftPrev != grabbingLeft )
+					{
+						var animName = grabbingLeft ? "GrabSmall" : "Natural";
+						animLeftHand.SetTrigger(animName);
+					}
 				}
 			}
 		}
