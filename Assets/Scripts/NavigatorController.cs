@@ -28,7 +28,6 @@ public class NavigatorController : NetworkBehaviour {
     GameObject disappearEffect = null;
 
     private TrackedObjects trackedObjects;
-	private PlayerTest playerTest;
 
 	private bool isVisible = false;
 
@@ -41,7 +40,7 @@ public class NavigatorController : NetworkBehaviour {
 	{
 		cameraRotate = transform.localRotation;
 		trackedObjects = GetComponent<TrackedObjects>();
-		playerTest = GetComponent<PlayerTest>();
+
 
         // 最初は非表示
         caterpillarVisual.SetActive(false);
@@ -94,8 +93,12 @@ public class NavigatorController : NetworkBehaviour {
 	[Client]
     void UpdateRotaition()
     {
-		// 参加型ナビゲーターの時はなにもしない
-		if (RtsTestNetworkManager.instance.MyNavigatorType.Equals( RtsTestNetworkManager.NavigatorType.Participatory )) return;
+		// 参加型ナビゲーターの時はいもむしビジュアルの回転だけ更新
+		if (RtsTestNetworkManager.instance.MyNavigatorType.Equals( RtsTestNetworkManager.NavigatorType.Participatory ))
+		{
+			caterpillarVisual.transform.rotation = trackedObjects.BodyObject.rotation;
+			return;
+		}
 
 		// 強制トラッカー依存操作の時はなにもしない
 		if (RtsTestNetworkManager.instance.MyInputMode.Equals( RtsTestNetworkManager.InputMode.ForceByTracking )) return;

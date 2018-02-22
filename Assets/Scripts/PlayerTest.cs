@@ -75,7 +75,7 @@ public class PlayerTest : NetworkBehaviour
     /// <summary>
     /// （仮）プリセットのプレイヤーカラー
     /// </summary>
-    Color[] playerColor = new Color[] { Color.gray, Color.red, Color.green, Color.blue, Color.yellow };
+    //Color[] playerColor = new Color[] { Color.gray, Color.red, Color.green, Color.blue, Color.yellow };
 
     /// <summary>
     /// 情報表示ラベル

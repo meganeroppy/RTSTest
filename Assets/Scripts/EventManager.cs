@@ -22,8 +22,8 @@ public class EventManager : NetworkBehaviour
     [SerializeField]
     private AvatarItem cakeLargePrefab = null;
 
-    [SerializeField]
-    private AvatarItem mushroomPrefab = null;
+//    [SerializeField]
+//    private AvatarItem mushroomPrefab = null;
 
     [SerializeField]
     private ShootTarget targetPrefab = null;
