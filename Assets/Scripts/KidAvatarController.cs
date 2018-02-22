@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 /// <summary>
 /// こどもアバターの制御
@@ -12,54 +13,78 @@ public class KidAvatarController : AvatarController
 	private Transform objectRoot;
 
 	public int testIndex = 0;
-	protected override void Init ()
+    protected override void Init()
+    {
+        //仮
+        if (isServer)
+        {
+        //    SetActiveKid(testIndex);
+        }
+    }
+
+    private void SetKidsList()
+    {
+        kidsList = new List<GameObject>();
+
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            kidsList.Add(transform.GetChild(i).gameObject);
+        }
+    }
+
+    [Server]
+	public void SetActiveKidServer( int index )
 	{
-		kidsList = new List<GameObject>();
+        SetKidsList();
 
-		for( int i = 0 ; i < transform.childCount ; i++ )
-		{
-			kidsList.Add( transform.GetChild( i ).gameObject);
-		}
+        // 指定インデックス以外の要素を削除
+        var kid = kidsList[index];
+        kid.gameObject.SetActive(true);
+        kid.transform.SetSiblingIndex(0);
 
-		//仮
-		SetActiveKid( testIndex );
+        index %= kidsList.Count;
+        for (int i = kidsList.Count - 1; i >= 0; --i)
+        {
+            if (i != index)
+            {
+                kidsList[i].SetActive(false);
+            }
+        }
+
+        RpcSetActiveKid(index);
 	}
 
-	public void SetActiveKid( int index )
-	{
-		// 指定インデックス以外削除
-		index %= kidsList.Count;
-		for( int i = kidsList.Count-1 ; i >= 0 ; --i )
-		{
-			if( i != index )
-			{
-				Destroy( kidsList[i] );
-			}
-		}
-			
-		var kid = kidsList[ 0 ];
+    [ClientRpc]
+    private void RpcSetActiveKid( int index )
+    {
+        SetKidsList();
 
-		kid.gameObject.SetActive( true );
+        SetActiveKid(index);
+    }
 
-        gameObject.SetActive(false);
-        gameObject.SetActive(true);
+    private void SetActiveKid( int index )
+    {
+        // 指定インデックス以外の要素を削除
+        var kid = kidsList[index];
+        kid.gameObject.SetActive(true);
+        kid.transform.SetSiblingIndex(0);
 
-		objectRoot = kid.transform;
+        index %= kidsList.Count;
+        for (int i = kidsList.Count - 1; i >= 0; --i)
+        {
+            if (i != index)
+            {
+                kidsList[i].SetActive(false);
+            }
+        }
+        objectRoot = kid.transform;
 
-		modelRoot = transform;
+        modelRoot = transform;
 
-		anim = kid.GetComponent<Animator>();
+        anim = kid.GetComponent<Animator>();
 
         StartCoroutine(Reactive());
-	}
-	/*
-	protected override void UpdatePositionAndRotation()
-	{
-		if( objectRoot == null ) return;
-
-		objectRoot.SetPositionAndRotation(ownerPosition, ownerRotation);
-	}
-	*/
+    }
 
     /// <summary>
     /// 一旦自身を無効にして次のフレームで有効にする
