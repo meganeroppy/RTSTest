@@ -188,12 +188,13 @@ public class RtsTestNetworkManager : NetworkManager
 
     /// <summary>
     /// アバター種類
-    /// ドロシー or Unityちゃん
+    /// ドロシー or Unityちゃん or こども
     /// </summary>
     public enum AvatarTypeEnum
     {
         Drothy,
-        UnityChan
+        UnityChan,
+		Kid,
     }
     [SerializeField]
     private AvatarTypeEnum avatarType = AvatarTypeEnum.UnityChan;
