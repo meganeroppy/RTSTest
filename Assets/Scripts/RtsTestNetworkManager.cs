@@ -7,14 +7,12 @@ using UnityEngine.Networking;
 /// ネットワーク関連処理
 /// NetworkManagaer継承するのが正義かも
 /// </summary>
-public class RtsTestNetworkManager : NetworkBehaviour 
+public class RtsTestNetworkManager : NetworkManager 
 {
     /// <summary>
     /// 自身のインスタンス
     /// </summary>
     public static RtsTestNetworkManager instance;
-
-	private NetworkManager nManager;
 
     [SerializeField]
     private int playerId = 1;
@@ -195,12 +193,10 @@ public class RtsTestNetworkManager : NetworkBehaviour
     // Use this for initialization
     void Start()
     {
-        nManager = GetComponent<NetworkManager>();
-
         // 何か文字列が入っていたらサーバアドレスを上書き
         if (!string.IsNullOrEmpty(localServerAddress))
         {
-            nManager.networkAddress = localServerAddress;
+            networkAddress = localServerAddress;
         }
 
         if (autoExecRole) ExecRole();
@@ -229,14 +225,14 @@ public class RtsTestNetworkManager : NetworkBehaviour
         switch( role )
         {
             case Role.Server:
-                nManager.StartServer();
+                StartServer();
                 break;
             case Role.Host:
-                nManager.StartHost();
+                StartHost();
                 break;
             case Role.Client:
             default:
-                nManager.StartClient();
+                StartClient();
                 break;            
         }
     }
