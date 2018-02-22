@@ -22,11 +22,18 @@ public class RtsTestNetworkManager : NetworkManager
         	return playerId;
     	}
 	}
+
+	/// <summary>
+	/// オートの挙動：
+	/// まずクライアントとして定義済みのアドレスに接続しようとする
+	/// すべての定義済みアドレスに接続しようとして失敗したら、自身がホストになる
+	/// </summary>
     public enum Role
     {
         Server,
         Host,
-        Client,
+		Client,
+		Auto,
     }
 	public Role GetRole()
 	{
@@ -41,6 +48,13 @@ public class RtsTestNetworkManager : NetworkManager
 	/// </summary>
 	[SerializeField]
 	private bool autoExecRole = false;
+
+	/// <summary>
+	/// 定義済みサーバーアドレス
+	/// オート設定の時だけ使用する
+	/// </summary>
+	[SerializeField]
+	private string[] definedServerAddress;	
 
 	/// <summary>
 	/// 後々アプリケーションと同じディレクトリに保存したファイルなどから設定できるようにする
@@ -231,9 +245,80 @@ public class RtsTestNetworkManager : NetworkManager
                 StartHost();
                 break;
             case Role.Client:
+				StartClient();
+				break;
+			case Role.Auto:			
             default:
-                StartClient();
+				StartCoroutine(ExecAutoRoleProcedure());
                 break;            
         }
     }
+
+	public override void OnClientDisconnect (NetworkConnection conn)
+	{
+		Debug.Log( System.Reflection.MethodBase.GetCurrentMethod()); 
+
+		base.OnClientDisconnect (conn);
+
+		disconnected = true;
+	}
+	private bool disconnected = false;
+	private bool connected = false;
+
+	public override void OnClientConnect (NetworkConnection conn)
+	{
+		base.OnClientConnect (conn);
+		connected = true;
+	}
+
+	/// <summary>
+	/// オート時の処理を実行する
+	/// ①：定義済みアドレスにクライアントとしての接続を試みる
+	/// ②：接続に失敗したら次の定義済みアドレスを接続先として指定する
+	/// ③：①、②を定義済みアドレスを全て試すまで繰り返す
+	/// ④：③をプレイヤーIDの回数繰り返す
+	/// ⑤：④まで終わってまだ接続できていなかったら自身がホストになる
+	/// </summary>
+	/// <returns>The auto role procedure.</returns>
+	private IEnumerator ExecAutoRoleProcedure()
+	{
+		int MaxLoop = Mathf.Abs(playerId);
+
+		Debug.Log("オート処理開始 プレイヤーIDは" + playerId.ToString() + "なので" + MaxLoop.ToString() + "回試行する");
+
+		int retryCount = 0;
+		int retryLoopCount = 0;
+
+		while( retryLoopCount < MaxLoop && !connected)
+		{
+			localServerAddress = definedServerAddress[ retryCount ];
+			StartClient();
+
+			Debug.Log( localServerAddress + "にクライアントとして接続中" );
+			while( !connected && !disconnected )
+			{
+				yield return null;
+			}
+
+			if( connected )
+			{
+				Debug.Log( localServerAddress + "にクライアントとして接続完了 オート処理を終了" );
+				break;
+			}
+
+			if( disconnected )
+			{
+				Debug.Log( localServerAddress + "へクライアントとして接続失敗 次の処理を実行" );
+				retryCount++;
+				if( retryCount >= definedServerAddress.Length )
+				{
+					retryLoopCount++;
+					retryCount = 0;
+				}
+			}
+		}
+
+		Debug.Log( "クライアントとしての接続処理失敗 自身がホストになる" );
+		StartHost();
+	}
 }
