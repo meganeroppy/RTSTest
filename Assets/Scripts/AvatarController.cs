@@ -12,7 +12,7 @@ public class AvatarController : NetworkBehaviour
 	private float threasholdMoveSpeed = 1f;
 
 	[SerializeField]
-	private Transform modelRoot;
+	protected Transform modelRoot;
 
 	private Vector3 prevPosition;
 
@@ -27,10 +27,10 @@ public class AvatarController : NetworkBehaviour
     private Transform owner = null;
 
     [SyncVar]
-    private Vector3 ownerPosition;
+	protected Vector3 ownerPosition;
 
     [SyncVar]
-    private Quaternion ownerRotation;
+	protected Quaternion ownerRotation;
 
     [SyncVar]
     private Vector3 targetPosition;
@@ -109,7 +109,7 @@ public class AvatarController : NetworkBehaviour
 			}
 
 			// サーバーとクライアント双方で位置を更新 ownerPositionとownerRotationはSyncVarなのでサーバーの値がクライアントにも同期される
-	        transform.SetPositionAndRotation(ownerPosition, ownerRotation);
+			UpdatePositionAndRotation();
 		}
 
 		// ドレスの色変更 サーバーとクライアント両方
@@ -153,6 +153,11 @@ public class AvatarController : NetworkBehaviour
         ownerPosition = owner.position;
         ownerRotation = owner.rotation;
     }
+
+	protected virtual void UpdatePositionAndRotation()
+	{
+		transform.SetPositionAndRotation(ownerPosition, ownerRotation);
+	}
 
     /// <summary>
     /// サーバーのみ
