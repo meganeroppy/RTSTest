@@ -35,11 +35,6 @@ public class PlayerTest : NetworkBehaviour
     private RtsTestNetworkManager.NavigatorType navigatorType = RtsTestNetworkManager.NavigatorType.Remote;
     public RtsTestNetworkManager.NavigatorType NavigatorType { get { return navigatorType; } }
 
-    [SerializeField]
-    private IKControl drothyIKPrefab = null;
-    [SerializeField]
-    private IKControl unityChanIKPrefab = null;
-
     private AvatarController myAvatar;
 
     /// <summary>
@@ -730,8 +725,15 @@ public class PlayerTest : NetworkBehaviour
         }
 
         // プレハブから生成　アバタータイプに応じて生成するモデルを指定する
-        var avatar = myAvatarType == RtsTestNetworkManager.AvatarTypeEnum.UnityChan ? unityChanIKPrefab : drothyIKPrefab;
-        var avatarIK = Instantiate(avatar);
+		string avatarName = myAvatarType.ToString();
+		var avatar = RtsTestNetworkManager.instance.spawnPrefabs.Find( o => o.name == avatarName );
+		if( avatar == null )
+		{
+			Debug.LogError( avatarName + "がみつからない" ); 
+			return;
+		}
+//        var avatar = myAvatarType == RtsTestNetworkManager.AvatarTypeEnum.UnityChan ? unityChanIKPrefab : drothyIKPrefab;
+		var avatarIK = Instantiate(avatar).GetComponent<IKControl>();
 
         // IKのターゲットをトラッキングオブジェクトから取得
         {
