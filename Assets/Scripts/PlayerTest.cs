@@ -227,17 +227,21 @@ public class PlayerTest : NetworkBehaviour
             if (camera.gameObject) camera.gameObject.SetActive(false);
         }
 
+		// ID表示設定
+		playerLabel.enabled = RtsTestNetworkManager.instance.ShowPlayerId;
+
         // ラベルの設定
+		if( playerLabel.enabled ) 
         {
-            var nIdentity = GetComponent<NetworkIdentity>();
-            if (nIdentity != null)
+			string numberStr = "?";
+
+			var nIdentity = GetComponent<NetworkIdentity>();
+			if (nIdentity != null)
             {
-                playerLabel.text = "PLAYER[ " + nIdentity.netId.ToString() + " ]";
+				numberStr = nIdentity.netId.ToString();
             }
-            else
-            {
-                playerLabel.enabled = false;
-            }
+
+			playerLabel.text = "PLAYER[ " + numberStr + " ]";
         }
     }
 

@@ -103,6 +103,13 @@ public class RtsTestNetworkManager : NetworkBehaviour
 	/// </summary>
 	public InputMode MyInputMode{ get{ return inputMode;} }
 
+	/// <summary>
+	/// プレイヤーのIDを表示するか？
+	/// </summary>
+	[SerializeField]
+	private bool showPlayerId = false;
+	public bool ShowPlayerId{ get{ return showPlayerId;}}
+
     /// <summary>
     /// RTS空間内のプレイヤーの動きをシミュレートするか？
 	/// RTS設備がない環境での開発用
