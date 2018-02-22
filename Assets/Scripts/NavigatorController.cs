@@ -41,7 +41,6 @@ public class NavigatorController : NetworkBehaviour {
 		cameraRotate = transform.localRotation;
 		trackedObjects = GetComponent<TrackedObjects>();
 
-
         // 最初は非表示
         caterpillarVisual.SetActive(false);
     }
@@ -324,7 +323,9 @@ public class NavigatorController : NetworkBehaviour {
     [ClientRpc]
     private void RpcSetVisibility(bool val)
     {
-        if (isLocalPlayer) return;
+		// 自分の時は処理しない ただし強制表示設定の時は例外
+		if (isLocalPlayer && !RtsTestNetworkManager.instance.ForceDisplayAvatar ) return;
+
         if (!caterpillarVisual) return;
 
         // 芋虫の表示/非表示
