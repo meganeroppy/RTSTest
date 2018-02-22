@@ -103,10 +103,6 @@ public class PlayerTest : NetworkBehaviour
     private GameObject headObject = null;
 	public GameObject HeadObject{ get { return headObject;} }
 
-    /// <summary>
-    /// ナビゲータークラス
-    /// </summary>
-    private NavigatorController navigatorController;
 
     /// <summary>
     /// プレイヤーのリスト
@@ -474,9 +470,8 @@ public class PlayerTest : NetworkBehaviour
     /// </summary>
     private void SetNavigatorEnable()
     {
-        // 参照が無ければ取得する
-        if (navigatorController == null) navigatorController = GetComponent<NavigatorController>();
-
+        // ナビゲータクラスの有効切り替え
+		var navigatorController = GetComponent<NavigatorController>();
         navigatorController.enabled = isNavigator;
 
         // ナビゲータかつ自身でないときにいもむしビジュアルを有効にする ただし強制アバター表示設定の時は自身でも表示する
