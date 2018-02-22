@@ -101,8 +101,6 @@ public class PlayerTest : NetworkBehaviour
     /// </summary>
     [SerializeField]
     private GameObject headObject = null;
-	public GameObject HeadObject{ get { return headObject;} }
-
 
     /// <summary>
     /// プレイヤーのリスト
