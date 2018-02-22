@@ -5,7 +5,7 @@ using UnityEngine.Networking;
 
 public class AvatarController : NetworkBehaviour 
 {
-	private Animator anim;
+	protected Animator anim;
 	private bool walking;
 
 	[SerializeField]
@@ -14,7 +14,7 @@ public class AvatarController : NetworkBehaviour
 	[SerializeField]
 	protected Transform modelRoot;
 
-	private Vector3 prevPosition;
+	protected Vector3 prevPosition;
 
 	[SerializeField]
 	private SkinnedMeshRenderer skinMesh;
@@ -60,6 +60,9 @@ public class AvatarController : NetworkBehaviour
     /// </summary>
     private float blinkingTimer = 0;
 
+	[SerializeField]
+	private bool useWalkAnim = false;
+
     /// <summary>
     /// サーバーからのみ呼ぶこと
     /// </summary>
@@ -72,17 +75,26 @@ public class AvatarController : NetworkBehaviour
     // Use this for initialization
     void Start ()
 	{
-		anim = GetComponent<Animator>();
-		prevPosition = modelRoot.localPosition;
+		Init();
 		walking = false;
 
         Debug.Log("AvatarController isLocal=" + isLocalPlayer.ToString());
+	}
+
+	protected virtual void Init()
+	{
+		anim = GetComponent<Animator>();
+		if( useWalkAnim )
+		{
+			prevPosition = modelRoot.localPosition;
+		}
 	}
 
 	// Update is called once per frame
 	void Update () 
 	{
 		// 一定の速度以上で移動していたら歩きアニメにする
+		if( useWalkAnim )
 		{
 			var vDiff = (prevPosition - modelRoot.localPosition);
 	//		Debug.Log( vDiff );
@@ -188,6 +200,8 @@ public class AvatarController : NetworkBehaviour
     /// </summary>
     private void UpdateBlinking()
     {
+		if( anim == null ) return;
+
         blinkingTimer += Time.deltaTime;
         if (blinkingTimer >= blinkingInterval)
         {
@@ -201,6 +215,7 @@ public class AvatarController : NetworkBehaviour
     /// </summary>
     private void UpdateTalk()
     {
+		if( anim == null ) return;
         if (talking > 0) talking -= Time.deltaTime;
         anim.SetBool("MouseOpen", talking > 0);
     }

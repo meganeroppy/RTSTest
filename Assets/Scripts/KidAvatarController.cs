@@ -7,52 +7,52 @@ using UnityEngine;
 /// </summary>
 public class KidAvatarController : AvatarController
 {
-	private List<IKControl> kidsList;
+	private List<GameObject> kidsList;
 
 	private Transform objectRoot;
 
-	private void Start()
+	public int testIndex = 0;
+	protected override void Init ()
 	{
-		kidsList = new List<IKControl>();
+		kidsList = new List<GameObject>();
 
 		for( int i = 0 ; i < transform.childCount ; i++ )
 		{
-			kidsList.Add( transform.GetChild( i ).GetComponent<IKControl>());
+			kidsList.Add( transform.GetChild( i ).gameObject);
 		}
 
-		SetActiveKid( 0 );
+		//仮
+		SetActiveKid( testIndex );
 	}
 
 	public void SetActiveKid( int index )
 	{
-		// いったんすべて無効
-		foreach( IKControl k in kidsList )
-		{
-			k.gameObject.SetActive( false );
-		}
-
+		// 指定インデックス以外削除
 		index %= kidsList.Count;
-
-		var kid = kidsList[ index ];
+		for( int i = kidsList.Count-1 ; i >= 0 ; --i )
+		{
+			if( i != index )
+			{
+				Destroy( kidsList[i] );
+			}
+		}
+			
+		var kid = kidsList[ 0 ];
 
 		kid.gameObject.SetActive( true );
 
 		objectRoot = kid.transform;
 
-		var mRoot = kid.transform.Find("ROOT");
-		if( !mRoot ) 
-		{
-			Debug.LogError(" [ROOT] がみつからない");
-			return;
-		}
+		modelRoot = transform;
 
-		modelRoot = mRoot;
+		anim = kid.GetComponent<Animator>();
 	}
-
+	/*
 	protected override void UpdatePositionAndRotation()
 	{
 		if( objectRoot == null ) return;
 
 		objectRoot.SetPositionAndRotation(ownerPosition, ownerRotation);
 	}
+	*/
 }
