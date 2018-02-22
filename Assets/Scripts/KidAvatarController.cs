@@ -41,11 +41,16 @@ public class KidAvatarController : AvatarController
 
 		kid.gameObject.SetActive( true );
 
+        gameObject.SetActive(false);
+        gameObject.SetActive(true);
+
 		objectRoot = kid.transform;
 
 		modelRoot = transform;
 
 		anim = kid.GetComponent<Animator>();
+
+        StartCoroutine(Reactive());
 	}
 	/*
 	protected override void UpdatePositionAndRotation()
@@ -55,4 +60,16 @@ public class KidAvatarController : AvatarController
 		objectRoot.SetPositionAndRotation(ownerPosition, ownerRotation);
 	}
 	*/
+
+    /// <summary>
+    /// 一旦自身を無効にして次のフレームで有効にする
+    /// </summary>
+    private IEnumerator Reactive()
+    {
+        gameObject.SetActive(false);
+
+        yield return null;
+
+        gameObject.SetActive(true);
+    }
 }
