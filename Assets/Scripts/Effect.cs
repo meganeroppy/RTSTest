@@ -8,6 +8,9 @@ public class Effect : NetworkBehaviour
 	[SerializeField]
 	private float lifeTime = 2f;
 
+	[SerializeField]
+	private bool spawnOnNetwork = true;
+
 	private float timer = 0;
 
 	// Use this for initialization
@@ -20,7 +23,14 @@ public class Effect : NetworkBehaviour
 		timer += Time.deltaTime;
 		if( timer >= lifeTime )
 		{
-			NetworkServer.Destroy( gameObject );
+			if( spawnOnNetwork )
+			{
+				NetworkServer.Destroy( gameObject );
+			}
+			else
+			{
+				Destroy( gameObject );
+			}
 		}
 	}
 }
