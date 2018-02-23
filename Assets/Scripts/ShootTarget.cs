@@ -23,6 +23,9 @@ public class ShootTarget : NetworkBehaviour
 
     private float timer = 0;
 
+	[SerializeField]
+	private GameObject effect;
+
     /// <summary>
     /// 見た目
     /// </summary>
@@ -67,9 +70,49 @@ public class ShootTarget : NetworkBehaviour
     [Server]
     private void Dead()
     {
+		// エフェクト
+		CreateEffect();
+
+		//ビジュアルを消す
+		SetVisibility(false);
+
         activated = false;
         timer = 0;
+
+
+		// クライアントでもエフェクト
+		RpcCreateEffect();
+		// クライアントでもビジュアルを消す
+		RpcSetVisibility( false ); 
     }
+
+	/// <summary>
+	/// 爆発
+	/// </summary>
+	private void CreateEffect()
+	{
+		Instantiate( effect, transform.position, transform.rotation );
+	}
+
+	[ClientRpc]
+	private void RpcCreateEffect()
+	{
+		CreateEffect();
+	}
+
+	/// <summary>
+	/// 爆発
+	/// </summary>
+	private void SetVisibility( bool key )
+	{
+		visual.SetActive( key );
+	}
+
+	[ClientRpc]
+	private void RpcSetVisibility( bool key)
+	{
+		SetVisibility(key);
+	}
 
     /// <summary>
     /// 復活
@@ -79,5 +122,11 @@ public class ShootTarget : NetworkBehaviour
     {
         activated = true;
         currentHealth = maxHealth;
+
+		// ビジュアルを表示
+		SetVisibility( true );
+
+		// クライアントでもビジュアルを表示
+		RpcSetVisibility( true );
     }
 }
