@@ -947,10 +947,13 @@ public class PlayerTest : NetworkBehaviour
         if(hIndex == HandIndex.Right)
         {
 			holdItemRight = selectedItem;
+			holdItemRight.GetComponent<NetworkIdentity>().AssignClientAuthority( GetComponent<NetworkIdentity>().connectionToClient );
         }
         else
         {
 			holdItemLeft = selectedItem;
+			holdItemLeft.GetComponent<NetworkIdentity>().AssignClientAuthority( GetComponent<NetworkIdentity>().connectionToClient );
+
         }
 			
         // つかむ
@@ -977,12 +980,14 @@ public class PlayerTest : NetworkBehaviour
 		{
 			Debug.Log("右手のアイテムを離した");
 			holdItemRight.SetHeld(false);
+			holdItemRight.GetComponent<NetworkIdentity>().RemoveClientAuthority( GetComponent<NetworkIdentity>().connectionToClient );
 			holdItemRight = null;
 		}
 		else
 		{
 			Debug.Log("左手のアイテムを離した");
 			holdItemLeft.SetHeld(false);
+			holdItemLeft.GetComponent<NetworkIdentity>().RemoveClientAuthority( GetComponent<NetworkIdentity>().connectionToClient );
 			holdItemLeft = null;
 		}
 	}
