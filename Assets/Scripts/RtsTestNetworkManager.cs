@@ -178,6 +178,7 @@ public class RtsTestNetworkManager : NetworkManager
     {
         Garden,
         Template,
+        Classroom,
     }
     /// <summary>
     /// 最初に遷移するシーン
@@ -199,6 +200,13 @@ public class RtsTestNetworkManager : NetworkManager
     [SerializeField]
     private AvatarTypeEnum avatarType = AvatarTypeEnum.UnityChan;
     public AvatarTypeEnum AvatarType { get { return avatarType; } }
+
+    [SerializeField]
+    bool createEggs = false;
+    public bool CreateEggs
+    {
+        get { return createEggs; }
+    }
 
     private void Awake()
     {

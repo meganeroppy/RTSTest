@@ -91,6 +91,7 @@ public class BaseSceneManager : MonoBehaviour
                 copyTransformBody.ObjectName += playerId.ToString();
         }
     }
+
     private IEnumerator LoadFirstScene()
     {
         var operation = SceneManager.LoadSceneAsync(RtsTestNetworkManager.instance.FirsScene.ToString(), LoadSceneMode.Additive);
@@ -100,7 +101,6 @@ public class BaseSceneManager : MonoBehaviour
         var scene = SceneManager.GetSceneByName(RtsTestNetworkManager.instance.FirsScene.ToString());
 
         SceneManager.SetActiveScene( scene );
-
     }
 
     public void ActivatePresetCameras()

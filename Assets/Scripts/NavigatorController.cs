@@ -34,6 +34,8 @@ public class NavigatorController : NetworkBehaviour {
     [SerializeField]
 	private GameObject caterpillarVisual;
 
+    [SerializeField]
+	private EggCreator eggCreator;
 
     // Use this for initialization
     void Start () 
@@ -43,6 +45,12 @@ public class NavigatorController : NetworkBehaviour {
 
         // 最初は非表示
         caterpillarVisual.SetActive(false);
+        
+        // 設定に応じてタマゴクリエータを生成
+        if( RtsTestNetworkManager.instance.CreateEggs && isLocalPlayer )
+        {
+            CmdSetEggCreator();
+        }
     }
 
     // Update is called once per frame
@@ -330,5 +338,16 @@ public class NavigatorController : NetworkBehaviour {
 
         // 芋虫の表示/非表示
         caterpillarVisual.SetActive(val);
+    }
+
+    /// <summary>
+    /// 卵クリエーターを生成
+    /// </summary>
+    [Command]
+    private void CmdSetEggCreator()
+    {
+        var obj = Instantiate(eggCreator);
+
+		NetworkServer.Spawn( obj.gameObject );
     }
 }
