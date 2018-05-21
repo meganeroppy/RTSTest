@@ -28,10 +28,18 @@ public class EggCreator : NetworkBehaviour
 
 		foreach (TrackerSettings t in trackerSettings)
 		{
-			if (t.ObjectName.Contains ("Egg")) 
+			if (t.ObjectName.Contains ("Egg") ) 
 			{
 				var obj = Instantiate (eggPrefab).GetComponent<CopyTransform>();
 				obj.copySource = t.gameObject;
+
+				NetworkServer.Spawn (obj.gameObject);
+			}
+			else if ( t.ObjectName.Contains ("Wand") ) 
+			{
+				var obj = Instantiate (eggPrefab).GetComponent<CopyTransform>();
+				obj.copySource = t.gameObject;
+				obj.transform.localScale *= 1.2f;
 
 				NetworkServer.Spawn (obj.gameObject);
 			}
