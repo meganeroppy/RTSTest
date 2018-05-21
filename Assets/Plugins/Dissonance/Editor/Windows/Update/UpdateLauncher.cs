@@ -67,11 +67,11 @@ namespace Dissonance.Editor.Windows.Update
             request.Send();
 
             //Wait until request is complete
-            while (!request.isDone && !request.isError)
+            while (!request.isDone && !request.isNetworkError)
                 yield return true;
 
             //If it's an error give up and schedule the next check fairly soon
-            if (request.isError)
+            if (request.isNetworkError)
             {
                 request.Dispose();
                 failed();
