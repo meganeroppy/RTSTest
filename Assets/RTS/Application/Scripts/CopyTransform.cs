@@ -51,7 +51,7 @@ public class CopyTransform : MonoBehaviour
 
         else
         {
-            transform.localPosition -= UnityEngine.XR.InputTracking.GetLocalPosition(UnityEngine.XR.XRNode.Head);
+            transform.localPosition -= InputTracking.GetLocalPosition(VRNode.Head);
         }
     }
 }
