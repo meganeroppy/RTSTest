@@ -178,7 +178,8 @@ public class RtsTestNetworkManager : NetworkManager
     {
         Garden,
         Template,
-        Classroom,
+		Classroom,
+		Classroom2,
     }
     /// <summary>
     /// 最初に遷移するシーン
