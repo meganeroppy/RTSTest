@@ -21,6 +21,24 @@ public class EggCreator : NetworkBehaviour
 	CopyTransform handCameraPrefab;
 
 	[SerializeField]
+	CopyTransform hiraiBoyPrefab;
+
+	[SerializeField]
+	CopyTransform hiraiRHPrefab;
+
+	[SerializeField]
+	CopyTransform hiraiLHPrefab;
+
+	[SerializeField]
+	CopyTransform hiraiRFPrefab;
+
+	[SerializeField]
+	CopyTransform hiraiLFPrefab;
+
+	[SerializeField]
+	CopyTransform hiraiHeadPrefab;
+
+	[SerializeField]
 	Material[] materials;
 
 	[SerializeField]
@@ -98,6 +116,48 @@ public class EggCreator : NetworkBehaviour
 			else if ( t.ObjectName.Contains ("Chair") ) 
 			{
 				var obj = Instantiate (chairPrefab).GetComponent<CopyTransform>();
+				obj.copySource = t.gameObject;
+
+				NetworkServer.Spawn (obj.gameObject);
+			}
+			else if ( t.ObjectName.Contains ("HiraiBody") ) 
+			{
+				var obj = Instantiate (hiraiBoyPrefab).GetComponent<CopyTransform>();
+				obj.copySource = t.gameObject;
+
+				NetworkServer.Spawn (obj.gameObject);
+			}
+			else if ( t.ObjectName.Contains ("HiraiRH") ) 
+			{
+				var obj = Instantiate (hiraiRHPrefab).GetComponent<CopyTransform>();
+				obj.copySource = t.gameObject;
+
+				NetworkServer.Spawn (obj.gameObject);
+			}
+			else if ( t.ObjectName.Contains ("HiraiLH") ) 
+			{
+				var obj = Instantiate (hiraiLHPrefab).GetComponent<CopyTransform>();
+				obj.copySource = t.gameObject;
+
+				NetworkServer.Spawn (obj.gameObject);
+			}
+			else if ( t.ObjectName.Contains ("HiraiRF") ) 
+			{
+				var obj = Instantiate (hiraiRFPrefab).GetComponent<CopyTransform>();
+				obj.copySource = t.gameObject;
+
+				NetworkServer.Spawn (obj.gameObject);
+			}
+			else if ( t.ObjectName.Contains ("HiraiLF") ) 
+			{
+				var obj = Instantiate (hiraiLFPrefab).GetComponent<CopyTransform>();
+				obj.copySource = t.gameObject;
+
+				NetworkServer.Spawn (obj.gameObject);
+			}
+			else if ( t.ObjectName.Contains ("HiraiHead") ) 
+			{
+				var obj = Instantiate (hiraiHeadPrefab).GetComponent<CopyTransform>();
 				obj.copySource = t.gameObject;
 
 				NetworkServer.Spawn (obj.gameObject);
