@@ -23,7 +23,14 @@ public class EggCreator : NetworkBehaviour
 	[SerializeField]
 	Material[] materials;
 
-    // Use this for initialization
+	[SerializeField]
+	Transform cameraPrefab;
+
+	int currentCameraIndex = 0;
+
+	List<Camera> cameraList = new List<Camera>();
+
+	// Use this for initialization
     void Start()
     {
 		CreateObjects ();
@@ -100,8 +107,73 @@ public class EggCreator : NetworkBehaviour
 				var obj = Instantiate (handCameraPrefab).GetComponent<CopyTransform>();
 				obj.copySource = t.gameObject;
 
+				var cam = obj.transform.GetComponentInChildren<Camera> ();
+				if (cam != null) {
+					cameraList.Add (cam);
+				}
+
 				NetworkServer.Spawn (obj.gameObject);
 			}
 		}
+
+		// 固定カメラを生成
+		StartCoroutine( CreateCamera() );
+	}
+
+	void Update()
+	{
+		if (Input.GetKeyDown (KeyCode.LeftArrow))
+			SwitchCamera (false);
+		if (Input.GetKeyDown (KeyCode.RightArrow))
+			SwitchCamera (true);
+		if (Input.GetKeyDown (KeyCode.C)) {
+			camName.enabled = !camName.enabled;
+		}	
+
+	}
+		
+	IEnumerator CreateCamera()
+	{
+		while (CameraPositionManager.instance == null) {
+			yield return null;
+		}
+	
+		var c = CameraPositionManager.instance; 
+
+		foreach( Camera t in c.Cameras )
+		{
+			cameraList.Add (t);
+		}
+
+		SwitchCamera (true);
+	}
+
+	/// <summary>
+	/// カメラ切り替え
+	/// </summary>
+	void SwitchCamera( bool forward )
+	{
+		if (cameraList == null)
+			return;
+
+		if( forward )
+			currentCameraIndex = (currentCameraIndex + 1) % cameraList.Count;
+		else
+			currentCameraIndex = (currentCameraIndex + cameraList.Count - 1) % cameraList.Count;
+		
+		for ( int i=0 ; i < cameraList.Count ; ++i) {
+			cameraList [i].enabled = i == currentCameraIndex;
+		}
+
+		UpdateUi ();
+	}
+
+	[SerializeField]
+	UnityEngine.UI.Text camName;
+
+	void UpdateUi()
+	{
+		var currentCam = cameraList [currentCameraIndex];
+		camName.text = currentCam.name;
 	}
 }
