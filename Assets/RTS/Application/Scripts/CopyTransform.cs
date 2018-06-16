@@ -9,9 +9,9 @@ public class CopyTransform : MonoBehaviour
 {
 	public	GameObject	copySource	= null;
     public bool useRotation = true;
-    public GameObject offsetObject;
-
-
+	[SerializeField]
+	Vector3 rotOffset = Vector3.zero;
+	public GameObject offsetObject;
 	/// <summary>
 	/// Update.
 	/// </summary>
@@ -41,11 +41,11 @@ public class CopyTransform : MonoBehaviour
         {
 		//	if( offsetObject )
 		//	{
-		//		transform.localRotation =  copySource.transform.rotation * offsetObject.transform.rotation;
+		//		transform.localRotation =  copySource.transform.rotation + offsetObject.transform.rotation;
 		//	}
 		//	else
 		//	{
-            	transform.localRotation = copySource.transform.rotation;
+			transform.localRotation = copySource.transform.rotation * Quaternion.Euler(rotOffset);
 		//	}
         }
 
