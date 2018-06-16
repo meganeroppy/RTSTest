@@ -10,6 +10,8 @@ public class CopyTransform : MonoBehaviour
 	public	GameObject	copySource	= null;
     public bool useRotation = true;
 	[SerializeField]
+	Vector3 posOffset = Vector3.zero;
+	[SerializeField]
 	Vector3 rotOffset = Vector3.zero;
 	public GameObject offsetObject;
 	/// <summary>
@@ -33,7 +35,7 @@ public class CopyTransform : MonoBehaviour
         }
         else
         {
-            transform.localPosition = copySource.transform.position;
+			transform.localPosition = copySource.transform.position + posOffset;
         }
 
         //非头部

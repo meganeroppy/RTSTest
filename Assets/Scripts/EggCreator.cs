@@ -13,10 +13,42 @@ public class EggCreator : NetworkBehaviour
 	}
 
     [SerializeField]
-	CopyTransform eggPrefab=null;
+	CopyTransform eggPrefab1=null;
 
 	[SerializeField]
-	CopyTransform toppogiPrefab=null;
+	CopyTransform eggPrefab2=null;
+	[SerializeField]
+	CopyTransform eggPrefab3=null;
+	[SerializeField]
+	CopyTransform eggPrefab4=null;
+	[SerializeField]
+	CopyTransform eggPrefab5=null;
+	[SerializeField]
+	CopyTransform eggPrefab6=null;
+	[SerializeField]
+	CopyTransform eggPrefab7=null;
+	[SerializeField]
+	CopyTransform eggPrefab8=null;
+	[SerializeField]
+	CopyTransform eggPrefab9=null;
+	[SerializeField]
+	CopyTransform eggPrefab10=null;
+	[SerializeField]
+	CopyTransform eggPrefab11=null;
+	[SerializeField]
+	CopyTransform eggPrefab12=null;
+	[SerializeField]
+	CopyTransform eggPrefab13=null;
+	[SerializeField]
+	CopyTransform eggPrefab14=null;
+	[SerializeField]
+	CopyTransform eggPrefab15=null;
+
+	[SerializeField]
+	CopyTransform toppogiPrefab1=null;
+
+	[SerializeField]
+	CopyTransform toppogiPrefab2=null;
 
 	[SerializeField]
 	CopyTransform horsePrefab=null;
@@ -52,7 +84,7 @@ public class EggCreator : NetworkBehaviour
 	Material[] materials=null;
 
 	[SerializeField]
-	Material[] toppogiMaterials=null;
+	Material[] nameMaterials=null;
 
 	[SerializeField]
 	Transform cameraPrefab;
@@ -66,6 +98,9 @@ public class EggCreator : NetworkBehaviour
     {
 		CreateObjects ();
     }
+
+	[SerializeField]
+	float eggScale = 3f;
 
 	[Server]
 	void CreateObjects()
@@ -81,9 +116,121 @@ public class EggCreator : NetworkBehaviour
 
 		foreach (TrackerSettings t in trackerSettings)
 		{
-			if (t.ObjectName.Contains ("Egg") ) 
+			if (t.ObjectName.Contains ("Egg1") && t.ObjectName != ("Egg10") && t.ObjectName != ("Egg11") && t.ObjectName != ("Egg12") && t.ObjectName != ("Egg13") && t.ObjectName != ("Egg14")&& t.ObjectName != ("Egg15")) 
 			{
-				var obj = Instantiate (eggPrefab).GetComponent<CopyTransform>();
+				var obj = Instantiate (eggPrefab1).GetComponent<CopyTransform>();
+				obj.copySource = t.gameObject;
+				obj.transform.localScale *= eggScale;
+				NetworkServer.Spawn (obj.gameObject);
+			}
+			else if (t.ObjectName.Contains ("Egg2") ) 
+			{
+				var obj = Instantiate (eggPrefab2).GetComponent<CopyTransform>();
+				obj.copySource = t.gameObject;
+				obj.transform.localScale *= eggScale;
+				NetworkServer.Spawn (obj.gameObject);
+			}
+			else if (t.ObjectName.Contains ("Egg3") ) 
+			{
+				var obj = Instantiate (eggPrefab3).GetComponent<CopyTransform>();
+				obj.copySource = t.gameObject;
+				obj.transform.localScale *= eggScale;
+				NetworkServer.Spawn (obj.gameObject);
+			}
+			else if (t.ObjectName.Contains ("Egg4") ) 
+			{
+				var obj = Instantiate (eggPrefab4).GetComponent<CopyTransform>();
+				obj.copySource = t.gameObject;
+				obj.transform.localScale *= eggScale;
+				NetworkServer.Spawn (obj.gameObject);
+			}
+			else if (t.ObjectName.Contains ("Egg5") ) 
+			{
+				var obj = Instantiate (eggPrefab5).GetComponent<CopyTransform>();
+				obj.copySource = t.gameObject;
+				obj.transform.localScale *= eggScale;
+				NetworkServer.Spawn (obj.gameObject);
+			}
+			else if (t.ObjectName.Contains ("Egg6") ) 
+			{
+				var obj = Instantiate (eggPrefab6).GetComponent<CopyTransform>();
+				obj.copySource = t.gameObject;
+				obj.transform.localScale *= eggScale;
+				NetworkServer.Spawn (obj.gameObject);
+			}
+			else if (t.ObjectName.Contains ("Egg6") ) 
+			{
+				var obj = Instantiate (eggPrefab6).GetComponent<CopyTransform>();
+				obj.copySource = t.gameObject;
+				obj.transform.localScale *= eggScale;
+				NetworkServer.Spawn (obj.gameObject);
+			}
+			else if (t.ObjectName.Contains ("Egg7") ) 
+			{
+				var obj = Instantiate (eggPrefab7).GetComponent<CopyTransform>();
+				obj.copySource = t.gameObject;
+				obj.transform.localScale *= eggScale;
+				NetworkServer.Spawn (obj.gameObject);
+			}
+			else if (t.ObjectName.Contains ("Egg8") ) 
+			{
+				var obj = Instantiate (eggPrefab8).GetComponent<CopyTransform>();
+				obj.copySource = t.gameObject;
+				obj.transform.localScale *= eggScale;
+				NetworkServer.Spawn (obj.gameObject);
+			}
+			else if (t.ObjectName.Contains ("Egg9") ) 
+			{
+				var obj = Instantiate (eggPrefab9).GetComponent<CopyTransform>();
+				obj.copySource = t.gameObject;
+				obj.transform.localScale *= eggScale;
+				NetworkServer.Spawn (obj.gameObject);
+			}
+			else if (t.ObjectName.Contains ("Egg10") ) 
+			{
+				var obj = Instantiate (eggPrefab10).GetComponent<CopyTransform>();
+				obj.copySource = t.gameObject;
+				obj.transform.localScale *= eggScale;
+				NetworkServer.Spawn (obj.gameObject);
+			}
+			else if (t.ObjectName.Contains ("Egg11") ) 
+			{
+				var obj = Instantiate (eggPrefab11).GetComponent<CopyTransform>();
+				obj.copySource = t.gameObject;
+				obj.transform.localScale *= eggScale;
+				NetworkServer.Spawn (obj.gameObject);
+			}
+			else if (t.ObjectName.Contains ("Egg12") ) 
+			{
+				var obj = Instantiate (eggPrefab12).GetComponent<CopyTransform>();
+				obj.copySource = t.gameObject;
+				obj.transform.localScale *= eggScale;
+				NetworkServer.Spawn (obj.gameObject);
+			}
+			else if (t.ObjectName.Contains ("Egg13") ) 
+			{
+				var obj = Instantiate (eggPrefab13).GetComponent<CopyTransform>();
+				obj.copySource = t.gameObject;
+				obj.transform.localScale *= eggScale;
+				NetworkServer.Spawn (obj.gameObject);
+			}
+			else if (t.ObjectName.Contains ("Egg14") ) 
+			{
+				var obj = Instantiate (eggPrefab14).GetComponent<CopyTransform>();
+				obj.copySource = t.gameObject;
+				obj.transform.localScale *= eggScale;
+				NetworkServer.Spawn (obj.gameObject);
+			}
+			else if (t.ObjectName.Contains ("Egg15") ) 
+			{
+				var obj = Instantiate (eggPrefab15).GetComponent<CopyTransform>();
+				obj.copySource = t.gameObject;
+				obj.transform.localScale *= eggScale;
+				NetworkServer.Spawn (obj.gameObject);
+			}
+			else if (t.ObjectName.Contains ("Toppogi1") ) 
+			{
+				var obj = Instantiate (toppogiPrefab1).GetComponent<CopyTransform>();
 				obj.copySource = t.gameObject;
 				obj.transform.localScale *= 1.5f;
 
@@ -98,15 +245,11 @@ public class EggCreator : NetworkBehaviour
 					return;
 				}
 
-				var newMat = materials[result % materials.Length];
-
-				mesh.material = newMat;
-
 				NetworkServer.Spawn (obj.gameObject);
 			}
-			else if (t.ObjectName.Contains ("Toppogi") ) 
+			else if (t.ObjectName.Contains ("Toppogi2") ) 
 			{
-				var obj = Instantiate (toppogiPrefab).GetComponent<CopyTransform>();
+				var obj = Instantiate (toppogiPrefab2).GetComponent<CopyTransform>();
 				obj.copySource = t.gameObject;
 				obj.transform.localScale *= 1.5f;
 
@@ -120,18 +263,6 @@ public class EggCreator : NetworkBehaviour
 				if (!int.TryParse (keyStr, out result)) {
 					return;
 				}
-
-				var newMat = toppogiMaterials[result % toppogiMaterials.Length];
-
-				mesh.material = newMat;
-
-				NetworkServer.Spawn (obj.gameObject);
-			}
-			else if ( t.ObjectName.Contains ("Wand") ) 
-			{
-				var obj = Instantiate (eggPrefab).GetComponent<CopyTransform>();
-				obj.copySource = t.gameObject;
-				obj.transform.localScale *= 1.8f;
 
 				NetworkServer.Spawn (obj.gameObject);
 			}
