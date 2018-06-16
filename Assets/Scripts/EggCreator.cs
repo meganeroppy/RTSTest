@@ -5,6 +5,13 @@ using UnityEngine.Networking;
 
 public class EggCreator : NetworkBehaviour
 {
+	enum Emote{
+		Happy,
+		Angry,
+		Sad,
+		Joy
+	}
+
     [SerializeField]
 	CopyTransform eggPrefab;
 
@@ -190,7 +197,24 @@ public class EggCreator : NetworkBehaviour
 			camName.enabled = !camName.enabled;
 		}	
 
-	}
+		if( Input.GetKeyDown(KeyCode.Q ) )
+		{
+			SetEffect (Emote.Happy);
+		}
+		if( Input.GetKeyDown(KeyCode.W ) )
+		{
+			SetEffect (Emote.Angry);
+		}
+		if( Input.GetKeyDown(KeyCode.E ) )
+		{
+			SetEffect (Emote.Sad);
+		}
+		if( Input.GetKeyDown(KeyCode.R ) )
+		{
+			SetEffect (Emote.Joy);
+		}
+		}
+
 		
 	IEnumerator CreateCamera()
 	{
@@ -236,4 +260,63 @@ public class EggCreator : NetworkBehaviour
 		var currentCam = cameraList [currentCameraIndex];
 		camName.text = currentCam.name;
 	}
+
+	[SerializeField]
+	LayerMask effectTargetmask;
+	[SerializeField]
+	string effectTargetMaskName = "Egg";
+
+	void SetEffect( Emote emote )
+	{
+		int maskNo = LayerMask.NameToLayer (effectTargetMaskName);
+		int mask = 1 << maskNo;
+		var currentCam = cameraList [currentCameraIndex];
+		RaycastHit hit;
+		if ( !Physics.Raycast (currentCam.transform.position, currentCam.transform.forward, out hit, 10f, mask)) {
+			Debug.Log ("ヒットなし");
+			return;
+		}
+
+		Debug.Log (hit.transform.gameObject.name + "にヒット");
+
+		GameObject obj=null;
+		Vector3 position = hit.transform.position;
+
+		if( emote == Emote.Happy )
+		{
+			obj = Instantiate (happy);
+		}
+
+		else if( emote == Emote.Angry )
+		{
+			obj = Instantiate (angry);
+		}
+
+		else if( emote == Emote.Sad )
+		{
+			obj = Instantiate (sad);
+		}
+
+		else if( emote == Emote.Joy )
+		{
+			obj = Instantiate (joy);
+		}
+
+		obj.transform.position = position;
+		obj.transform.forward = cameraList [currentCameraIndex].transform.forward;
+
+	}
+
+	[SerializeField]
+	GameObject happy;
+
+	[SerializeField]
+	GameObject angry;
+
+	[SerializeField]
+	GameObject sad;
+
+	[SerializeField]
+	GameObject joy;
+
 }
