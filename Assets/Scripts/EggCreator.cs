@@ -213,7 +213,39 @@ public class EggCreator : NetworkBehaviour
 		{
 			SetEffect (Emote.Joy);
 		}
+
+		if( Input.GetKeyDown(KeyCode.Alpha0 ) )
+		{
+			currentCameraIndex = 0;
+			SetActiveCamera ();
 		}
+		if( Input.GetKeyDown(KeyCode.Alpha1 ) )
+		{
+			currentCameraIndex = 1;
+			SetActiveCamera ();
+		}
+		if( Input.GetKeyDown(KeyCode.Alpha2 ) )
+		{
+			currentCameraIndex = 2;
+				SetActiveCamera ();
+		}
+		if( Input.GetKeyDown(KeyCode.Alpha3 ) )
+		{
+			currentCameraIndex = 3;
+				SetActiveCamera ();
+		}
+		if( Input.GetKeyDown(KeyCode.Alpha4 ) )
+		{
+			currentCameraIndex = 4;
+				SetActiveCamera ();
+		}
+		if( Input.GetKeyDown(KeyCode.Alpha5 ) )
+		{
+			currentCameraIndex = 5;
+			SetActiveCamera ();
+		}
+
+	}
 
 		
 	IEnumerator CreateCamera()
@@ -244,10 +276,16 @@ public class EggCreator : NetworkBehaviour
 			currentCameraIndex = (currentCameraIndex + 1) % cameraList.Count;
 		else
 			currentCameraIndex = (currentCameraIndex + cameraList.Count - 1) % cameraList.Count;
-		
+
+		SetActiveCamera ();
+	}
+
+	void SetActiveCamera()
+	{
 		for ( int i=0 ; i < cameraList.Count ; ++i) {
 
 			bool flag = i == currentCameraIndex;
+
 			cameraList [i].enabled = flag;
 
 			if (cameraList [i].transform.childCount <= 0) {
@@ -264,6 +302,7 @@ public class EggCreator : NetworkBehaviour
 		}
 
 		UpdateUi ();
+
 	}
 
 	[SerializeField]
