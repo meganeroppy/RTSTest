@@ -13,40 +13,46 @@ public class EggCreator : NetworkBehaviour
 	}
 
     [SerializeField]
-	CopyTransform eggPrefab;
+	CopyTransform eggPrefab=null;
 
 	[SerializeField]
-	CopyTransform horsePrefab;
+	CopyTransform toppogiPrefab=null;
 
 	[SerializeField]
-	CopyTransform earthPrefab;
+	CopyTransform horsePrefab=null;
 
 	[SerializeField]
-	CopyTransform chairPrefab;
+	CopyTransform earthPrefab=null;
 
 	[SerializeField]
-	CopyTransform handCameraPrefab;
+	CopyTransform chairPrefab=null;
 
 	[SerializeField]
-	CopyTransform hiraiBoyPrefab;
+	CopyTransform handCameraPrefab=null;
 
 	[SerializeField]
-	CopyTransform hiraiRHPrefab;
+	CopyTransform hiraiBoyPrefab=null;
 
 	[SerializeField]
-	CopyTransform hiraiLHPrefab;
+	CopyTransform hiraiRHPrefab=null;
 
 	[SerializeField]
-	CopyTransform hiraiRFPrefab;
+	CopyTransform hiraiLHPrefab=null;
 
 	[SerializeField]
-	CopyTransform hiraiLFPrefab;
+	CopyTransform hiraiRFPrefab=null;
 
 	[SerializeField]
-	CopyTransform hiraiHeadPrefab;
+	CopyTransform hiraiLFPrefab=null;
 
 	[SerializeField]
-	Material[] materials;
+	CopyTransform hiraiHeadPrefab=null;
+
+	[SerializeField]
+	Material[] materials=null;
+
+	[SerializeField]
+	Material[] toppogiMaterials=null;
 
 	[SerializeField]
 	Transform cameraPrefab;
@@ -93,6 +99,29 @@ public class EggCreator : NetworkBehaviour
 				}
 
 				var newMat = materials[result % materials.Length];
+
+				mesh.material = newMat;
+
+				NetworkServer.Spawn (obj.gameObject);
+			}
+			else if (t.ObjectName.Contains ("Toppogi") ) 
+			{
+				var obj = Instantiate (toppogiPrefab).GetComponent<CopyTransform>();
+				obj.copySource = t.gameObject;
+				obj.transform.localScale *= 1.5f;
+
+				var mesh = obj.GetComponentInChildren<MeshRenderer> ();
+				if (mesh == null)
+					return;
+
+				var keyStr = t.ObjectName.Substring (t.ObjectName.Length - 1);
+
+				int result;
+				if (!int.TryParse (keyStr, out result)) {
+					return;
+				}
+
+				var newMat = toppogiMaterials[result % toppogiMaterials.Length];
 
 				mesh.material = newMat;
 
