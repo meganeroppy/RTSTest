@@ -6,7 +6,9 @@ public class CameraPositionManager : MonoBehaviour {
 
 	public static CameraPositionManager instance;
 
-	public Camera[] Cameras{ get; private set; }
+	[SerializeField]
+	private Camera[] cameras;
+	public Camera[] Cameras{ get{ return cameras; } }
 
 	// Use this for initialization
 	void Awake ()
@@ -14,8 +16,4 @@ public class CameraPositionManager : MonoBehaviour {
 		instance = this;
 	}
 
-	void Start()
-	{
-		Cameras = transform.GetComponentsInChildren<Camera> ();
-	}
 }

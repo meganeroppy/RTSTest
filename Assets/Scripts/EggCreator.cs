@@ -246,7 +246,21 @@ public class EggCreator : NetworkBehaviour
 			currentCameraIndex = (currentCameraIndex + cameraList.Count - 1) % cameraList.Count;
 		
 		for ( int i=0 ; i < cameraList.Count ; ++i) {
-			cameraList [i].enabled = i == currentCameraIndex;
+
+			bool flag = i == currentCameraIndex;
+			cameraList [i].enabled = flag;
+
+			if (cameraList [i].transform.childCount <= 0) {
+				Debug.LogWarning ( cameraList[i].name + "は子要素なし");
+				continue;
+			}
+			var efsCam = cameraList [i].transform.GetChild (0).GetComponent<Camera> ();
+
+			if (efsCam == null) {
+				Debug.LogWarning ( efsCam.name + "にカメラコンポーネントなし");
+				continue;
+			}
+			efsCam.enabled = flag;
 		}
 
 		UpdateUi ();
@@ -280,7 +294,7 @@ public class EggCreator : NetworkBehaviour
 		Debug.Log (hit.transform.gameObject.name + "にヒット");
 
 		GameObject obj=null;
-		Vector3 position = hit.transform.position;
+		Vector3 position = hit.collider.transform.position;
 
 		if( emote == Emote.Happy )
 		{
